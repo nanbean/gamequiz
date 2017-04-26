@@ -1,35 +1,50 @@
 import React, { Component } from 'react';
+import { withRouter, Redirect } from 'react-router-dom'
+import { connect } from 'react-redux';
 import FacebookLogin from 'react-facebook-login';
+import { Header } from 'semantic-ui-react'
 
-import quiz from '../quiz.png';
+import { setTeacherInfo } from '../actions';
+
+import question from '../question.png';
 import '../styles/teacher.css';
 
 class TeacherMain extends Component {
-	componentClicked () {
-		console.log('componentClicked')
+	constructor (props) {
+		super(props);
+
+		this.responseFacebook = this.responseFacebook.bind(this);
 	}
 
 	responseFacebook (ev) {
-		console.log('responseFacebook', ev)
+		this.props.setTeacherInfo(ev);
 	}
 
 	render () {
+		const { teacherInfo, checkTeacher } = this.props;
+		const validTeacher = checkTeacher && checkTeacher.valid;
+		const hasTeacherInfo = teacherInfo && teacherInfo.userID;
+
 		return (
+			
 			<div className='teacher'>
+				{
+					validTeacher === true && hasTeacherInfo && <Redirect to='/my'/>
+				}
+				{
+					validTeacher === false && hasTeacherInfo && <Redirect to='/join'/>
+				}
 				<img
-					src={quiz}
+					src={question}
 					className='teacher-logo'
 					alt='quiz'
 				/>
-				<h2>
-					Welcome to GameQuiz
-				</h2>
+				<Header as='h1'>Welcome to GameQuiz</Header>
 				<div>
 					<FacebookLogin
 						appId='1873315276258418'
 						autoLoad={true}
 						fields='name,email,picture'
-						onClick={this.componentClicked}
 						callback={this.responseFacebook}
 					/>
 				</div>
@@ -38,4 +53,15 @@ class TeacherMain extends Component {
 	}
 }
 
-export default TeacherMain;
+const mapStateToProps = (state) => ({
+	teacherInfo: state.teacherInfo,
+	checkTeacher: state.checkTeacher
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	setTeacherInfo (param) {
+		dispatch(setTeacherInfo(param));
+	}
+});
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TeacherMain))

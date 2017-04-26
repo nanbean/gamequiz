@@ -3,6 +3,8 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 
 import StudentMain from './views/StudentMain';
 import TeacherMain from './views/TeacherMain';
+import TeacherMy from './views/TeacherMy';
+import TeacherJoin from './views/TeacherJoin';
 
 import './App.css';
 
@@ -11,8 +13,10 @@ const Routing = () => (
 		<div>
 			<Route exact path="/" component={StudentMain}/>
 			<Route path="/teacher" component={TeacherMain}/>
+			<Route path="/my" component={TeacherMy}/>
+			<Route path="/join" component={TeacherJoin}/>
 		</div>
-		</Router>
+	</Router>
 )
 
 class App extends Component {
