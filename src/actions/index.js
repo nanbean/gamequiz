@@ -45,3 +45,29 @@ export const callRegisterTeacher = params => dispatch => {
 			}
 		);
 };
+
+export const callGetQuizList = params => dispatch => {
+		return fetchCall('/teacher/getQuizList', params).then(
+			response => {return response.json()}
+		).then(
+			result => {
+				dispatch({
+					type: 'SET_GET_QUIZ_LIST',
+					payload: result
+				});
+			}
+		);
+};
+
+export const callGetFeedBackList = params => dispatch => {
+		return fetchCall('/teacher/getFeedBackList', params).then(
+			response => {return response.json()}
+		).then(
+			result => {
+				dispatch({
+					type: 'SET_GET_FEEDBACK_LIST',
+					payload: result
+				});
+			}
+		);
+};

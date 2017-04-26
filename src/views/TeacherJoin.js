@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux';
+import { Button, Header, Divider } from 'semantic-ui-react'
+
+import Avatar from '../components/Avatar'
+import TitleHeader from '../components/TitleHeader'
 
 import { callRegisterTeacher } from '../actions';
 
@@ -22,6 +26,7 @@ class TeacherJoin extends Component {
 	render () {
 		const {teacherInfo, registerTeacher} = this.props;
 		const isRegistered = registerTeacher.return;
+		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url
 
 		return (
 			<div className='teacher'>
@@ -31,22 +36,29 @@ class TeacherJoin extends Component {
 				{
 					isRegistered && <Redirect to='/my'/>
 				}
-				<h2>
-					Do you want to join {teacherInfo.name}?
-				</h2>
+				<TitleHeader
+					icon='add user'
+					title='Join to GameQuiz'
+				/>
+				<Divider />
+				<Header as='h1'>
+					Do you want to join?
+				</Header>
 				{
-					teacherInfo.picture &&
-					<img
-						src={teacherInfo.picture.data.url}
-						alt='avatar'
+					avatarUrl &&
+					<Avatar
+						url={teacherInfo.picture.data.url}
+						name={teacherInfo.name}
 					/>
 				}
+				<Divider />
 				<div>
-					<button
+					<Button
+						size='huge'
 						onClick={this.onJoinButton}
 					>
 						Confirm
-					</button>
+					</Button>
 				</div>
 			</div>
 		);

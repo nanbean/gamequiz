@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux';
 import FacebookLogin from 'react-facebook-login';
+import { Header } from 'semantic-ui-react'
 
 import { setTeacherInfo } from '../actions';
 
-import quiz from '../quiz.png';
+import question from '../question.png';
 import '../styles/teacher.css';
 
 class TeacherMain extends Component {
@@ -34,13 +35,11 @@ class TeacherMain extends Component {
 					validTeacher === false && hasTeacherInfo && <Redirect to='/join'/>
 				}
 				<img
-					src={quiz}
+					src={question}
 					className='teacher-logo'
 					alt='quiz'
 				/>
-				<h2>
-					Welcome to GameQuiz
-				</h2>
+				<Header as='h1'>Welcome to GameQuiz</Header>
 				<div>
 					<FacebookLogin
 						appId='1873315276258418'
