@@ -22,5 +22,5 @@
     "eject": "react-scripts eject"
   },
   "homepage": "http://gamequiz.xyz",
-  "proxy": "http://gamequiz.xyz"
+  "proxy": "http://gamequiz.xyz:3001"
 }

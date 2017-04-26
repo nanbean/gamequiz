@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux';
 
 import quiz from '../quiz.png';
 import '../styles/student.css';
@@ -30,4 +32,7 @@ class StudentMain extends Component {
 	}
 }
 
-export default StudentMain;
+const mapStateToProps = (state) => ({
+});
+
+export default withRouter(connect(mapStateToProps)(StudentMain))
