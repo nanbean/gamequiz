@@ -1,19 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Header, Image } from 'semantic-ui-react'
+import { Header, Image } from 'semantic-ui-react';
 
 const Avatar = ({ url, name }) => (
-  <Header as='h2'>
-    <Image
-    	shape='circular'
-    	src={url}
-    />
+	<Header as='h2'>
+		<Image
+			shape='circular'
+			src={url}
+		/>
 		{' '}{name}
-  </Header>
-)
+	</Header>
+);
 
 Avatar.propTypes = {
+	url: PropTypes.string.isRequired,
 	name: PropTypes.string.isRequired
-}
+};
 
-export default Avatar
+export default Avatar;

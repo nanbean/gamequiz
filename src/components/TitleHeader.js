@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Header, Icon } from 'semantic-ui-react'
+import { Header, Icon } from 'semantic-ui-react';
 
 const TitleHeader = ({ icon, title }) => (
 	<Header as='h2'>
@@ -9,10 +9,11 @@ const TitleHeader = ({ icon, title }) => (
 			{title}
 		</Header.Content>
 	</Header>
-)
+);
 
 TitleHeader.propTypes = {
+	icon: PropTypes.string.isRequired,
 	title: PropTypes.string.isRequired
-}
+};
 
-export default TitleHeader
+export default TitleHeader;

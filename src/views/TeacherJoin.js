@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { withRouter, Redirect } from 'react-router-dom'
+import PropTypes from 'prop-types';
+import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Button, Header, Divider } from 'semantic-ui-react'
+import { Button, Header, Divider } from 'semantic-ui-react';
 
-import Avatar from '../components/Avatar'
-import TitleHeader from '../components/TitleHeader'
+import Avatar from '../components/Avatar';
+import TitleHeader from '../components/TitleHeader';
 
 import { callRegisterTeacher } from '../actions';
 
@@ -19,22 +20,22 @@ class TeacherJoin extends Component {
 
 	onJoinButton () {
 		this.props.callRegisterTeacher({
-			facebookUserID: this.props.teacherInfo.userID
+			teacherId: this.props.teacherInfo.userID
 		});
 	}
 
 	render () {
-		const {teacherInfo, registerTeacher} = this.props;
+		const { teacherInfo, registerTeacher } = this.props;
 		const isRegistered = registerTeacher.return;
-		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url
+		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
 
 		return (
 			<div className='teacher'>
 				{
-					!teacherInfo.userID && <Redirect to='/teacher'/>
+					!teacherInfo.userID && <Redirect to='/teacher' />
 				}
 				{
-					isRegistered && <Redirect to='/my'/>
+					isRegistered && <Redirect to='/my' />
 				}
 				<TitleHeader
 					icon='add user'
@@ -65,15 +66,21 @@ class TeacherJoin extends Component {
 	}
 }
 
-const mapStateToProps = (state) => ({
+TeacherJoin.propTypes = {
+	callRegisterTeacher: PropTypes.function.isRequired,
+	registerTeacher: PropTypes.function.isRequired,
+	teacherInfo: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
 	registerTeacher: state.registerTeacher
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
 	callRegisterTeacher (param) {
 		dispatch(callRegisterTeacher(param));
 	}
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TeacherJoin))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TeacherJoin));

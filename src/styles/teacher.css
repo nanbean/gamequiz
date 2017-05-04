@@ -6,5 +6,9 @@
 
 .teacher-logo {
 	height: 150px;
-	margin-top: 50px;
+	margin: 50px;
+	background: url(../question.png);
+	background-position: center;
+	background-size: 150px 150px;
+	background-repeat: no-repeat;
 }

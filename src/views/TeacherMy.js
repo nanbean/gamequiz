@@ -1,31 +1,66 @@
 import React, { Component } from 'react';
-import { withRouter, Redirect } from 'react-router-dom'
+import PropTypes from 'prop-types';
+import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Header, Divider, Grid, List, Button, Table } from 'semantic-ui-react'
+import { Header, Divider, Grid, List, Button, Table } from 'semantic-ui-react';
 
-import Avatar from '../components/Avatar'
-import TitleHeader from '../components/TitleHeader'
+import Avatar from '../components/Avatar';
+import TitleHeader from '../components/TitleHeader';
 
-import { callGetQuizList, callGetFeedBackList } from '../actions';
+import { setQuizId, callGetQuizList, callGetFeedBackList } from '../actions';
 
 import '../styles/teacher.css';
 
 class TeacherMy extends Component {
+	constructor (props) {
+		super(props);
+
+		this.onQuizEditButton = this.onQuizEditButton.bind(this);
+		this.onQuizAddButton = this.onQuizAddButton.bind(this);
+		this.onQuizStartButton = this.onQuizStartButton.bind(this);
+	}
+
 	componentDidMount () {
 		this.props.callGetQuizList({
-			facebookUserID: this.props.teacherInfo.userID
+			teacherId: this.props.teacherInfo.userID
 		});
 		this.props.callGetFeedBackList({
-			facebookUserID: this.props.teacherInfo.userID
+			teacherId: this.props.teacherInfo.userID
 		});
+	}
+
+	onQuizAddButton () {
+		this.props.history.push('/quizedit/new');
+	}
+
+	onQuizEditButton (ev, refs) {
+		this.props.setQuizId(refs.target);
+		this.props.history.push(`/quizedit/' + ${refs.target}`);
+	}
+
+	onQuizStartButton (ev, refs) {
+		this.props.setQuizId(refs.target);
+		this.props.history.push('/mode/');
 	}
 
 	renderQuiz (data) {
 		return (
 			<List.Item key={data.quizId}>
 				<List.Content floated='right'>
-					<Button content='Start' icon='play' labelPosition='left' />
-					<Button content='Edit' icon='edit' labelPosition='left' />
+					<Button
+						content='Start'
+						icon='play'
+						labelPosition='left'
+						onClick={this.onQuizStartButton}
+						target={data.quizId}
+					/>
+					<Button
+						content='Edit'
+						icon='edit'
+						labelPosition='left'
+						onClick={this.onQuizEditButton}
+						target={data.quizId}
+					/>
 				</List.Content>
 				<List.Content floated='left'>
 					<Header as='h2'>
@@ -50,13 +85,15 @@ class TeacherMy extends Component {
 	}
 
 	render () {
-		const { teacherInfo, getFeedBackList } = this.props;
-		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url
+		const { teacherInfo, getFeedBackList, getQuizList } = this.props;
+		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
+		const quizList = getQuizList && getQuizList.quizList;
+		const feedBackList = getFeedBackList && getFeedBackList.feedBackList;
 
 		return (
 			<div className='teacher'>
 				{
-					!teacherInfo.userID && <Redirect to='/teacher'/>
+					!teacherInfo.userID && <Redirect to='/teacher' />
 				}
 				<TitleHeader
 					icon='user'
@@ -78,12 +115,13 @@ class TeacherMy extends Component {
 							</Header>
 							<List divided verticalAlign='middle'>
 								{
-									this.props.getQuizList.map(this.renderQuiz, this)
+									quizList && quizList.map(this.renderQuiz, this)
 								}
 							</List>
 							<Button
 								fluid
 								size='huge'
+								onClick={this.onQuizAddButton}
 							>
 								New Quiz
 							</Button>
@@ -102,7 +140,7 @@ class TeacherMy extends Component {
 
 								<Table.Body>
 									{
-										getFeedBackList.map(this.renderFeedBack, this)
+										feedBackList && feedBackList.map(this.renderFeedBack, this)
 									}
 								</Table.Body>
 							</Table>
@@ -114,13 +152,26 @@ class TeacherMy extends Component {
 	}
 }
 
-const mapStateToProps = (state) => ({
+TeacherMy.propTypes = {
+	callGetQuizList: PropTypes.function.isRequired,
+	callGetFeedBackList: PropTypes.function.isRequired,
+	history: PropTypes.object.isRequired,
+	setQuizId: PropTypes.function.isRequired,
+	teacherInfo: PropTypes.object.isRequired,
+	getQuizList: PropTypes.object.isRequired,
+	getFeedBackList: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
 	getQuizList: state.getQuizList,
 	getFeedBackList: state.getFeedBackList
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
+	setQuizId (param) {
+		dispatch(setQuizId(param));
+	},
 	callGetQuizList (param) {
 		dispatch(callGetQuizList(param));
 	},
@@ -129,4 +180,4 @@ const mapDispatchToProps = (dispatch) => ({
 	}
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TeacherMy))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TeacherMy));

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { withRouter, Redirect } from 'react-router-dom'
+import PropTypes from 'prop-types';
+import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import FacebookLogin from 'react-facebook-login';
-import { Header } from 'semantic-ui-react'
+import { Header } from 'semantic-ui-react';
 
 import { setTeacherInfo } from '../actions';
 
-import question from '../question.png';
 import '../styles/teacher.css';
 
 class TeacherMain extends Component {
@@ -26,24 +26,20 @@ class TeacherMain extends Component {
 		const hasTeacherInfo = teacherInfo && teacherInfo.userID;
 
 		return (
-			
+
 			<div className='teacher'>
 				{
-					validTeacher === true && hasTeacherInfo && <Redirect to='/my'/>
+					validTeacher === true && hasTeacherInfo && <Redirect to='/my' />
 				}
 				{
-					validTeacher === false && hasTeacherInfo && <Redirect to='/join'/>
+					validTeacher === false && hasTeacherInfo && <Redirect to='/join' />
 				}
-				<img
-					src={question}
-					className='teacher-logo'
-					alt='quiz'
-				/>
+				<div className='teacher-logo' />
 				<Header as='h1'>Welcome to GameQuiz</Header>
 				<div>
 					<FacebookLogin
 						appId='1873315276258418'
-						autoLoad={true}
+						autoLoad
 						fields='name,email,picture'
 						callback={this.responseFacebook}
 					/>
@@ -53,15 +49,21 @@ class TeacherMain extends Component {
 	}
 }
 
-const mapStateToProps = (state) => ({
+TeacherMain.propTypes = {
+	checkTeacher: PropTypes.object.isRequired,
+	teacherInfo: PropTypes.object.isRequired,
+	setTeacherInfo: PropTypes.function.isRequired
+};
+
+const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
 	checkTeacher: state.checkTeacher
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
 	setTeacherInfo (param) {
 		dispatch(setTeacherInfo(param));
 	}
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TeacherMain))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TeacherMain));
