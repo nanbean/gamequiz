@@ -1,0 +1,14 @@
+.teacher {
+	height: 100%;
+	text-align: center;
+	margin: 10px;
+}
+
+.teacher-logo {
+	height: 150px;
+	margin: 50px;
+	background: url(../question.png);
+	background-position: center;
+	background-size: 150px 150px;
+	background-repeat: no-repeat;
+}

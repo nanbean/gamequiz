@@ -1,21 +1,38 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { Switch, Route } from 'react-router-dom';
+
+import StudentMain from './views/StudentMain';
+import TeacherMain from './views/TeacherMain';
+import TeacherMy from './views/TeacherMy';
+import TeacherJoin from './views/TeacherJoin';
+import TeacherQuizEdit from './views/TeacherQuizEdit';
+import TeacherQuestionEdit from './views/TeacherQuestionEdit';
+import TeacherMode from './views/TeacherMode';
+import TeacherWait from './views/TeacherWait';
+
 import './App.css';
 
+const Routing = () => (
+	<Switch>
+		<Route exact path='/' component={StudentMain} />
+		<Route path='/teacher' component={TeacherMain} />
+		<Route path='/my' component={TeacherMy} />
+		<Route path='/join' component={TeacherJoin} />
+		<Route path='/quizedit/:id' component={TeacherQuizEdit} />
+		<Route path='/questionedit/:id' component={TeacherQuestionEdit} />
+		<Route path='/mode' component={TeacherMode} />
+		<Route path='/wait' component={TeacherWait} />
+	</Switch>
+);
+
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
+	render() {
+		return (
+			<div className='App'>
+				<Routing />
+			</div>
+		);
+	}
 }
 
 export default App;

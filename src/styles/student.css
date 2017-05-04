@@ -1,0 +1,30 @@
+.student {
+	height: 100%;
+	text-align: center;
+}
+
+.student-logo {
+	height: 150px;
+	margin: 50px;
+	background: url(../question.png);
+	background-position: center;
+	background-size: 150px 150px;
+	background-repeat: no-repeat;
+}
+
+.student-palyid-input {
+	text-align: center;
+	background-color: #222;
+	color: white;
+	font-size: x-large;
+	width: 80%;
+	max-width: 400px;
+	margin: 10px
+}
+
+.student-palyid-button {
+	text-align: center;
+	font-size: x-large;
+	width: 80%;
+	max-width: 400px;
+}

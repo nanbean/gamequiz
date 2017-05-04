@@ -3,16 +3,40 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "body-parser": "^1.17.1",
+    "compression": "^1.6.2",
+    "express": "^4.15.2",
+    "ignore-styles": "^5.0.1",
+    "import-export": "^1.0.1",
+    "morgan": "^1.8.1",
+    "prop-types": "^15.5.8",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "react-facebook-login": "^3.5.0",
+    "react-redux": "^5.0.4",
+    "react-router": "^4.1.1",
+    "react-router-dom": "^4.1.1",
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0",
+    "semantic-ui-react": "^0.68.2"
   },
   "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-config-google": "^0.7.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.10.3",
     "react-scripts": "0.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:server": "NODE_ENV=development node server/index.js",
+    "now-start": "NODE_ENV=production node server/index.js",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "homepage": "http://gamequiz.xyz",
+  "proxy": "http://gamequiz.xyz:3001"
 }
