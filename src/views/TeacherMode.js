@@ -73,7 +73,7 @@ class TeacherMode extends Component {
 }
 
 TeacherMode.propTypes = {
-	callStartGameMode: PropTypes.function.isRequired,
+	callStartGameMode: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	teacherInfo: PropTypes.object.isRequired
 };

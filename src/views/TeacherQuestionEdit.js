@@ -24,7 +24,6 @@ class TeacherQuestionEdit extends Component {
 		this.onExample3Change = this.onExample3Change.bind(this);
 		this.onExample4Change = this.onExample4Change.bind(this);
 		this.onAnswerChange = this.onAnswerChange.bind(this);
-		console.log(this.props)
 	}
 
 	onSaveButton () {
@@ -198,11 +197,10 @@ class TeacherQuestionEdit extends Component {
 }
 
 TeacherQuestionEdit.propTypes = {
-	callEditQuestion: PropTypes.function.isRequired,
-	callAddQuestion: PropTypes.function.isRequired,
+	callEditQuestion: PropTypes.func.isRequired,
+	callAddQuestion: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
-	setQuizId: PropTypes.function.isRequired,
 	quizId: PropTypes.object.isRequired,
 	question: PropTypes.object.isRequired
 };

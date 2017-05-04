@@ -35,7 +35,7 @@ class TeacherMy extends Component {
 
 	onQuizEditButton (ev, refs) {
 		this.props.setQuizId(refs.target);
-		this.props.history.push(`/quizedit/' + ${refs.target}`);
+		this.props.history.push(`/quizedit/${refs.target}`);
 	}
 
 	onQuizStartButton (ev, refs) {
@@ -153,10 +153,10 @@ class TeacherMy extends Component {
 }
 
 TeacherMy.propTypes = {
-	callGetQuizList: PropTypes.function.isRequired,
-	callGetFeedBackList: PropTypes.function.isRequired,
+	callGetQuizList: PropTypes.func.isRequired,
+	callGetFeedBackList: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
-	setQuizId: PropTypes.function.isRequired,
+	setQuizId: PropTypes.func.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
 	getQuizList: PropTypes.object.isRequired,
 	getFeedBackList: PropTypes.object.isRequired

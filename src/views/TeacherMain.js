@@ -52,7 +52,7 @@ class TeacherMain extends Component {
 TeacherMain.propTypes = {
 	checkTeacher: PropTypes.object.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
-	setTeacherInfo: PropTypes.function.isRequired
+	setTeacherInfo: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

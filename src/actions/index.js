@@ -21,7 +21,9 @@ function fetchCall (call, params) {
 
 export const checkTeacher = params => dispatch => (
 	fetchCall('/api/teacher/checkTeacher', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then(
 		result => (
 			dispatch({
@@ -45,77 +47,91 @@ export const setTeacherInfo = params => (dispatch) => {
 
 export const callRegisterTeacher = params => dispatch => (
 	fetchCall('/api/teacher/registerTeacher', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then(
-		(result) => {
+		result => (
 			dispatch({
 				type: 'SET_REGISTER_TEACHER',
 				payload: result
-			});
-		}
+			})
+		)
 	)
 );
 
 export const callGetQuizList = params => dispatch => (
 	fetchCall('/api/teacher/getQuizList', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then(
-		(result) => {
+		result => (
 			dispatch({
 				type: 'SET_GET_QUIZ_LIST',
 				payload: result
-			});
-		}
+			})
+		)
 	)
 );
 
 export const callGetFeedBackList = params => dispatch => (
 	fetchCall('/api/teacher/getFeedBackList', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then(
-		(result) => {
+		result => (
 			dispatch({
 				type: 'SET_GET_FEEDBACK_LIST',
 				payload: result
-			});
-		}
+			})
+		)
 	)
 );
 
 export const callGetQuestionList = params => dispatch => (
 	fetchCall('/api/teacher/getQuestionList', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then(
-		(result) => {
+		result => (
 			dispatch({
 				type: 'SET_GET_QUESTION_LIST',
 				payload: result
-			});
-		}
+			})
+		)
 	)
 );
 
 export const callAddQuestion = params => () => (
 	fetchCall('/api/teacher/addQuestion', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then()
 );
 
 export const callEditQuestion = params => () => (
 	fetchCall('/api/teacher/editQuestion', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then()
 );
 
 export const callStartGameMode = params => dispatch => (
 	fetchCall('/api/teacher/startGameMode', params).then(
-		(response) => { response.json(); }
+		response => (
+			response.json()
+		)
 	).then(
-		(result) => {
+		result => (
 			dispatch({
 				type: 'SET_PLAY_ID_N_GAMEMODE',
 				payload: result
-			});
-		}
+			})
+		)
 	)
 );

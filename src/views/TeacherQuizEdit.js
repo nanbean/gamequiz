@@ -28,7 +28,7 @@ class TeacherQuizEdit extends Component {
 		const questionList = this.props.getQuestionList && this.props.getQuestionList.questionList;
 		const data = questionList.find(item => item.questionId === refs.target);
 		this.props.setQuestion(data);
-		this.props.history.push(`/questionedit/ + ${refs.target}`);
+		this.props.history.push(`/questionedit/${refs.target}`);
 	}
 
 	onQuestionNewButton () {
@@ -96,11 +96,11 @@ class TeacherQuizEdit extends Component {
 }
 
 TeacherQuizEdit.propTypes = {
-	callGetQuestionList: PropTypes.function.isRequired,
-	setQuestion: PropTypes.function.isRequired,
+	callGetQuestionList: PropTypes.func.isRequired,
+	setQuestion: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
-	getQuestionList: PropTypes.function.isRequired
+	getQuestionList: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
