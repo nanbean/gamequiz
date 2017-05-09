@@ -1,13 +1,16 @@
 const express = require('express')
 const router = express.Router()
+const getServerEventTeacher = require("./sse")
+const getServerEvent = require("./sse")
+
 router.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-  next()
+	res.header("Access-Control-Allow-Origin", "*")
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+	next()
 })
 
 router.get('/', function(req, res, next) {
-  res.json({})
+	res.json({})
 })
 
 var teacher = [
@@ -51,10 +54,7 @@ var quiz = [
 		questionList: [
 			1,
 			2,
-			3,
-			4,
-			5,
-			6
+			3
 		]
 	}
 ];
@@ -87,8 +87,8 @@ var questions = [
 		example2: '20',
 		example3: '25',
 		example4: '30',
-		answer: 1,
-		timer: 20
+		answer: 3,
+		timer: 5
 	},
 	{
 		questionId: 2,
@@ -104,7 +104,7 @@ var questions = [
 		example3: '대구',
 		example4: '광주',
 		answer: 1,
-		timer: 20
+		timer: 10
 	},
 	{
 		questionId: 3,
@@ -165,7 +165,7 @@ var questions = [
 		example3: '대구',
 		example4: '광주',
 		answer: 1,
-		timer: 20
+		timer: 10
 	},
 	{
 		questionId: 7,
@@ -222,9 +222,19 @@ var feedback = [
 	}
 ];
 
+var plays = [
+	// {
+	// 	playId: 1234,
+	// 	quizId: 3,
+	// 	gameMode: 'NORMAL'
+	// 	studentPlayerList: [],
+	// 	currentQuestionIndex: 0
+	// 	presentationTime: new Date()
+	// }
+]
+
 function checkUserExist (teacherId) {
 	for (var i = 0; i < teacher.length; i++) {
-		console.log(teacher[i].teacherId);
 		if (teacher[i].teacherId == teacherId) {
 			return true;
 		}
@@ -272,7 +282,6 @@ function getQuizList (teacherId) {
 	for (var i = 0; i < teacher.length; i++) {
 		if (teacher[i].teacherId == teacherId) {
 			for (var j = 0; j < teacher[i].quizList.length; j++) {
-				console.log(quiz[teacher[i].quizList[j]]);
 				result.push(quiz[teacher[i].quizList[j]]);
 			}
 			break;
@@ -372,9 +381,18 @@ router.post('/teacher/addQuestion', function(req, res){
 });
 
 function startGameMode (quizId, gameMode) {
-	var playId = -1;
+	var playId;
+	var gameMode;
 
-	playId = 1234;
+	playId = Math.floor((Math.random() * 10000) + 1);
+
+	plays.push({
+		playId: playId,
+		quizId: quizId,
+		gameMode: gameMode,
+		studentPlayerList: [],
+		currentQuestionIndex: 0
+	})
 
 	return {
 		playId: playId,
@@ -391,6 +409,413 @@ router.post('/teacher/startGameMode', function(req, res){
 	data = startGameMode(quizId, gameMode);
 
 	res.send(data);
+});
+
+function getPlayWithPlayId (playId) {
+	for (var i = 0; i < plays.length; i++) {
+		if (plays[i].playId == playId) {
+			return plays[i];
+		}
+	}
+
+	return null;
+}
+
+function deletePlayWithPlayId (playId) {
+	for (var i = 0; i < plays.length; i++) {
+		if (plays[i].playId == playId) {
+			plays.splice(i, 1);
+		}
+	}
+}
+
+function getQuizWithQuizId (quizId) {
+	for (var i = 0; i < quiz.length; i++) {
+		if (quiz[i].quizId == quizId) {
+			return quiz[i];
+		}
+	}
+
+	return null;
+}
+
+function getQuestionWithQuestionId (questionId) {
+	for (var i = 0; i < questions.length; i++) {
+		if (questions[i].questionId == questionId) {
+			return questions[i];
+		}
+	}
+
+	return null;
+}
+
+function sendLeaderBoard (playId) {
+	var data = {};
+	var play = getPlayWithPlayId(playId);
+	var quiz = play && getQuizWithQuizId(play.quizId);
+
+	data.leaderBoard = [];
+	if (play.currentQuestionIndex < quiz.questionList.length - 1) {
+		data.serverStatus = 'LEADER_BOARD';
+
+		for (var i = 0; i < play.studentPlayerList.length; i++) {
+			var student = {};
+			student.studentId = play.studentPlayerList[i].studentId;
+			student.studentNick = play.studentPlayerList[i].studentNick;
+			student.score = 0;
+
+			for (var j = 0; j < play.studentPlayerList[i].answerList.length; j++) {
+				student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+			}
+			data.leaderBoard.push(student);
+		}
+	} else {
+		data.serverStatus = 'END';
+
+		for (var i = 0; i < play.studentPlayerList.length; i++) {
+			var student = {};
+			student.studentId = play.studentPlayerList[i].studentId;
+			student.studentNick = play.studentPlayerList[i].studentNick;
+			student.score = 0;
+
+			for (var j = 0; j < play.studentPlayerList[i].answerList.length; j++) {
+				student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+			}
+			data.leaderBoard.push(student);
+		}
+
+		deletePlayWithPlayId(playId);
+	}
+
+	getServerEvent.publish(JSON.stringify(data));
+	getServerEventTeacher.publish(JSON.stringify(data));
+}
+
+function sendResult (playId) {
+	var data = {};
+	var play = getPlayWithPlayId(playId);
+	var quiz = play && getQuizWithQuizId(play.quizId);
+	var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
+
+	data.serverStatus = 'RESULT';
+
+	data.result = {
+		answer: question.answer,
+		example1: 0,
+		example2: 0,
+		example3: 0,
+		example4: 0
+	};
+
+	for (var i = 0; i < play.studentPlayerList.length; i++) {
+		if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 1) {
+			data.result.example1++;
+		}
+		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 2) {
+			data.result.example2++;
+		}
+		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 3) {
+			data.result.example3++;
+		}
+		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 4) {
+			data.result.example4++;
+		}
+	}
+
+	getServerEvent.publish(JSON.stringify(data));
+	getServerEventTeacher.publish(JSON.stringify(data));
+
+	setTimeout(function() {
+		sendLeaderBoard(playId);
+	}, 5000);
+}
+
+function sendWait (playId) {
+	var data = {};
+
+	data.serverStatus = 'WAIT';
+
+	getServerEvent.publish(JSON.stringify(data));
+	getServerEventTeacher.publish(JSON.stringify(data));
+}
+
+function sendQuetion (playId) {
+	var data = {};
+	var timeOut;
+	var play = getPlayWithPlayId(playId);
+	var quiz = play && getQuizWithQuizId(play.quizId);
+
+	data.serverStatus = 'PLAY';
+
+	for (var j = 0; j < questions.length; j++) {
+		if (questions[j].questionId === quiz.questionList[play.currentQuestionIndex]) {
+			data.question = questions[j];
+			timeOut = data.question.timer;
+		}
+	}
+	data.timeOut = timeOut
+
+	play.presentationTime = new Date();
+	play.timeOut = timeOut;
+
+	getServerEvent.publish(JSON.stringify(data));
+	getServerEventTeacher.publish(JSON.stringify(data));
+
+	var timerInterval = setInterval(function() {
+		timeOut--;
+		data.timeOut = timeOut;
+		if ( timeOut >= 0) {
+			getServerEvent.publish(JSON.stringify(data));
+			getServerEventTeacher.publish(JSON.stringify(data));
+		} else {
+			clearInterval(timerInterval);
+			sendResult(playId);
+		}
+	}, 1000);
+}
+
+function startPlay (playId) {
+	sendWait(playId);
+
+	setTimeout(function() {
+		sendQuetion(playId);
+	}, 3000);
+}
+
+router.post('/teacher/nextPlayQuestion', function(req, res){
+	var playId = req.body.playId;
+
+	var data = {
+		return: true
+	};
+
+	getPlayWithPlayId(playId).currentQuestionIndex++;
+	sendWait(playId);
+
+	setTimeout(function() {
+		sendQuetion(playId);
+	}, 3000);
+
+	res.send(data);
+});
+
+router.post('/teacher/startPlay', function(req, res){
+	var playId = req.body.playId;
+
+	var data = {
+		return: true
+	};
+
+	// this is for test only
+	// TO DO: need to add game send
+	// TO DO: need to add gmae leader board
+	startPlay(playId);
+
+	res.send(data);
+});
+
+function initialiseGetServerEventTeacherSSE(req, res) {
+	const playId = req.query.playId;
+
+	var subscriber = getServerEventTeacher.subscribe(function(channel, message){
+			var messageEvent = new ServerEvent();
+			messageEvent.addData(message);
+			outputGetServerEventTeacherSSE(req, res, messageEvent.payload());
+	});
+
+	res.set({
+			"Content-Type": "text/event-stream",
+			"Cache-Control": "no-cache",
+			"Connection": "keep-alive",
+			"Access-Control-Allow-Origin": "*"
+	});
+
+	res.write("retry: 10000\n\n");
+
+	var keepAlive = setInterval(function() {
+		outputGetServerEventTeacherSSE(req, res, ':keep-alive\n\n');
+	}, 20000);
+
+	res.on('close', function close() {
+		clearInterval(keepAlive);
+
+		// TO DO: need to delete play with playId
+		// TO DO: need to send play end event to Students
+
+		getServerEventTeacher.unsubscribe(subscriber);
+	});
+}
+
+function outputGetServerEventTeacherSSE(req, res, data) {
+	res.write(data);
+			if (res.flush && data.match(/\n\n$/)) {
+		res.flush();
+	}
+}
+
+function ServerEvent() {
+	this.data = "";
+};
+
+ServerEvent.prototype.addData = function(data) {
+	var lines = data.split(/\n/);
+
+	for (var i = 0; i < lines.length; i++) {
+			var element = lines[i];
+			this.data += "data:" + element + "\n";
+	}
+}
+
+ServerEvent.prototype.payload = function() {
+	var payload = "";
+
+	payload += this.data;
+	return payload + "\n";
+}
+
+router.get("/teacher/getServerEventTeacher", function(req, res) {
+	const playId = req.body.playId;
+	initialiseGetServerEventTeacherSSE(req, res);
+
+	getServerEventTeacher.publish(JSON.stringify({serverStatus: 'wait'}));
+});
+
+router.post('/student/checkPlayId', function(req, res){
+	var playId = req.body.playId;
+	var data = {};
+
+	if (getPlayWithPlayId(playId)) {
+		data.valid = true;
+	} else {
+		data.valid = false;
+	}
+
+	res.send(data);
+});
+
+function addStudentPalyer (playId, student) {
+	var play = getPlayWithPlayId(playId);
+
+	if (play) {
+		getPlayWithPlayId(playId).studentPlayerList.push(student);
+		getServerEventTeacher.publish(JSON.stringify(play));
+	}
+}
+
+router.post('/student/sendStudentInfo', function(req, res){
+	const studentNick = req.body.studentNick;
+	const playId = req.body.playId;
+
+	var data = {};
+
+	data.playId = playId;
+	data.studentId = Math.floor((Math.random() * 10000) + 1);
+	data.studentNick = studentNick;
+
+	addStudentPalyer(playId, data)
+
+	res.send(data);
+});
+
+function calculateScore (playTimeOut, presentationTime, answerTime) {
+	var elapsedTime = answerTime - presentationTime;
+	var score = playTimeOut*25 - elapsedTime/1000*25;
+	// 25 is temporary number
+	return score;
+}
+
+function updateAnswerToPlay (playId, studentId, answer) {
+	var play = getPlayWithPlayId(playId);
+	var quiz = play && getQuizWithQuizId(play.quizId);
+	var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
+
+	if (question) {
+		for (var i = 0; i < play.studentPlayerList.length; i++) {
+			if ( play.studentPlayerList[i].studentId == studentId) {
+				if (!play.studentPlayerList[i].answerList) {
+					play.studentPlayerList[i].answerList = [];
+				}
+				play.studentPlayerList[i].answerList.push({
+					questionId: question.questionId,
+					answer: answer,
+					correct: question.answer == answer,
+					score: question.answer == answer ? calculateScore(play.timeOut, play.presentationTime, new Date()):0
+				});
+			}
+
+		}
+	}
+}
+
+router.post('/student/sendStudentAnswer', function(req, res){
+	const playId = req.body.playId;
+	const studentId = req.body.studentId;
+	const answer = req.body.answer;
+
+	var data = {
+		return: true
+	};
+
+	updateAnswerToPlay(playId, studentId, answer);
+
+	res.send(data);
+});
+
+function removeStudentFromPlay (playId, studentId) {
+	var play = getPlayWithPlayId(playId);
+
+	if (play) {
+		for (let i = 0; i < play.studentPlayerList.length; i++) {
+			if (play.studentPlayerList[i].studentId == studentId) {
+				play.studentPlayerList.splice(i, 1);
+				getServerEventTeacher.publish(JSON.stringify(play));
+				return;
+			}
+		}
+	}
+}
+
+function initialiseGetServerEventSSE(req, res) {
+	const playId = req.query.playId;
+	const studentId = req.query.studentId;
+
+	var subscriber = getServerEvent.subscribe(function(channel, message){
+			var messageEvent = new ServerEvent();
+			messageEvent.addData(message);
+			outputGetServerEventSSE(req, res, messageEvent.payload());
+	});
+
+	res.set({
+			"Content-Type": "text/event-stream",
+			"Cache-Control": "no-cache",
+			"Connection": "keep-alive",
+			"Access-Control-Allow-Origin": "*"
+	});
+
+	res.write("retry: 10000\n\n");
+
+	var keepAlive = setInterval(function() {
+		outputGetServerEventSSE(req, res, ':keep-alive\n\n');
+	}, 20000);
+
+	res.on('close', function close() {
+		clearInterval(keepAlive);
+		getServerEvent.unsubscribe(subscriber);
+		removeStudentFromPlay(playId, studentId);
+	});
+}
+
+function outputGetServerEventSSE(req, res, data) {
+	res.write(data);
+	if (res.flush && data.match(/\n\n$/)) {
+		res.flush();
+	}
+}
+
+router.get("/getServerEvent", function(req, res) {
+	initialiseGetServerEventSSE(req, res);
+
+	getServerEvent.publish(JSON.stringify({serverStatus: 'wait'}));
 });
 
 module.exports = router

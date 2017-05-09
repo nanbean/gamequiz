@@ -1,6 +1,6 @@
-export default function getFeedBackList (state = {}, action) {
+export default function checkPlayId (state = {}, action) {
 	switch (action.type) {
-	case 'SET_GET_FEEDBACK_LIST':
+	case 'SET_CHECK_PLAY_ID':
 		return Object.assign({}, state, action.payload);
 	default:
 		return state;
