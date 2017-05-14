@@ -31,6 +31,8 @@ app.use('/', index)
 // Serve static assets
 app.use(express.static(path.resolve(__dirname, '..', 'build')))
 
+app.use('/uploads', express.static('uploads'));
+
 app.use('/api', api)
 
 // Always return the main index.html, so react-router render the route in the client
