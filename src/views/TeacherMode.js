@@ -20,17 +20,26 @@ class TeacherMode extends Component {
 	}
 
 	onQuizMarathonButton () {
-		this.props.callStartGameMode({ gameMode: 'MARATHON' });
+		this.props.callStartGameMode({
+			quizId: this.props.quizId,
+			gameMode: 'MARATHON'
+		});
 		this.props.history.push('/wait/');
 	}
 
 	onQuizSurvivalButton () {
-		this.props.callStartGameMode({ gameMode: 'SURVIVAL' });
+		this.props.callStartGameMode({
+			quizId: this.props.quizId,
+			gameMode: 'SURVIVAL'
+		});
 		this.props.history.push('/wait/');
 	}
 
 	onQuizTeamButton () {
-		this.props.callStartGameMode({ gameMode: 'TEAM' });
+		this.props.callStartGameMode({
+			quizId: this.props.quizId,
+			gameMode: 'TEAM'
+		});
 		this.props.history.push('/wait/');
 	}
 
@@ -75,11 +84,13 @@ class TeacherMode extends Component {
 TeacherMode.propTypes = {
 	callStartGameMode: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired
+	teacherInfo: PropTypes.object.isRequired,
+	quizId: PropTypes.number.isRequired
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo
+	teacherInfo: state.teacherInfo,
+	quizId: state.quizId
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -9,6 +9,7 @@ import TeacherQuizEdit from './views/TeacherQuizEdit';
 import TeacherQuestionEdit from './views/TeacherQuestionEdit';
 import TeacherMode from './views/TeacherMode';
 import TeacherWait from './views/TeacherWait';
+import TeacherPlay from './views/TeacherPlay';
 
 import './App.css';
 
@@ -22,11 +23,12 @@ const Routing = () => (
 		<Route path='/questionedit/:id' component={TeacherQuestionEdit} />
 		<Route path='/mode' component={TeacherMode} />
 		<Route path='/wait' component={TeacherWait} />
+		<Route path='/play' component={TeacherPlay} />
 	</Switch>
 );
 
 class App extends Component {
-	render() {
+	render () {
 		return (
 			<div className='App'>
 				<Routing />

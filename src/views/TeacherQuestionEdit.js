@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Divider, Input, Button, Grid, Checkbox } from 'semantic-ui-react';
+import Dropzone from 'react-dropzone';
+import { Divider, Input, Button, Grid, Checkbox, Image } from 'semantic-ui-react';
 
 import TitleHeader from '../components/TitleHeader';
 
-import { callAddQuestion, callEditQuestion } from '../actions';
+import { callAddQuestion, callEditQuestion, callUploadImage } from '../actions';
 
 import '../styles/teacher.css';
 
@@ -24,6 +25,11 @@ class TeacherQuestionEdit extends Component {
 		this.onExample3Change = this.onExample3Change.bind(this);
 		this.onExample4Change = this.onExample4Change.bind(this);
 		this.onAnswerChange = this.onAnswerChange.bind(this);
+		this.handleFileUpload = this.handleFileUpload.bind(this);
+	}
+
+	componentWillReceiveProps (nextProps) {
+		this.state = nextProps.question;
 	}
 
 	onSaveButton () {
@@ -86,6 +92,13 @@ class TeacherQuestionEdit extends Component {
 		});
 	}
 
+	handleFileUpload (files) {
+		this.props.callUploadImage({
+			files,
+			teacherId: this.props.teacherInfo.userID
+		});
+	}
+
 	render () {
 		return (
 			<div className='teacher'>
@@ -106,7 +119,7 @@ class TeacherQuestionEdit extends Component {
 							/>
 						</Grid.Column>
 					</Grid.Row>
-					<Grid.Row columns={1}>
+					<Grid.Row columns={3}>
 						<Grid.Column>
 							<Input
 								label='Time Out'
@@ -114,6 +127,24 @@ class TeacherQuestionEdit extends Component {
 								defaultValue={this.state.timer}
 								onChange={this.onTimerChange}
 							/>
+						</Grid.Column>
+						<Grid.Column>
+							<Dropzone
+								multiple={false}
+								accept='image/*'
+								onDrop={this.handleFileUpload}
+							>
+								<p>Try dropping some files here, or click to select files to upload.</p>
+							</Dropzone>
+						</Grid.Column>
+						<Grid.Column>
+							{
+								this.state.pictureUrl &&
+								<Image
+									src={`/${this.state.pictureUrl}`}
+									height={200}
+								/>
+							}
 						</Grid.Column>
 					</Grid.Row>
 					<Grid.Row columns={2}>
@@ -199,13 +230,16 @@ class TeacherQuestionEdit extends Component {
 TeacherQuestionEdit.propTypes = {
 	callEditQuestion: PropTypes.func.isRequired,
 	callAddQuestion: PropTypes.func.isRequired,
+	callUploadImage: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	quizId: PropTypes.object.isRequired,
-	question: PropTypes.object.isRequired
+	question: PropTypes.object.isRequired,
+	teacherInfo: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
+	teacherInfo: state.teacherInfo,
 	quizId: state.quizId,
 	question: state.question
 });
@@ -216,6 +250,9 @@ const mapDispatchToProps = dispatch => ({
 	},
 	callAddQuestion (param) {
 		dispatch(callAddQuestion(param));
+	},
+	callUploadImage (param) {
+		dispatch(callUploadImage(param));
 	}
 });
 
