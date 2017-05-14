@@ -1,3 +1,5 @@
+import request from 'superagent';
+
 export const setQuizId = params => ({
 	type: 'SET_QUIZ_ID',
 	payload: params
@@ -131,10 +133,36 @@ export const callEditQuestion = params => () => (
 	).then()
 );
 
+export const callUploadImage = params => (dispatch) => {
+	const photo = new FormData();
+	params.files.forEach(
+		(file) => {
+			photo.append(file.name, file);
+		}
+	);
+
+	request.post(`/api/teacher/uploadImage/${params.teacherId}`)
+	.send(photo)
+	.end(
+		(err, resp) => {
+			if (err) {
+				throw new Error(err);
+			}
+			const data = JSON.parse(resp.text);
+			dispatch({
+				type: 'SET_IMAGE_UPLOAD',
+				payload: {
+					pictureUrl: data.path
+				}
+			});
+		}
+	);
+};
+
 export const callGetServerEventTeacher = params => (dispatch) => {
 	const source = new EventSource(`/api/teacher/getServerEventTeacher?playId=${params.playId}`);
 
-	source.addEventListener('message', function(e) {
+	source.addEventListener('message', (e) => {
 		const data = JSON.parse(e.data);
 
 		if (data.studentPlayerList) {
@@ -175,10 +203,10 @@ export const callGetServerEventTeacher = params => (dispatch) => {
 		}
 	}, false);
 
-	source.addEventListener('open', function () {
+	source.addEventListener('open', () => {
 	}, false);
 
-	source.addEventListener('error', function () {
+	source.addEventListener('error', () => {
 	}, false);
 };
 
@@ -234,7 +262,7 @@ export const callCheckPlayId = params => dispatch => (
 export const callGetServerEvent = params => (dispatch) => {
 	const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 
-	source.addEventListener('message', function (e) {
+	source.addEventListener('message', (e) => {
 		if (e.data) {
 			dispatch({
 				type: 'SET_SERVER_STATUS',
@@ -243,10 +271,10 @@ export const callGetServerEvent = params => (dispatch) => {
 		}
 	}, false);
 
-	source.addEventListener('open', function () {
+	source.addEventListener('open', () => {
 	}, false);
 
-	source.addEventListener('error', function () {
+	source.addEventListener('error', () => {
 	}, false);
 };
 

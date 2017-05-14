@@ -7,6 +7,11 @@ export default function question (state = {}, action) {
 		return {};
 	case 'CLEAR_QUESTION':
 		return {};
+	case 'SET_IMAGE_UPLOAD':
+		if (action.payload) {
+			return Object.assign({}, state, action.payload);
+		}
+		return {};
 	default:
 		return state;
 	}

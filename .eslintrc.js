@@ -10,7 +10,8 @@ module.exports = {
         "foo": true,
         "window": true,
         "fetch": true,
-        "EventSource": true
+        "EventSource": true,
+        "FormData": true
     },
     "rules": {
         "no-tabs": "off",

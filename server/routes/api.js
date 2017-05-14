@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router()
+const fs = require('fs');
+const multer  = require('multer')
 const getServerEventTeacher = require("./sse")
 const getServerEvent = require("./sse")
 
@@ -379,6 +381,31 @@ router.post('/teacher/addQuestion', function(req, res){
 
 	res.send(data);
 });
+
+let upload = multer({
+	storage: multer.diskStorage({
+		destination: (req, file, callback) => {
+			let teacherId = req.params.teacherId;
+			let path = `./uploads/${teacherId}`;
+			if(!fs.existsSync('./uploads')) {
+				fs.mkdirSync('./uploads');
+			}
+			if(!fs.existsSync(path)) {
+				fs.mkdirSync(path);
+			}
+			callback(null, path);
+		},
+		filename: (req, file, callback) => {
+			callback(null, file.originalname);
+		}
+	})
+});
+
+router.post('/teacher/uploadImage/:teacherId', upload.any(), function (req, res, next) {
+	res.status(200).send({
+		path: req.files[0].path
+	});
+})
 
 function startGameMode (quizId, gameMode) {
 	var playId;
