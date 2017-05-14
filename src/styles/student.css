@@ -3,9 +3,21 @@
 	text-align: center;
 }
 
+.student-outer {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.student-inner {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
 .student-logo {
+	margin-bottom: 50px;
 	height: 150px;
-	margin: 50px;
 	background: url(../question.png);
 	background-position: center;
 	background-size: 150px 150px;
@@ -13,18 +25,26 @@
 }
 
 .student-palyid-input {
-	text-align: center;
-	background-color: #222;
-	color: white;
-	font-size: x-large;
 	width: 80%;
-	max-width: 400px;
-	margin: 10px
+	max-width: 300px;
+}
+
+.student-name-input {
+	width: 80%;
+	max-width: 300px;
+}
+
+.student-nick-input {
+	width: 80%;
+	max-width: 300px;
 }
 
 .student-palyid-button {
-	text-align: center;
-	font-size: x-large;
 	width: 80%;
-	max-width: 400px;
+	max-width: 300px;
+}
+
+.student-login-button {
+	width: 80%;
+	max-width: 300px;
 }

@@ -487,12 +487,16 @@ function sendLeaderBoard (playId) {
 
 		for (var i = 0; i < play.studentPlayerList.length; i++) {
 			var student = {};
+			var answerList = play.studentPlayerList[i].answerList;
+
 			student.studentId = play.studentPlayerList[i].studentId;
 			student.studentNick = play.studentPlayerList[i].studentNick;
 			student.score = 0;
 
-			for (var j = 0; j < play.studentPlayerList[i].answerList.length; j++) {
-				student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+			if (answerList) {
+				for (var j = 0; j < answerList.length; j++) {
+					student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+				}
 			}
 			data.leaderBoard.push(student);
 		}
@@ -501,12 +505,15 @@ function sendLeaderBoard (playId) {
 
 		for (var i = 0; i < play.studentPlayerList.length; i++) {
 			var student = {};
+			var answerList = play.studentPlayerList[i].answerList;
 			student.studentId = play.studentPlayerList[i].studentId;
 			student.studentNick = play.studentPlayerList[i].studentNick;
 			student.score = 0;
 
-			for (var j = 0; j < play.studentPlayerList[i].answerList.length; j++) {
-				student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+			if (answerList) {
+				for (var j = 0; j < answerList.length; j++) {
+					student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+				}
 			}
 			data.leaderBoard.push(student);
 		}
@@ -535,16 +542,17 @@ function sendResult (playId) {
 	};
 
 	for (var i = 0; i < play.studentPlayerList.length; i++) {
-		if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 1) {
+		var answerList = play.studentPlayerList[i].answerList;
+		if (answerList && answerList[play.currentQuestionIndex].answer == 1) {
 			data.result.example1++;
 		}
-		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 2) {
+		else if (answerList && answerList[play.currentQuestionIndex].answer == 2) {
 			data.result.example2++;
 		}
-		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 3) {
+		else if (answerList && answerList[play.currentQuestionIndex].answer == 3) {
 			data.result.example3++;
 		}
-		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 4) {
+		else if (answerList && answerList[play.currentQuestionIndex].answer == 4) {
 			data.result.example4++;
 		}
 	}
@@ -704,7 +712,7 @@ router.get("/teacher/getServerEventTeacher", function(req, res) {
 	const playId = req.body.playId;
 	initialiseGetServerEventTeacherSSE(req, res);
 
-	getServerEventTeacher.publish(JSON.stringify({serverStatus: 'wait'}));
+	getServerEventTeacher.publish(JSON.stringify({serverStatus: 'WAIT'}));
 });
 
 router.post('/student/checkPlayId', function(req, res){
@@ -842,7 +850,7 @@ function outputGetServerEventSSE(req, res, data) {
 router.get("/getServerEvent", function(req, res) {
 	initialiseGetServerEventSSE(req, res);
 
-	getServerEvent.publish(JSON.stringify({serverStatus: 'wait'}));
+	getServerEvent.publish(JSON.stringify({serverStatus: 'WAIT'}));
 });
 
 module.exports = router
