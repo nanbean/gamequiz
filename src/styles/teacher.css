@@ -12,3 +12,8 @@
 	background-size: 150px 150px;
 	background-repeat: no-repeat;
 }
+
+.teacher-quizname-input {
+	width: 80%;
+	max-width: 300px;
+}

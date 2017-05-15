@@ -7,7 +7,7 @@ import { Header, Divider, Grid, List, Button, Table } from 'semantic-ui-react';
 import Avatar from '../components/Avatar';
 import TitleHeader from '../components/TitleHeader';
 
-import { setQuizId, callGetQuizList, callGetFeedBackList } from '../actions';
+import { setQuizId, setQuiz, callGetQuizList, callGetFeedBackList } from '../actions';
 
 import '../styles/teacher.css';
 
@@ -34,7 +34,13 @@ class TeacherMy extends Component {
 	}
 
 	onQuizEditButton (ev, refs) {
+		const { getQuizList } = this.props;
 		this.props.setQuizId(refs.target);
+		for (let i = 0; i < getQuizList.quizList.length; i += 1) {
+			if (getQuizList.quizList[i].quizId === refs.target) {
+				this.props.setQuiz(getQuizList.quizList[i]);
+			}
+		}
 		this.props.history.push(`/quizedit/${refs.target}`);
 	}
 
@@ -72,13 +78,17 @@ class TeacherMy extends Component {
 	}
 
 	renderFeedBack (data) {
+		this.studentId = data.studentId;
+		this.studentName = data.studentName;
+		this.wrongQuestionList = data.wrongQuestionList;
+
 		return (
-			<Table.Row key={data.studentId}>
+			<Table.Row key={this.studentId}>
 				<Table.Cell>
-					{data.studentName}
+					{this.studentName}
 				</Table.Cell>
 				<Table.Cell>
-					{data.wrongQuestionList.length}
+					{this.wrongQuestionList.length}
 				</Table.Cell>
 			</Table.Row>
 		);
@@ -157,6 +167,7 @@ TeacherMy.propTypes = {
 	callGetFeedBackList: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	setQuizId: PropTypes.func.isRequired,
+	setQuiz: PropTypes.func.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
 	getQuizList: PropTypes.object.isRequired,
 	getFeedBackList: PropTypes.object.isRequired
@@ -171,6 +182,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
 	setQuizId (param) {
 		dispatch(setQuizId(param));
+	},
+	setQuiz (param) {
+		dispatch(setQuiz(param));
 	},
 	callGetQuizList (param) {
 		dispatch(callGetQuizList(param));

@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Header, Divider, Grid, List, Button } from 'semantic-ui-react';
+import { Header, Divider, Grid, List, Button, Input } from 'semantic-ui-react';
 
 import TitleHeader from '../components/TitleHeader';
 
-import { setQuestion, callGetQuestionList } from '../actions';
+import { setQuestion, callAddQuiz, callEditQuiz, callGetQuestionList } from '../actions';
 
 import '../styles/teacher.css';
 
@@ -14,13 +14,69 @@ class TeacherQuizEdit extends Component {
 	constructor (props) {
 		super(props);
 
+		this.onSaveButton = this.onSaveButton.bind(this);
+		this.onCancelButton = this.onCancelButton.bind(this);
+		this.onTitleChange = this.onTitleChange.bind(this);
 		this.onQuestionNewButton = this.onQuestionNewButton.bind(this);
 		this.onQuestionEditButton = this.onQuestionEditButton.bind(this);
+
+		this.state = {
+			title: this.props.quiz.quizTitle
+		};
 	}
 
 	componentDidMount () {
 		this.props.callGetQuestionList({
 			quizId: this.props.match.params.id
+		});
+		if (this.props.match.params.id === 'new') {
+			const quiz = {};
+			quiz.quizTitle = '';
+			quiz.questionList = [];
+
+			this.props.callAddQuiz({
+				teacherId: this.props.teacherInfo.userID,
+				quiz
+			});
+		}
+	}
+
+	componentWillReceiveProps (nextProps) {
+		this.setState({
+			title: nextProps.quiz.quizTitle
+		});
+	}
+
+	onSaveButton () {
+		const quiz = {};
+		quiz.quizId = this.props.match.params.id;
+		quiz.quizTitle = this.state.title;
+		quiz.questionList = [];
+
+		for (let i = 0; i < this.props.getQuestionList.questionList.length; i += 1) {
+			quiz.questionList.push(this.props.getQuestionList.questionList[i].questionId);
+		}
+
+		if (this.props.match.params.id === 'new') {
+			quiz.quizId = this.props.newQuizId;
+			this.props.callEditQuiz({
+				quiz
+			});
+		} else {
+			this.props.callEditQuiz({
+				quiz
+			});
+		}
+		this.props.history.goBack();
+	}
+
+	onCancelButton () {
+		this.props.history.goBack();
+	}
+
+	onTitleChange (e) {
+		this.setState({
+			title: e.target.value
 		});
 	}
 
@@ -72,6 +128,13 @@ class TeacherQuizEdit extends Component {
 				<Grid divided='vertically'>
 					<Grid.Row columns={1}>
 						<Grid.Column>
+							<Input
+								className='teacher-quizname-input'
+								size='huge'
+								placeholder='Quiz Name'
+								defaultValue={this.state.title}
+								onChange={this.onTitleChange}
+							/>
 							<Header as='h2'>
 								Question List
 							</Header>
@@ -87,6 +150,20 @@ class TeacherQuizEdit extends Component {
 							>
 								New Question
 							</Button>
+							<Button
+								fluid
+								size='huge'
+								onClick={this.onSaveButton}
+							>
+								Save
+							</Button>
+							<Button
+								fluid
+								size='huge'
+								onClick={this.onCancelButton}
+							>
+								Cancel
+							</Button>
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>
@@ -97,17 +174,31 @@ class TeacherQuizEdit extends Component {
 
 TeacherQuizEdit.propTypes = {
 	callGetQuestionList: PropTypes.func.isRequired,
+	callAddQuiz: PropTypes.func.isRequired,
+	callEditQuiz: PropTypes.func.isRequired,
 	setQuestion: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
+	teacherInfo: PropTypes.object.isRequired,
+	quiz: PropTypes.object.isRequired,
+	newQuizId: PropTypes.number.isRequired,
 	getQuestionList: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
+	teacherInfo: state.teacherInfo,
+	quiz: state.quiz,
+	newQuizId: state.newQuizId,
 	getQuestionList: state.getQuestionList
 });
 
 const mapDispatchToProps = dispatch => ({
+	callAddQuiz (param) {
+		dispatch(callAddQuiz(param));
+	},
+	callEditQuiz (param) {
+		dispatch(callEditQuiz(param));
+	},
 	callGetQuestionList (param) {
 		dispatch(callGetQuestionList(param));
 	},

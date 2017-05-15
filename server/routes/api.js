@@ -22,7 +22,7 @@ var teacher = [
 	}
 ];
 
-var quiz = [
+var quizzes = [
 	{
 		quizId: 0,
 		quizTitle: 'SEP521',
@@ -284,7 +284,7 @@ function getQuizList (teacherId) {
 	for (var i = 0; i < teacher.length; i++) {
 		if (teacher[i].teacherId == teacherId) {
 			for (var j = 0; j < teacher[i].quizList.length; j++) {
-				result.push(quiz[teacher[i].quizList[j]]);
+				result.push(quizzes[teacher[i].quizList[j]]);
 			}
 			break;
 		}
@@ -311,10 +311,10 @@ router.post('/teacher/getFeedBackList', function(req, res){
 function getQuestionList (quizId) {
 	var result = [];
 
-	for (var i = 0; i < quiz.length; i++) {
-		if (quiz[i].quizId == quizId) {
-			for (var j = 0; j < quiz[i].questionList.length; j++) {
-				result.push(questions[quiz[i].questionList[j]]);
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quizId) {
+			for (var j = 0; j < quizzes[i].questionList.length; j++) {
+				result.push(questions[quizzes[i].questionList[j]]);
 			}
 			break;
 		}
@@ -322,6 +322,69 @@ function getQuestionList (quizId) {
 
 	return result;
 }
+
+function addQuiztoTeacher (teacherId, quizId) {
+	for (var i = 0; i < teacher.length; i++) {
+		if (teacher[i].teacherId == teacherId) {
+			teacher[i].quizList.push(quizId);
+		}
+	}
+}
+
+function addQuiz (quiz) {
+	var lastQuizId = 0;
+
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId > lastQuizId) {
+			lastQuizId = quizzes[i].quizId;
+		}
+	}
+
+	quiz.quizId = lastQuizId + 1;
+
+	quizzes.push(quiz);
+
+	return quiz.quizId;
+}
+
+router.post('/teacher/addQuiz', function(req, res){
+	var teacherId = req.body.teacherId;
+	var quiz = req.body.quiz;
+	var data = {
+		return: true
+	};
+
+	data.quizId = addQuiz(quiz);
+
+	addQuiztoTeacher(teacherId, data.quizId);
+
+	res.send(data);
+});
+
+function editQuiz (quiz) {
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quiz.quizId) {
+			quizzes[i] = quiz;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+router.post('/teacher/editQuiz', function(req, res){
+	var quiz = req.body.quiz;
+	var data = {
+		return: true
+	};
+
+	if (editQuiz(quiz)) {
+
+	} else {
+		data.return = false;
+	}
+	res.send(data);
+});
 
 router.post('/teacher/getQuestionList', function(req, res){
 	var quizId = req.body.quizId;
@@ -344,9 +407,9 @@ function editQuestion (question) {
 }
 
 function addQuestiontoQuiz (quizId, questionId) {
-	for (var i = 0; i < quiz.length; i++) {
-		if (quiz[i].quizId == quizId) {
-			quiz[i].questionList.push(questionId);
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quizId) {
+			quizzes[i].questionList.push(questionId);
 			break;
 		}
 	}
@@ -457,9 +520,9 @@ function deletePlayWithPlayId (playId) {
 }
 
 function getQuizWithQuizId (quizId) {
-	for (var i = 0; i < quiz.length; i++) {
-		if (quiz[i].quizId == quizId) {
-			return quiz[i];
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quizId) {
+			return quizzes[i];
 		}
 	}
 

@@ -5,6 +5,11 @@ export const setQuizId = params => ({
 	payload: params
 });
 
+export const setQuiz = params => ({
+	type: 'SET_QUIZ',
+	payload: params
+});
+
 export const setQuestion = params => ({
 	type: 'SET_QUESTION',
 	payload: params
@@ -100,6 +105,29 @@ export const callGetFeedBackList = params => dispatch => (
 			})
 		)
 	)
+);
+
+export const callAddQuiz = params => dispatch => (
+	fetchCall('/api/teacher/addQuiz', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		result => (
+			dispatch({
+				type: 'SET_ADD_QUIZ',
+				payload: result
+			})
+		)
+	)
+);
+
+export const callEditQuiz = params => () => (
+	fetchCall('/api/teacher/editQuiz', params).then(
+		response => (
+			response.json()
+		)
+	).then()
 );
 
 export const callGetQuestionList = params => dispatch => (
