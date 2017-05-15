@@ -7,7 +7,7 @@ import { Header, Divider, Grid, List, Button, Table } from 'semantic-ui-react';
 import Avatar from '../components/Avatar';
 import TitleHeader from '../components/TitleHeader';
 
-import { setQuizId, setQuiz, callGetQuizList, callGetFeedBackList } from '../actions';
+import { setQuizId, setQuizName, setQuiz, callGetQuizList, callGetFeedBackList } from '../actions';
 
 import '../styles/teacher.css';
 
@@ -46,6 +46,7 @@ class TeacherMy extends Component {
 
 	onQuizStartButton (ev, refs) {
 		this.props.setQuizId(refs.target);
+		this.props.setQuizName(refs.targetName);
 		this.props.history.push('/mode/');
 	}
 
@@ -59,6 +60,7 @@ class TeacherMy extends Component {
 						labelPosition='left'
 						onClick={this.onQuizStartButton}
 						target={data.quizId}
+						targetName={data.quizTitle}
 					/>
 					<Button
 						content='Edit'
@@ -167,6 +169,7 @@ TeacherMy.propTypes = {
 	callGetFeedBackList: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	setQuizId: PropTypes.func.isRequired,
+	setQuizName: PropTypes.func.isRequired,
 	setQuiz: PropTypes.func.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
 	getQuizList: PropTypes.object.isRequired,
@@ -182,6 +185,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
 	setQuizId (param) {
 		dispatch(setQuizId(param));
+	},
+	setQuizName (param) {
+		dispatch(setQuizName(param));
 	},
 	setQuiz (param) {
 		dispatch(setQuiz(param));

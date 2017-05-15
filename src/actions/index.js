@@ -5,6 +5,11 @@ export const setQuizId = params => ({
 	payload: params
 });
 
+export const setQuizName = params => ({
+	type: 'SET_QUIZ_NAME',
+	payload: params
+});
+
 export const setQuiz = params => ({
 	type: 'SET_QUIZ',
 	payload: params
