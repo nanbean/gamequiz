@@ -5,33 +5,33 @@
 }
 
 .teacher-outer {
-  display: table;
-  width: 100%;
-  height: 100%;
+	display: table;
+	width: 100%;
+	height: 100%;
 }
 
 .teacher-inner {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
 }
 
 .teacher-floater {
-  float: left;
-  height: 50%;
-  margin-bottom: -120px;
+	float: left;
+	height: 50%;
+	margin-bottom: -120px;
 }
 
 .teacher-top {
-  float: right;
-  width: 100%;
-  text-align: center;
+	float: right;
+	width: 100%;
+	text-align: center;
 }
 
 .teacher-content {
-  clear: both;
-  height: 240px;
-  position: relative;
+	clear: both;
+	height: 240px;
+	position: relative;
 }
 
 .teacher-logo {
@@ -48,7 +48,56 @@
 	max-width: 300px;
 }
 
+.teacher-quizlist-title-wrapper {
+	width: 70%;
+}
+
+.teacher-quizlist-title {
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .teacher-mode-button {
 	width: 60%;
 	max-width: 400px;
+}
+
+.teacher-tag {
+	margin: 5px;
+}
+
+.teacher-tag-input {
+	width: 60%;
+	max-width: 300px;
+	margin-left: 10px;
+}
+
+div.teacher-tag-suggestions {
+	position: absolute;
+	z-index: 3
+}
+
+div.teacher-tag-suggestions ul {
+	list-style-type: none;
+	box-shadow: .05em .01em .5em rgba(0,0,0,.2);
+	background: white;
+	width: 200px;
+}
+div.teacher-tag-suggestions li {
+	border-bottom: 1px solid #ddd;
+	padding: 5px 10px;
+	margin: 0;
+}
+
+div.teacher-tag-suggestions li mark {
+	text-decoration: underline;
+	background: none;
+	font-weight: 600;
+}
+
+div.teacher-tag-suggestions ul li.teacher-tag-active-suggestion {
+	background: #b7cfe0;
+	cursor: pointer;
 }

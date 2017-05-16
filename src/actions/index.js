@@ -192,6 +192,21 @@ export const callUploadImage = params => (dispatch) => {
 	);
 };
 
+export const callGetTagSuggestions = params => dispatch => (
+	fetchCall('/api/teacher/getTagSuggestions', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		result => (
+			dispatch({
+				type: 'SET_GET_TAG_SUGGESTIONS',
+				payload: result
+			})
+		)
+	)
+);
+
 export const callGetServerEventTeacher = params => (dispatch) => {
 	const source = new EventSource(`/api/teacher/getServerEventTeacher?playId=${params.playId}`);
 

@@ -105,8 +105,8 @@ class TeacherQuizEdit extends Component {
 					/>
 					<Button content='Delete' icon='trash' labelPosition='left' />
 				</List.Content>
-				<List.Content floated='left'>
-					<Header as='h2'>
+				<List.Content className='teacher-quizlist-title-wrapper' floated='left'>
+					<Header className='teacher-quizlist-title' as='h2'>
 						{data.title}
 					</Header>
 				</List.Content>
@@ -182,7 +182,7 @@ TeacherQuizEdit.propTypes = {
 	teacherInfo: PropTypes.object.isRequired,
 	quiz: PropTypes.object.isRequired,
 	newQuizId: PropTypes.number.isRequired,
-	getQuestionList: PropTypes.func.isRequired
+	getQuestionList: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

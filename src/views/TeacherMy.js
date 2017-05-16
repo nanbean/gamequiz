@@ -45,8 +45,14 @@ class TeacherMy extends Component {
 	}
 
 	onQuizStartButton (ev, refs) {
+		const { getQuizList } = this.props;
+
 		this.props.setQuizId(refs.target);
-		this.props.setQuizName(refs.targetName);
+		for (let i = 0; i < getQuizList.quizList.length; i += 1) {
+			if (getQuizList.quizList[i].quizId === refs.target) {
+				this.props.setQuizName(getQuizList.quizList[i].quizTitle);
+			}
+		}
 		this.props.history.push('/mode/');
 	}
 
@@ -60,7 +66,6 @@ class TeacherMy extends Component {
 						labelPosition='left'
 						onClick={this.onQuizStartButton}
 						target={data.quizId}
-						targetName={data.quizTitle}
 					/>
 					<Button
 						content='Edit'

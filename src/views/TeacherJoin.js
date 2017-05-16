@@ -68,7 +68,7 @@ class TeacherJoin extends Component {
 
 TeacherJoin.propTypes = {
 	callRegisterTeacher: PropTypes.func.isRequired,
-	registerTeacher: PropTypes.func.isRequired,
+	registerTeacher: PropTypes.object.isRequired,
 	teacherInfo: PropTypes.object.isRequired
 };
 

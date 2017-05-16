@@ -11,6 +11,7 @@ import quizName from './quizName';
 import newQuizId from './newQuizId';
 import quiz from './quiz';
 import question from './question';
+import tagSuggestions from './tagSuggestions';
 import gameMode from './gameMode';
 import checkPlayId from './checkPlayId';
 import studentNick from './studentNick';
@@ -32,6 +33,7 @@ const gamequiz = combineReducers({
 	newQuizId,
 	quiz,
 	question,
+	tagSuggestions,
 	teacherInfo,
 	checkTeacher,
 	registerTeacher,

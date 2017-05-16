@@ -65,8 +65,14 @@ var questions = [
 	{
 		questionId: 0,
 		quizCategory: [
-			'덧셈',
-			'산수'
+			{
+				id: 1,
+				text: "덧셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '1+1=?',
 		pictureUrl: '',
@@ -80,8 +86,14 @@ var questions = [
 	{
 		questionId: 1,
 		quizCategory: [
-			'곱셈',
-			'산수'
+			{
+				id: 1,
+				text: "곱셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '5x5=?',
 		pictureUrl: '',
@@ -95,9 +107,18 @@ var questions = [
 	{
 		questionId: 2,
 		quizCategory: [
-			'지리',
-			'나라',
-			'수도'
+			{
+				id: 1,
+				text: "지리"
+			},
+			{
+				id: 2,
+				text: "나라"
+			},
+			{
+				id: 3,
+				text: "수도"
+			}
 		],
 		title: '대한민국의 수도는?',
 		pictureUrl: '',
@@ -111,8 +132,14 @@ var questions = [
 	{
 		questionId: 3,
 		quizCategory: [
-			'달력',
-			'생활'
+			{
+				id: 1,
+				text: "달력"
+			},
+			{
+				id: 2,
+				text: "생활"
+			}
 		],
 		title: '1월은 몇일까지 있을까요?',
 		pictureUrl: '',
@@ -126,8 +153,14 @@ var questions = [
 	{
 		questionId: 4,
 		quizCategory: [
-			'덧셈',
-			'산수'
+			{
+				id: 1,
+				text: "덧셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '1+1=?',
 		pictureUrl: '',
@@ -141,8 +174,14 @@ var questions = [
 	{
 		questionId: 5,
 		quizCategory: [
-			'곱셈',
-			'산수'
+			{
+				id: 1,
+				text: "곱셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '5x5=?',
 		pictureUrl: '',
@@ -156,9 +195,18 @@ var questions = [
 	{
 		questionId: 6,
 		quizCategory: [
-			'지리',
-			'나라',
-			'수도'
+			{
+				id: 1,
+				text: "지리"
+			},
+			{
+				id: 2,
+				text: "나라"
+			},
+			{
+				id: 3,
+				text: "수도"
+			}
 		],
 		title: '대한민국의 수도는?',
 		pictureUrl: '',
@@ -172,8 +220,14 @@ var questions = [
 	{
 		questionId: 7,
 		quizCategory: [
-			'달력',
-			'생활'
+			{
+				id: 1,
+				text: "달력"
+			},
+			{
+				id: 2,
+				text: "생활"
+			}
 		],
 		title: '1월은 몇일까지 있을까요?',
 		pictureUrl: '',
@@ -468,7 +522,24 @@ router.post('/teacher/uploadImage/:teacherId', upload.any(), function (req, res,
 	res.status(200).send({
 		path: req.files[0].path
 	});
-})
+});
+
+router.post('/teacher/getTagSuggestions', function(req, res){
+	var suggestions = [];
+	var data = {};
+
+	for (var i = 0; i < questions.length; i++) {
+		for (var j = 0; j < questions[i].quizCategory.length; j++) {
+			if (questions[i].quizCategory[j] && questions[i].quizCategory[j].text) {
+				suggestions.push(questions[i].quizCategory[j].text);
+			}
+		}
+	}
+
+	data.suggestions = [...new Set(suggestions)];
+
+	res.send(data);
+});
 
 function startGameMode (quizId, gameMode) {
 	var playId;
