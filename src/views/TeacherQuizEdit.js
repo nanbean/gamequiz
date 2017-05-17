@@ -143,27 +143,33 @@ class TeacherQuizEdit extends Component {
 									questionList && questionList.map(this.renderQuestion, this)
 								}
 							</List>
-							<Button
-								fluid
-								size='huge'
-								onClick={this.onQuestionNewButton}
-							>
-								New Question
-							</Button>
-							<Button
-								fluid
-								size='huge'
-								onClick={this.onSaveButton}
-							>
-								Save
-							</Button>
-							<Button
-								fluid
-								size='huge'
-								onClick={this.onCancelButton}
-							>
-								Cancel
-							</Button>
+							<div className='teacher-button'>
+								<Button
+									fluid
+									size='huge'
+									onClick={this.onQuestionNewButton}
+								>
+									New Question
+								</Button>
+							</div>
+							<div className='teacher-button'>
+								<Button
+									fluid
+									size='huge'
+									onClick={this.onSaveButton}
+								>
+									Save
+								</Button>
+							</div>
+							<div className='teacher-button'>
+								<Button
+									fluid
+									size='huge'
+									onClick={this.onCancelButton}
+								>
+									Cancel
+								</Button>
+							</div>
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>

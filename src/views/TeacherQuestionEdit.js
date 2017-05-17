@@ -186,8 +186,8 @@ class TeacherQuestionEdit extends Component {
 					title='Question Edit'
 				/>
 				<Divider />
-				<Grid divided='vertically'>
-					<Grid.Row columns={1}>
+				<Grid celled>
+					<Grid.Row>
 						<Grid.Column>
 							<ReactTags
 								classNames={{
@@ -209,8 +209,8 @@ class TeacherQuestionEdit extends Component {
 							/>
 						</Grid.Column>
 					</Grid.Row>
-					<Grid.Row columns={1}>
-						<Grid.Column>
+					<Grid.Row>
+						<Grid.Column width={13}>
 							<Input
 								fluid
 								label='Title'
@@ -219,10 +219,9 @@ class TeacherQuestionEdit extends Component {
 								onChange={this.onTitleChange}
 							/>
 						</Grid.Column>
-					</Grid.Row>
-					<Grid.Row columns={3}>
-						<Grid.Column>
+						<Grid.Column width={3}>
 							<Input
+								fluid
 								label='Time Out'
 								type='number'
 								placeholder='input Time Out'
@@ -230,8 +229,11 @@ class TeacherQuestionEdit extends Component {
 								onChange={this.onTimerChange}
 							/>
 						</Grid.Column>
-						<Grid.Column>
+					</Grid.Row>
+					<Grid.Row>
+						<Grid.Column width={6}>
 							<Dropzone
+								className='teacher-dropzone'
 								multiple={false}
 								accept='image/*'
 								onDrop={this.handleFileUpload}
@@ -239,37 +241,46 @@ class TeacherQuestionEdit extends Component {
 								<p>Try dropping some files here, or click to select files to upload.</p>
 							</Dropzone>
 						</Grid.Column>
-						<Grid.Column>
+						<Grid.Column width={10}>
 							{
 								this.state.pictureUrl &&
 								<Image
+									centered
 									src={`/${this.state.pictureUrl}`}
 									height={200}
 								/>
 							}
 						</Grid.Column>
 					</Grid.Row>
-					<Grid.Row columns={2}>
-						<Grid.Column>
+				</Grid>
+				<Grid celled>
+					<Grid.Row>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='1'
 								placeholder='Example 1'
 								defaultValue={this.state.example1}
 								onChange={this.onExample1Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer1'
 								checked={this.state.answer === 1}
 								onChange={this.onAnswerChange}
 							/>
 						</Grid.Column>
-						<Grid.Column>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='2'
 								placeholder='Example 2'
 								defaultValue={this.state.example2}
 								onChange={this.onExample2Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer2'
 								checked={this.state.answer === 2}
@@ -277,27 +288,33 @@ class TeacherQuestionEdit extends Component {
 							/>
 						</Grid.Column>
 					</Grid.Row>
-					<Grid.Row columns={2}>
-						<Grid.Column>
+					<Grid.Row>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='3'
 								placeholder='Example 3'
 								defaultValue={this.state.example3}
 								onChange={this.onExample3Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer3'
 								checked={this.state.answer === 3}
 								onChange={this.onAnswerChange}
 							/>
 						</Grid.Column>
-						<Grid.Column>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='4'
 								placeholder='Example 4'
 								defaultValue={this.state.example4}
 								onChange={this.onExample4Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer4'
 								checked={this.state.answer === 4}
@@ -305,6 +322,8 @@ class TeacherQuestionEdit extends Component {
 							/>
 						</Grid.Column>
 					</Grid.Row>
+				</Grid>
+				<div className='teacher-button'>
 					<Button
 						fluid
 						size='huge'
@@ -312,6 +331,8 @@ class TeacherQuestionEdit extends Component {
 					>
 						Save
 					</Button>
+				</div>
+				<div className='teacher-button'>
 					<Button
 						fluid
 						size='huge'
@@ -319,7 +340,7 @@ class TeacherQuestionEdit extends Component {
 					>
 						Cancel
 					</Button>
-				</Grid>
+				</div>
 			</div>
 		);
 	}

@@ -100,6 +100,7 @@ class TeacherMode extends Component {
 						<Popup
 							trigger={
 								<Button
+									disabled
 									className='teacher-mode-button'
 									content='Team'
 									icon='users'
