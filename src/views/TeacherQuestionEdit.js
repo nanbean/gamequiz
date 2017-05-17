@@ -4,10 +4,11 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
 import { Divider, Input, Button, Grid, Checkbox, Image } from 'semantic-ui-react';
+import { WithContext as ReactTags } from 'react-tag-input';
 
 import TitleHeader from '../components/TitleHeader';
 
-import { callAddQuestion, callEditQuestion, callUploadImage } from '../actions';
+import { callGetTagSuggestions, callAddQuestion, callEditQuestion, callUploadImage } from '../actions';
 
 import '../styles/teacher.css';
 
@@ -15,7 +16,6 @@ class TeacherQuestionEdit extends Component {
 	constructor (props) {
 		super(props);
 
-		this.state = this.props.question;
 		this.onSaveButton = this.onSaveButton.bind(this);
 		this.onCancelButton = this.onCancelButton.bind(this);
 		this.onTitleChange = this.onTitleChange.bind(this);
@@ -25,16 +25,65 @@ class TeacherQuestionEdit extends Component {
 		this.onExample3Change = this.onExample3Change.bind(this);
 		this.onExample4Change = this.onExample4Change.bind(this);
 		this.onAnswerChange = this.onAnswerChange.bind(this);
+		this.handleDelete = this.handleDelete.bind(this);
+		this.handleAddition = this.handleAddition.bind(this);
+		this.handleDrag = this.handleDrag.bind(this);
 		this.handleFileUpload = this.handleFileUpload.bind(this);
+
+		const { questionId, title, pictureUrl, example1, example2, example3, example4,
+			answer, timer, quizCategory, tagSuggestions } = this.props;
+
+		this.state = {
+			questionId,
+			title,
+			pictureUrl,
+			example1,
+			example2,
+			example3,
+			example4,
+			answer,
+			timer,
+			quizCategory,
+			tagSuggestions
+		};
+	}
+
+	componentDidMount () {
+		this.props.callGetTagSuggestions({});
 	}
 
 	componentWillReceiveProps (nextProps) {
-		this.state = nextProps.question;
+		const { questionId, title, pictureUrl, example1, example2, example3, example4,
+			answer, timer, quizCategory, tagSuggestions } = nextProps;
+
+		this.setState({
+			questionId,
+			title,
+			pictureUrl,
+			example1,
+			example2,
+			example3,
+			example4,
+			answer,
+			timer,
+			quizCategory,
+			tagSuggestions
+		});
 	}
 
 	onSaveButton () {
 		const data = {};
-		data.question = this.state;
+		data.question = {};
+		data.question.questionId = this.state.questionId;
+		data.question.quizCategory = this.state.quizCategory;
+		data.question.title = this.state.title;
+		data.question.pictureUrl = this.state.pictureUrl;
+		data.question.example1 = this.state.example1;
+		data.question.example2 = this.state.example2;
+		data.question.example3 = this.state.example3;
+		data.question.example4 = this.state.example4;
+		data.question.answer = this.state.answer;
+		data.question.timer = this.state.timer;
 
 		if (this.props.match.params.id === 'new') {
 			data.quizId = this.props.quizId;
@@ -56,39 +105,69 @@ class TeacherQuestionEdit extends Component {
 		});
 	}
 
-	onTimerChange (e) {
+	onTimerChange (ev) {
 		this.setState({
-			timer: e.target.value
+			timer: ev.target.value
 		});
 	}
 
-	onExample1Change (e) {
+	onExample1Change (ev) {
 		this.setState({
-			example1: e.target.value
+			example1: ev.target.value
 		});
 	}
 
-	onExample2Change (e) {
+	onExample2Change (ev) {
 		this.setState({
-			example2: e.target.value
+			example2: ev.target.value
 		});
 	}
 
-	onExample3Change (e) {
+	onExample3Change (ev) {
 		this.setState({
-			example3: e.target.value
+			example3: ev.target.value
 		});
 	}
 
-	onExample4Change (e) {
+	onExample4Change (ev) {
 		this.setState({
-			example4: e.target.value
+			example4: ev.target.value
 		});
 	}
 
-	onAnswerChange (e) {
+	onAnswerChange (ev, refs) {
 		this.setState({
-			answer: Number(e.target.textContent.substr(6, 1))
+			answer: Number(refs.label.substr(6, 1))
+		});
+	}
+
+	handleDelete (i) {
+		const quizCategory = this.state.quizCategory;
+		quizCategory.splice(i, 1);
+		this.setState({
+			quizCategory
+		});
+	}
+
+	handleAddition (tag) {
+		const quizCategory = this.state.quizCategory;
+		quizCategory.push({
+			id: quizCategory.length + 1,
+			text: tag
+		});
+		this.setState({
+			quizCategory
+		});
+	}
+
+	handleDrag (tag, currPos, newPos) {
+		const quizCategory = this.state.quizCategory;
+
+		quizCategory.splice(currPos, 1);
+		quizCategory.splice(newPos, 0, tag);
+
+		this.setState({
+			quizCategory
 		});
 	}
 
@@ -107,9 +186,31 @@ class TeacherQuestionEdit extends Component {
 					title='Question Edit'
 				/>
 				<Divider />
-				<Grid divided='vertically'>
-					<Grid.Row columns={1}>
+				<Grid celled>
+					<Grid.Row>
 						<Grid.Column>
+							<ReactTags
+								classNames={{
+									tags: '',
+									tagInput: 'teacher-tag-input ui labeled input',
+									tagInputField: '',
+									selected: '',
+									tag: 'teacher-tag ui label',
+									remove: 'removeClass',
+									suggestions: 'teacher-tag-suggestions',
+									activeSuggestion: 'teacher-tag-active-suggestion'
+								}}
+								placeholder='Add new category'
+								tags={this.state.quizCategory}
+								suggestions={this.state.tagSuggestions}
+								handleDelete={this.handleDelete}
+								handleAddition={this.handleAddition}
+								handleDrag={this.handleDrag}
+							/>
+						</Grid.Column>
+					</Grid.Row>
+					<Grid.Row>
+						<Grid.Column width={13}>
 							<Input
 								fluid
 								label='Title'
@@ -118,18 +219,21 @@ class TeacherQuestionEdit extends Component {
 								onChange={this.onTitleChange}
 							/>
 						</Grid.Column>
-					</Grid.Row>
-					<Grid.Row columns={3}>
-						<Grid.Column>
+						<Grid.Column width={3}>
 							<Input
+								fluid
 								label='Time Out'
+								type='number'
 								placeholder='input Time Out'
 								defaultValue={this.state.timer}
 								onChange={this.onTimerChange}
 							/>
 						</Grid.Column>
-						<Grid.Column>
+					</Grid.Row>
+					<Grid.Row>
+						<Grid.Column width={6}>
 							<Dropzone
+								className='teacher-dropzone'
 								multiple={false}
 								accept='image/*'
 								onDrop={this.handleFileUpload}
@@ -137,76 +241,89 @@ class TeacherQuestionEdit extends Component {
 								<p>Try dropping some files here, or click to select files to upload.</p>
 							</Dropzone>
 						</Grid.Column>
-						<Grid.Column>
+						<Grid.Column width={10}>
 							{
 								this.state.pictureUrl &&
 								<Image
+									centered
 									src={`/${this.state.pictureUrl}`}
 									height={200}
 								/>
 							}
 						</Grid.Column>
 					</Grid.Row>
-					<Grid.Row columns={2}>
-						<Grid.Column>
+				</Grid>
+				<Grid celled>
+					<Grid.Row>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='1'
 								placeholder='Example 1'
 								defaultValue={this.state.example1}
 								onChange={this.onExample1Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer1'
-								number={1}
 								checked={this.state.answer === 1}
 								onChange={this.onAnswerChange}
 							/>
 						</Grid.Column>
-						<Grid.Column>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='2'
 								placeholder='Example 2'
 								defaultValue={this.state.example2}
 								onChange={this.onExample2Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer2'
-								number={2}
 								checked={this.state.answer === 2}
 								onChange={this.onAnswerChange}
 							/>
 						</Grid.Column>
 					</Grid.Row>
-					<Grid.Row columns={2}>
-						<Grid.Column>
+					<Grid.Row>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='3'
 								placeholder='Example 3'
 								defaultValue={this.state.example3}
 								onChange={this.onExample3Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer3'
-								number={3}
 								checked={this.state.answer === 3}
 								onChange={this.onAnswerChange}
 							/>
 						</Grid.Column>
-						<Grid.Column>
+						<Grid.Column width={6}>
 							<Input
+								fluid
 								label='4'
 								placeholder='Example 4'
 								defaultValue={this.state.example4}
 								onChange={this.onExample4Change}
 							/>
+						</Grid.Column>
+						<Grid.Column width={2}>
 							<Checkbox
 								label='Answer4'
-								number={4}
 								checked={this.state.answer === 4}
 								onChange={this.onAnswerChange}
 							/>
 						</Grid.Column>
 					</Grid.Row>
+				</Grid>
+				<div className='teacher-button'>
 					<Button
 						fluid
 						size='huge'
@@ -214,6 +331,8 @@ class TeacherQuestionEdit extends Component {
 					>
 						Save
 					</Button>
+				</div>
+				<div className='teacher-button'>
 					<Button
 						fluid
 						size='huge'
@@ -221,30 +340,54 @@ class TeacherQuestionEdit extends Component {
 					>
 						Cancel
 					</Button>
-				</Grid>
+				</div>
 			</div>
 		);
 	}
 }
 
 TeacherQuestionEdit.propTypes = {
+	callGetTagSuggestions: PropTypes.func.isRequired,
 	callEditQuestion: PropTypes.func.isRequired,
 	callAddQuestion: PropTypes.func.isRequired,
 	callUploadImage: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
-	quizId: PropTypes.object.isRequired,
-	question: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired
+	quizId: PropTypes.number.isRequired,
+	questionId: PropTypes.number.isRequired,
+	quizCategory: PropTypes.array.isRequired,
+	title: PropTypes.string.isRequired,
+	pictureUrl: PropTypes.string.isRequired,
+	example1: PropTypes.string.isRequired,
+	example2: PropTypes.string.isRequired,
+	example3: PropTypes.string.isRequired,
+	example4: PropTypes.string.isRequired,
+	answer: PropTypes.number.isRequired,
+	timer: PropTypes.number.isRequired,
+	teacherInfo: PropTypes.object.isRequired,
+	tagSuggestions: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
 	quizId: state.quizId,
-	question: state.question
+	questionId: state.question.questionId,
+	quizCategory: state.question.quizCategory,
+	title: state.question.title,
+	pictureUrl: state.question.pictureUrl,
+	example1: state.question.example1,
+	example2: state.question.example2,
+	example3: state.question.example3,
+	example4: state.question.example4,
+	answer: state.question.answer,
+	timer: state.question.timer,
+	tagSuggestions: state.tagSuggestions
 });
 
 const mapDispatchToProps = dispatch => ({
+	callGetTagSuggestions (param) {
+		dispatch(callGetTagSuggestions(param));
+	},
 	callEditQuestion (param) {
 		dispatch(callEditQuestion(param));
 	},

@@ -1,12 +1,25 @@
-export default function question (state = {}, action) {
+const initialState = {
+	questionId: -1,
+	quizCategory: [],
+	title: '',
+	pictureUrl: '',
+	example1: '',
+	example2: '',
+	example3: '',
+	example4: '',
+	answer: -1,
+	timer: 20
+};
+
+export default function question (state = initialState, action) {
 	switch (action.type) {
 	case 'SET_QUESTION':
 		if (action.payload) {
 			return Object.assign({}, state, action.payload);
 		}
-		return {};
+		return initialState;
 	case 'CLEAR_QUESTION':
-		return {};
+		return initialState;
 	case 'SET_IMAGE_UPLOAD':
 		if (action.payload) {
 			return Object.assign({}, state, action.payload);

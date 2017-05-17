@@ -5,6 +5,16 @@ export const setQuizId = params => ({
 	payload: params
 });
 
+export const setQuizName = params => ({
+	type: 'SET_QUIZ_NAME',
+	payload: params
+});
+
+export const setQuiz = params => ({
+	type: 'SET_QUIZ',
+	payload: params
+});
+
 export const setQuestion = params => ({
 	type: 'SET_QUESTION',
 	payload: params
@@ -102,6 +112,29 @@ export const callGetFeedBackList = params => dispatch => (
 	)
 );
 
+export const callAddQuiz = params => dispatch => (
+	fetchCall('/api/teacher/addQuiz', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		result => (
+			dispatch({
+				type: 'SET_ADD_QUIZ',
+				payload: result
+			})
+		)
+	)
+);
+
+export const callEditQuiz = params => () => (
+	fetchCall('/api/teacher/editQuiz', params).then(
+		response => (
+			response.json()
+		)
+	).then()
+);
+
 export const callGetQuestionList = params => dispatch => (
 	fetchCall('/api/teacher/getQuestionList', params).then(
 		response => (
@@ -158,6 +191,21 @@ export const callUploadImage = params => (dispatch) => {
 		}
 	);
 };
+
+export const callGetTagSuggestions = params => dispatch => (
+	fetchCall('/api/teacher/getTagSuggestions', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		result => (
+			dispatch({
+				type: 'SET_GET_TAG_SUGGESTIONS',
+				payload: result
+			})
+		)
+	)
+);
 
 export const callGetServerEventTeacher = params => (dispatch) => {
 	const source = new EventSource(`/api/teacher/getServerEventTeacher?playId=${params.playId}`);

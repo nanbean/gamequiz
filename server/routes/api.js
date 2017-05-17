@@ -22,7 +22,7 @@ var teacher = [
 	}
 ];
 
-var quiz = [
+var quizzes = [
 	{
 		quizId: 0,
 		quizTitle: 'SEP521',
@@ -65,8 +65,14 @@ var questions = [
 	{
 		questionId: 0,
 		quizCategory: [
-			'덧셈',
-			'산수'
+			{
+				id: 1,
+				text: "덧셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '1+1=?',
 		pictureUrl: '',
@@ -80,8 +86,14 @@ var questions = [
 	{
 		questionId: 1,
 		quizCategory: [
-			'곱셈',
-			'산수'
+			{
+				id: 1,
+				text: "곱셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '5x5=?',
 		pictureUrl: '',
@@ -95,9 +107,18 @@ var questions = [
 	{
 		questionId: 2,
 		quizCategory: [
-			'지리',
-			'나라',
-			'수도'
+			{
+				id: 1,
+				text: "지리"
+			},
+			{
+				id: 2,
+				text: "나라"
+			},
+			{
+				id: 3,
+				text: "수도"
+			}
 		],
 		title: '대한민국의 수도는?',
 		pictureUrl: '',
@@ -111,8 +132,14 @@ var questions = [
 	{
 		questionId: 3,
 		quizCategory: [
-			'달력',
-			'생활'
+			{
+				id: 1,
+				text: "달력"
+			},
+			{
+				id: 2,
+				text: "생활"
+			}
 		],
 		title: '1월은 몇일까지 있을까요?',
 		pictureUrl: '',
@@ -126,8 +153,14 @@ var questions = [
 	{
 		questionId: 4,
 		quizCategory: [
-			'덧셈',
-			'산수'
+			{
+				id: 1,
+				text: "덧셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '1+1=?',
 		pictureUrl: '',
@@ -141,8 +174,14 @@ var questions = [
 	{
 		questionId: 5,
 		quizCategory: [
-			'곱셈',
-			'산수'
+			{
+				id: 1,
+				text: "곱셈"
+			},
+			{
+				id: 2,
+				text: "산수"
+			}
 		],
 		title: '5x5=?',
 		pictureUrl: '',
@@ -156,9 +195,18 @@ var questions = [
 	{
 		questionId: 6,
 		quizCategory: [
-			'지리',
-			'나라',
-			'수도'
+			{
+				id: 1,
+				text: "지리"
+			},
+			{
+				id: 2,
+				text: "나라"
+			},
+			{
+				id: 3,
+				text: "수도"
+			}
 		],
 		title: '대한민국의 수도는?',
 		pictureUrl: '',
@@ -172,8 +220,14 @@ var questions = [
 	{
 		questionId: 7,
 		quizCategory: [
-			'달력',
-			'생활'
+			{
+				id: 1,
+				text: "달력"
+			},
+			{
+				id: 2,
+				text: "생활"
+			}
 		],
 		title: '1월은 몇일까지 있을까요?',
 		pictureUrl: '',
@@ -284,7 +338,7 @@ function getQuizList (teacherId) {
 	for (var i = 0; i < teacher.length; i++) {
 		if (teacher[i].teacherId == teacherId) {
 			for (var j = 0; j < teacher[i].quizList.length; j++) {
-				result.push(quiz[teacher[i].quizList[j]]);
+				result.push(quizzes[teacher[i].quizList[j]]);
 			}
 			break;
 		}
@@ -311,10 +365,10 @@ router.post('/teacher/getFeedBackList', function(req, res){
 function getQuestionList (quizId) {
 	var result = [];
 
-	for (var i = 0; i < quiz.length; i++) {
-		if (quiz[i].quizId == quizId) {
-			for (var j = 0; j < quiz[i].questionList.length; j++) {
-				result.push(questions[quiz[i].questionList[j]]);
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quizId) {
+			for (var j = 0; j < quizzes[i].questionList.length; j++) {
+				result.push(questions[quizzes[i].questionList[j]]);
 			}
 			break;
 		}
@@ -322,6 +376,69 @@ function getQuestionList (quizId) {
 
 	return result;
 }
+
+function addQuiztoTeacher (teacherId, quizId) {
+	for (var i = 0; i < teacher.length; i++) {
+		if (teacher[i].teacherId == teacherId) {
+			teacher[i].quizList.push(quizId);
+		}
+	}
+}
+
+function addQuiz (quiz) {
+	var lastQuizId = 0;
+
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId > lastQuizId) {
+			lastQuizId = quizzes[i].quizId;
+		}
+	}
+
+	quiz.quizId = lastQuizId + 1;
+
+	quizzes.push(quiz);
+
+	return quiz.quizId;
+}
+
+router.post('/teacher/addQuiz', function(req, res){
+	var teacherId = req.body.teacherId;
+	var quiz = req.body.quiz;
+	var data = {
+		return: true
+	};
+
+	data.quizId = addQuiz(quiz);
+
+	addQuiztoTeacher(teacherId, data.quizId);
+
+	res.send(data);
+});
+
+function editQuiz (quiz) {
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quiz.quizId) {
+			quizzes[i] = quiz;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+router.post('/teacher/editQuiz', function(req, res){
+	var quiz = req.body.quiz;
+	var data = {
+		return: true
+	};
+
+	if (editQuiz(quiz)) {
+
+	} else {
+		data.return = false;
+	}
+	res.send(data);
+});
 
 router.post('/teacher/getQuestionList', function(req, res){
 	var quizId = req.body.quizId;
@@ -344,9 +461,9 @@ function editQuestion (question) {
 }
 
 function addQuestiontoQuiz (quizId, questionId) {
-	for (var i = 0; i < quiz.length; i++) {
-		if (quiz[i].quizId == quizId) {
-			quiz[i].questionList.push(questionId);
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quizId) {
+			quizzes[i].questionList.push(questionId);
 			break;
 		}
 	}
@@ -405,7 +522,24 @@ router.post('/teacher/uploadImage/:teacherId', upload.any(), function (req, res,
 	res.status(200).send({
 		path: req.files[0].path
 	});
-})
+});
+
+router.post('/teacher/getTagSuggestions', function(req, res){
+	var suggestions = [];
+	var data = {};
+
+	for (var i = 0; i < questions.length; i++) {
+		for (var j = 0; j < questions[i].quizCategory.length; j++) {
+			if (questions[i].quizCategory[j] && questions[i].quizCategory[j].text) {
+				suggestions.push(questions[i].quizCategory[j].text);
+			}
+		}
+	}
+
+	data.suggestions = [...new Set(suggestions)];
+
+	res.send(data);
+});
 
 function startGameMode (quizId, gameMode) {
 	var playId;
@@ -457,9 +591,9 @@ function deletePlayWithPlayId (playId) {
 }
 
 function getQuizWithQuizId (quizId) {
-	for (var i = 0; i < quiz.length; i++) {
-		if (quiz[i].quizId == quizId) {
-			return quiz[i];
+	for (var i = 0; i < quizzes.length; i++) {
+		if (quizzes[i].quizId == quizId) {
+			return quizzes[i];
 		}
 	}
 
@@ -487,12 +621,16 @@ function sendLeaderBoard (playId) {
 
 		for (var i = 0; i < play.studentPlayerList.length; i++) {
 			var student = {};
+			var answerList = play.studentPlayerList[i].answerList;
+
 			student.studentId = play.studentPlayerList[i].studentId;
 			student.studentNick = play.studentPlayerList[i].studentNick;
 			student.score = 0;
 
-			for (var j = 0; j < play.studentPlayerList[i].answerList.length; j++) {
-				student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+			if (answerList) {
+				for (var j = 0; j < answerList.length; j++) {
+					student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+				}
 			}
 			data.leaderBoard.push(student);
 		}
@@ -501,12 +639,15 @@ function sendLeaderBoard (playId) {
 
 		for (var i = 0; i < play.studentPlayerList.length; i++) {
 			var student = {};
+			var answerList = play.studentPlayerList[i].answerList;
 			student.studentId = play.studentPlayerList[i].studentId;
 			student.studentNick = play.studentPlayerList[i].studentNick;
 			student.score = 0;
 
-			for (var j = 0; j < play.studentPlayerList[i].answerList.length; j++) {
-				student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+			if (answerList) {
+				for (var j = 0; j < answerList.length; j++) {
+					student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+				}
 			}
 			data.leaderBoard.push(student);
 		}
@@ -535,16 +676,17 @@ function sendResult (playId) {
 	};
 
 	for (var i = 0; i < play.studentPlayerList.length; i++) {
-		if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 1) {
+		var answerList = play.studentPlayerList[i].answerList;
+		if (answerList && answerList[play.currentQuestionIndex].answer == 1) {
 			data.result.example1++;
 		}
-		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 2) {
+		else if (answerList && answerList[play.currentQuestionIndex].answer == 2) {
 			data.result.example2++;
 		}
-		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 3) {
+		else if (answerList && answerList[play.currentQuestionIndex].answer == 3) {
 			data.result.example3++;
 		}
-		else if (play.studentPlayerList[i].answerList[play.currentQuestionIndex].answer == 4) {
+		else if (answerList && answerList[play.currentQuestionIndex].answer == 4) {
 			data.result.example4++;
 		}
 	}
@@ -704,7 +846,7 @@ router.get("/teacher/getServerEventTeacher", function(req, res) {
 	const playId = req.body.playId;
 	initialiseGetServerEventTeacherSSE(req, res);
 
-	getServerEventTeacher.publish(JSON.stringify({serverStatus: 'wait'}));
+	getServerEventTeacher.publish(JSON.stringify({serverStatus: 'WAIT'}));
 });
 
 router.post('/student/checkPlayId', function(req, res){
@@ -842,7 +984,7 @@ function outputGetServerEventSSE(req, res, data) {
 router.get("/getServerEvent", function(req, res) {
 	initialiseGetServerEventSSE(req, res);
 
-	getServerEvent.publish(JSON.stringify({serverStatus: 'wait'}));
+	getServerEvent.publish(JSON.stringify({serverStatus: 'WAIT'}));
 });
 
 module.exports = router
