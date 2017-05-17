@@ -13,15 +13,19 @@ class StudentMain extends Component {
 		super(props);
 
 		this.onPlayIdEnter = this.onPlayIdEnter.bind(this);
+		this.onPlayIdInput = this.onPlayIdInput.bind(this);
+		this.onPlayEnter = this.onPlayEnter.bind(this);
 		this.onNameInput = this.onNameInput.bind(this);
 		this.onNickInput = this.onNickInput.bind(this);
 		this.onNickKeyInput = this.onNickKeyInput.bind(this);
+		this.onLoginEnter = this.onLoginEnter.bind(this);
 		this.onExample1Button = this.onExample1Button.bind(this);
 		this.onExample2Button = this.onExample2Button.bind(this);
 		this.onExample3Button = this.onExample3Button.bind(this);
 		this.onExample4Button = this.onExample4Button.bind(this);
 
 		this.state = {
+			playId: '',
 			name: '',
 			nick: ''
 		};
@@ -29,13 +33,23 @@ class StudentMain extends Component {
 
 	onPlayIdEnter (ev) {
 		if (ev.key === 'Enter') {
-			this.props.callCheckPlayId({
-				playId: ev.target.value
-			});
-			this.props.setPlayId({
-				playId: ev.target.value
-			});
+			this.onPlayEnter();
 		}
+	}
+
+	onPlayEnter () {
+		this.props.callCheckPlayId({
+			playId: this.state.playId
+		});
+		this.props.setPlayId({
+			playId: this.state.playId
+		});
+	}
+
+	onPlayIdInput (ev, data) {
+		this.setState({
+			playId: data.value
+		});
 	}
 
 	onNameInput (ev, data) {
@@ -52,12 +66,16 @@ class StudentMain extends Component {
 
 	onNickKeyInput (ev) {
 		if (ev.key === 'Enter') {
-			this.props.callSendStudentInfo({
-				playId: this.props.playId,
-				studentName: this.state.name,
-				studentNick: this.state.nick
-			});
+			this.onLoginEnter();
 		}
+	}
+
+	onLoginEnter () {
+		this.props.callSendStudentInfo({
+			playId: this.props.playId,
+			studentName: this.state.name,
+			studentNick: this.state.nick
+		});
 	}
 
 	onExample1Button () {
@@ -110,38 +128,67 @@ class StudentMain extends Component {
 		return (
 			<div className='student'>
 				{ studentPage === 'main' &&
-					<div>
-						<div className='student-logo' />
-						<Input
-							size='huge'
-							icon='send'
-							placeholder='Type your game ID'
-							onKeyPress={this.onPlayIdEnter}
-						/>
+					<div className='student-outer'>
+						<div className='student-inner'>
+							<div className='student-logo' />
+							<div>
+								<Input
+									className='student-palyid-input'
+									size='huge'
+									icon='send'
+									placeholder='Type your game ID'
+									onKeyPress={this.onPlayIdEnter}
+									onChange={this.onPlayIdInput}
+								/>
+							</div>
+							<div>
+								<Button
+									className='student-palyid-button'
+									size='huge'
+									onClick={this.onPlayEnter}
+								>
+									Play
+								</Button>
+							</div>
+						</div>
 					</div>
 				}
 				{
 					studentPage === 'login' &&
-					<div>
-						<div className='student-logo' />
-						<Input
-							size='huge'
-							label='Name'
-							placeholder='Type your real name'
-							onChange={this.onNameInput}
-							defaultValue={this.state.name}
-						/>
-						<Input
-							size='huge'
-							label='Nickame'
-							placeholder='Type your nickname for the game'
-							onKeyPress={this.onNickKeyInput}
-							onChange={this.onNickInput}
-							defaultValue={this.state.nick}
-						/>
+					<div className='student-outer'>
+						<div className='student-inner'>
+							<div className='student-logo' />
+							<div>
+								<Input
+									className='student-name-input'
+									size='huge'
+									placeholder='Type your real name'
+									onChange={this.onNameInput}
+									defaultValue={this.state.name}
+								/>
+							</div>
+							<div>
+								<Input
+									className='student-nick-input'
+									size='huge'
+									placeholder='Type your nickname for the game'
+									onKeyPress={this.onNickKeyInput}
+									onChange={this.onNickInput}
+									defaultValue={this.state.nick}
+								/>
+							</div>
+							<div>
+								<Button
+									className='student-login-button'
+									size='huge'
+									onClick={this.onLoginEnter}
+								>
+									Go
+								</Button>
+							</div>
+						</div>
 					</div>
 				}
-
 				{
 					studentPage === 'play' && serverStatus === 'WAIT' &&
 					<div>
@@ -161,50 +208,58 @@ class StudentMain extends Component {
 					</div>
 				}
 				{
-					studentPage === 'play' && serverStatus === 'PLAY' && !studentAnswered &&
+					studentPage === 'play' && serverStatus === 'END' &&
 					<div>
-						<Grid divided='vertically'>
-							<Grid.Row columns={2}>
-								<Grid.Column>
-									<Button
-										fluid
-										size='huge'
-										onClick={this.onExample1Button}
-									>
-										1
-									</Button>
-								</Grid.Column>
-								<Grid.Column>
-									<Button
-										fluid
-										size='huge'
-										onClick={this.onExample2Button}
-									>
-										2
-									</Button>
-								</Grid.Column>
-							</Grid.Row>
-							<Grid.Row columns={2}>
-								<Grid.Column>
-									<Button
-										fluid
-										size='huge'
-										onClick={this.onExample3Button}
-									>
-										3
-									</Button>
-								</Grid.Column>
-								<Grid.Column>
-									<Button
-										fluid
-										size='huge'
-										onClick={this.onExample4Button}
-									>
-										4
-									</Button>
-								</Grid.Column>
-							</Grid.Row>
-						</Grid>
+						<Loader active>{serverStatus}</Loader>
+					</div>
+				}
+				{
+					studentPage === 'play' && serverStatus === 'PLAY' && !studentAnswered &&
+					<div className='student-outer'>
+						<div className='student-inner'>
+							<Grid divided='vertically'>
+								<Grid.Row columns={2}>
+									<Grid.Column>
+										<Button
+											fluid
+											size='massive'
+											onClick={this.onExample1Button}
+										>
+											1
+										</Button>
+									</Grid.Column>
+									<Grid.Column>
+										<Button
+											fluid
+											size='massive'
+											onClick={this.onExample2Button}
+										>
+											2
+										</Button>
+									</Grid.Column>
+								</Grid.Row>
+								<Grid.Row columns={2}>
+									<Grid.Column>
+										<Button
+											fluid
+											size='massive'
+											onClick={this.onExample3Button}
+										>
+											3
+										</Button>
+									</Grid.Column>
+									<Grid.Column>
+										<Button
+											fluid
+											size='massive'
+											onClick={this.onExample4Button}
+										>
+											4
+										</Button>
+									</Grid.Column>
+								</Grid.Row>
+							</Grid>
+						</div>
 					</div>
 				}
 				{

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Header, Divider, List, Button, Loader } from 'semantic-ui-react';
+import { Header, Divider, List, Button, Loader, Label, Segment, Icon } from 'semantic-ui-react';
 
 import TitleHeader from '../components/TitleHeader';
 
@@ -47,15 +47,31 @@ class TeacherWait extends Component {
 	}
 
 	renderStudentPlayer (data) {
+		this.studentId = data.studentId;
+		this.studentNick = data.studentNick;
+
 		return (
-			<Header as='h2' key={data.studentId}>
-				{data.studentNick}
+			<Header key={this.studentId} as='h3'>
+				<Icon name='detective' />
+				<Header.Content>
+					{this.studentNick}
+				</Header.Content>
 			</Header>
 		);
 	}
 
 	render () {
 		const { teacherInfo, playId, gameMode, studentPlayerList } = this.props;
+		let icon = '';
+
+		if (gameMode === 'MARATHON') {
+			icon = 'graduation';
+		} else if (gameMode === 'SURVIVAL') {
+			icon = 'child';
+		} else {
+			icon = 'users';
+		}
+
 
 		return (
 			<div className='teacher'>
@@ -67,23 +83,33 @@ class TeacherWait extends Component {
 					title='Wait your game'
 				/>
 				<Divider />
-				<Header as='h2'>
-					Your Play ID is {playId}
-				</Header>
-				<Header as='h2'>
-					Your Game Mode is {gameMode}
-				</Header>
-				{
-					studentPlayerList && studentPlayerList.map(this.renderStudentPlayer, this)
-				}
-				<Loader active>Wait</Loader>
+				<Segment padded>
+					<Label attached='top'>Join with</Label>
+					<Header size='huge'>
+						{playId}
+					</Header>
+				</Segment>
 				<Button
 					fluid
 					size='huge'
+					content='Start'
+					icon='play'
+					labelPosition='left'
 					onClick={this.onQuizStartButton}
-				>
-					Start
-				</Button>
+				/>
+				<Header as='h2' icon textAlign='center'>
+					<Icon name={icon} />
+					<Header.Content>
+						{gameMode} Mode
+					</Header.Content>
+				</Header>
+				<Divider />
+				<div>
+					{
+						studentPlayerList && studentPlayerList.map(this.renderStudentPlayer, this)
+					}
+				</div>
+				<Loader active>Wait</Loader>
 			</div>
 		);
 	}

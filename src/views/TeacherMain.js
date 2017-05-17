@@ -34,15 +34,19 @@ class TeacherMain extends Component {
 				{
 					validTeacher === false && hasTeacherInfo && <Redirect to='/join' />
 				}
-				<div className='teacher-logo' />
-				<Header as='h1'>Welcome to GameQuiz</Header>
-				<div>
-					<FacebookLogin
-						appId='1873315276258418'
-						autoLoad
-						fields='name,email,picture'
-						callback={this.responseFacebook}
-					/>
+				<div className='teacher-outer'>
+					<div className='teacher-inner'>
+						<div className='teacher-logo' />
+						<Header as='h1'>Welcome to GameQuiz</Header>
+						<div>
+							<FacebookLogin
+								appId='1873315276258418'
+								autoLoad
+								fields='name,email,picture'
+								callback={this.responseFacebook}
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 		);
