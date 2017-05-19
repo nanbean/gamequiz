@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Header, Divider, List, Button, Loader, Label, Segment, Icon } from 'semantic-ui-react';
+import { Header, Divider, List, Button, Label, Segment, Icon } from 'semantic-ui-react';
 
 import TitleHeader from '../components/TitleHeader';
 
@@ -72,7 +72,6 @@ class TeacherWait extends Component {
 			icon = 'users';
 		}
 
-
 		return (
 			<div className='teacher'>
 				{
@@ -96,6 +95,7 @@ class TeacherWait extends Component {
 					icon='play'
 					labelPosition='left'
 					onClick={this.onQuizStartButton}
+					disabled={studentPlayerList.length === 0}
 				/>
 				<Header as='h2' icon textAlign='center'>
 					<Icon name={icon} />
@@ -109,7 +109,6 @@ class TeacherWait extends Component {
 						studentPlayerList && studentPlayerList.map(this.renderStudentPlayer, this)
 					}
 				</div>
-				<Loader active>Wait</Loader>
 			</div>
 		);
 	}

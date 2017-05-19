@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Input, Loader, Grid, Button } from 'semantic-ui-react';
+import { Input, Loader, Grid, Button, Header, Icon } from 'semantic-ui-react';
 
-import { callCheckPlayId, setPlayId, callSendStudentInfo, callGetServerEvent, callSendStudentAnswer } from '../actions';
+import { callCheckPlayId, setPlayId, callSendStudentInfo, callGetServerEvent, callSendStudentAnswer, resetToHome } from '../actions';
 
 import '../styles/student.css';
+import triangle from '../assets/triangle.svg';
+import diamond from '../assets/diamond.svg';
+import circle from '../assets/circle.svg';
+import square from '../assets/square.svg';
 
 class StudentMain extends Component {
 	constructor (props) {
@@ -23,6 +27,7 @@ class StudentMain extends Component {
 		this.onExample2Button = this.onExample2Button.bind(this);
 		this.onExample3Button = this.onExample3Button.bind(this);
 		this.onExample4Button = this.onExample4Button.bind(this);
+		this.onHomeEnter = this.onHomeEnter.bind(this);
 
 		this.state = {
 			playId: '',
@@ -122,6 +127,10 @@ class StudentMain extends Component {
 		});
 	}
 
+	onHomeEnter () {
+		this.props.resetToHome();
+	}
+
 	render () {
 		const { studentPage, serverStatus, studentAnswered } = this.props;
 
@@ -209,53 +218,61 @@ class StudentMain extends Component {
 				}
 				{
 					studentPage === 'play' && serverStatus === 'END' &&
-					<div>
-						<Loader active>{serverStatus}</Loader>
+					<div className='student-outer'>
+						<div className='student-inner'>
+							<Header as='h2' icon textAlign='center'>
+								<Icon name='info' circular />
+								<Header.Content>
+									Game Over
+								</Header.Content>
+							</Header>
+							<div>
+								<Button
+									className='student-home-button'
+									size='huge'
+									onClick={this.onHomeEnter}
+								>
+									Home
+								</Button>
+							</div>
+						</div>
 					</div>
 				}
 				{
 					studentPage === 'play' && serverStatus === 'PLAY' && !studentAnswered &&
 					<div className='student-outer'>
 						<div className='student-inner'>
-							<Grid divided='vertically'>
-								<Grid.Row columns={2}>
+							<Grid celled className='student-example'>
+								<Grid.Row columns={2} padded>
 									<Grid.Column>
-										<Button
-											fluid
-											size='massive'
+										<Header
+											as='h1'
+											image={triangle}
 											onClick={this.onExample1Button}
-										>
-											1
-										</Button>
+										/>
 									</Grid.Column>
 									<Grid.Column>
-										<Button
-											fluid
-											size='massive'
+										<Header
+											as='h1'
+											image={diamond}
 											onClick={this.onExample2Button}
-										>
-											2
-										</Button>
+										/>
 									</Grid.Column>
 								</Grid.Row>
-								<Grid.Row columns={2}>
+								<Grid.Row columns={2} padded>
 									<Grid.Column>
-										<Button
-											fluid
-											size='massive'
+										<Header
+											as='h1'
+											image={circle}
 											onClick={this.onExample3Button}
-										>
-											3
-										</Button>
+										/>
 									</Grid.Column>
 									<Grid.Column>
-										<Button
-											fluid
-											size='massive'
+										<Header
+											as='h1'
+											image={square}
 											onClick={this.onExample4Button}
-										>
-											4
-										</Button>
+										/>
 									</Grid.Column>
 								</Grid.Row>
 							</Grid>
@@ -281,6 +298,7 @@ StudentMain.propTypes = {
 	studentAnswered: PropTypes.bool.isRequired,
 	callCheckPlayId: PropTypes.func.isRequired,
 	setPlayId: PropTypes.func.isRequired,
+	resetToHome: PropTypes.func.isRequired,
 	callSendStudentAnswer: PropTypes.func.isRequired,
 	callSendStudentInfo: PropTypes.func.isRequired
 };
@@ -299,6 +317,9 @@ const mapDispatchToProps = dispatch => ({
 	},
 	setPlayId (param) {
 		dispatch(setPlayId(param));
+	},
+	resetToHome () {
+		dispatch(resetToHome());
 	},
 	callSendStudentInfo (param) {
 		dispatch(callSendStudentInfo(param));
