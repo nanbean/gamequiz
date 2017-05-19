@@ -286,8 +286,9 @@ var plays = [
 	// 	studentPlayerList: [],
 	// 	currentQuestionIndex: 0
 	// 	presentationTime: new Date()
+	// 	nextStepTimer: new Date()
 	// }
-]
+];
 
 function checkUserExist (teacherId) {
 	for (var i = 0; i < teacher.length; i++) {
@@ -615,48 +616,51 @@ function sendLeaderBoard (playId) {
 	var play = getPlayWithPlayId(playId);
 	var quiz = play && getQuizWithQuizId(play.quizId);
 
-	data.leaderBoard = [];
-	if (play.currentQuestionIndex < quiz.questionList.length - 1) {
-		data.serverStatus = 'LEADER_BOARD';
+	if (play && quiz) {
+		data.playId = playId;
+		data.leaderBoard = [];
+		if (play.currentQuestionIndex < quiz.questionList.length - 1) {
+			data.serverStatus = 'LEADER_BOARD';
 
-		for (var i = 0; i < play.studentPlayerList.length; i++) {
-			var student = {};
-			var answerList = play.studentPlayerList[i].answerList;
+			for (var i = 0; i < play.studentPlayerList.length; i++) {
+				var student = {};
+				var answerList = play.studentPlayerList[i].answerList;
 
-			student.studentId = play.studentPlayerList[i].studentId;
-			student.studentNick = play.studentPlayerList[i].studentNick;
-			student.score = 0;
+				student.studentId = play.studentPlayerList[i].studentId;
+				student.studentNick = play.studentPlayerList[i].studentNick;
+				student.score = 0;
 
-			if (answerList) {
-				for (var j = 0; j < answerList.length; j++) {
-					student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+				if (answerList) {
+					for (var j = 0; j < answerList.length; j++) {
+						student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
+					}
 				}
+				data.leaderBoard.push(student);
 			}
-			data.leaderBoard.push(student);
-		}
-	} else {
-		data.serverStatus = 'END';
+		} else {
+			data.serverStatus = 'END';
 
-		for (var i = 0; i < play.studentPlayerList.length; i++) {
-			var student = {};
-			var answerList = play.studentPlayerList[i].answerList;
-			student.studentId = play.studentPlayerList[i].studentId;
-			student.studentNick = play.studentPlayerList[i].studentNick;
-			student.score = 0;
+			for (var i = 0; i < play.studentPlayerList.length; i++) {
+				var student = {};
+				var answerList = play.studentPlayerList[i].answerList;
+				student.studentId = play.studentPlayerList[i].studentId;
+				student.studentNick = play.studentPlayerList[i].studentNick;
+				student.score = 0;
 
-			if (answerList) {
-				for (var j = 0; j < answerList.length; j++) {
-					student.score = student.score + play.studentPlayerList[i].answerList[j].score;
+				if (answerList) {
+					for (var j = 0; j < answerList.length; j++) {
+						student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
+					}
 				}
+				data.leaderBoard.push(student);
 			}
-			data.leaderBoard.push(student);
+
+			deletePlayWithPlayId(playId);
 		}
 
-		deletePlayWithPlayId(playId);
+		getServerEvent.publish(JSON.stringify(data));
+		getServerEventTeacher.publish(JSON.stringify(data));
 	}
-
-	getServerEvent.publish(JSON.stringify(data));
-	getServerEventTeacher.publish(JSON.stringify(data));
 }
 
 function sendResult (playId) {
@@ -665,43 +669,47 @@ function sendResult (playId) {
 	var quiz = play && getQuizWithQuizId(play.quizId);
 	var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
 
+	data.playId = playId;
 	data.serverStatus = 'RESULT';
 
-	data.result = {
-		answer: question.answer,
-		example1: 0,
-		example2: 0,
-		example3: 0,
-		example4: 0
-	};
+	if (play && quiz && question) {
+		data.result = {
+			answer: question.answer,
+			example1: 0,
+			example2: 0,
+			example3: 0,
+			example4: 0
+		};
 
-	for (var i = 0; i < play.studentPlayerList.length; i++) {
-		var answerList = play.studentPlayerList[i].answerList;
-		if (answerList && answerList[play.currentQuestionIndex].answer == 1) {
-			data.result.example1++;
+		for (var i = 0; i < play.studentPlayerList.length; i++) {
+			var answerList = play.studentPlayerList[i].answerList;
+			if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 1) {
+				data.result.example1++;
+			}
+			else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
+				data.result.example2++;
+			}
+			else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
+				data.result.example3++;
+			}
+			else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
+				data.result.example4++;
+			}
 		}
-		else if (answerList && answerList[play.currentQuestionIndex].answer == 2) {
-			data.result.example2++;
-		}
-		else if (answerList && answerList[play.currentQuestionIndex].answer == 3) {
-			data.result.example3++;
-		}
-		else if (answerList && answerList[play.currentQuestionIndex].answer == 4) {
-			data.result.example4++;
-		}
+
+		getServerEvent.publish(JSON.stringify(data));
+		getServerEventTeacher.publish(JSON.stringify(data));
+
+		play.nextStepTimer = setTimeout(function() {
+			sendLeaderBoard(playId);
+		}, 5000);
 	}
-
-	getServerEvent.publish(JSON.stringify(data));
-	getServerEventTeacher.publish(JSON.stringify(data));
-
-	setTimeout(function() {
-		sendLeaderBoard(playId);
-	}, 5000);
 }
 
 function sendWait (playId) {
 	var data = {};
 
+	data.playId = playId;
 	data.serverStatus = 'WAIT';
 
 	getServerEvent.publish(JSON.stringify(data));
@@ -714,56 +722,63 @@ function sendQuetion (playId) {
 	var play = getPlayWithPlayId(playId);
 	var quiz = play && getQuizWithQuizId(play.quizId);
 
-	data.serverStatus = 'PLAY';
+	if (play && quiz) {
+		data.playId = playId;
+		data.serverStatus = 'PLAY';
 
-	for (var j = 0; j < questions.length; j++) {
-		if (questions[j].questionId === quiz.questionList[play.currentQuestionIndex]) {
-			data.question = questions[j];
-			timeOut = data.question.timer;
+		for (var j = 0; j < questions.length; j++) {
+			if (questions[j].questionId === quiz.questionList[play.currentQuestionIndex]) {
+				data.question = questions[j];
+				timeOut = data.question.timer;
+			}
 		}
+		data.timeOut = timeOut
+
+		play.presentationTime = new Date();
+		play.timeOut = timeOut;
+
+		getServerEvent.publish(JSON.stringify(data));
+		getServerEventTeacher.publish(JSON.stringify(data));
+
+		play.nextStepTimer = setInterval(function() {
+			timeOut--;
+			data.timeOut = timeOut;
+			if ( timeOut >= 0) {
+				getServerEvent.publish(JSON.stringify(data));
+				getServerEventTeacher.publish(JSON.stringify(data));
+			} else {
+				play && clearInterval(play.nextStepTimer);
+				play.nextStepTimer =  null;
+				sendResult(playId);
+			}
+		}, 1000);
 	}
-	data.timeOut = timeOut
-
-	play.presentationTime = new Date();
-	play.timeOut = timeOut;
-
-	getServerEvent.publish(JSON.stringify(data));
-	getServerEventTeacher.publish(JSON.stringify(data));
-
-	var timerInterval = setInterval(function() {
-		timeOut--;
-		data.timeOut = timeOut;
-		if ( timeOut >= 0) {
-			getServerEvent.publish(JSON.stringify(data));
-			getServerEventTeacher.publish(JSON.stringify(data));
-		} else {
-			clearInterval(timerInterval);
-			sendResult(playId);
-		}
-	}, 1000);
 }
 
 function startPlay (playId) {
+	var play = getPlayWithPlayId(playId);
+
 	sendWait(playId);
 
-	setTimeout(function() {
+	play.nextStepTimer = setTimeout(function() {
 		sendQuetion(playId);
-	}, 3000);
+	}, 5000);
 }
 
 router.post('/teacher/nextPlayQuestion', function(req, res){
 	var playId = req.body.playId;
+	var play = getPlayWithPlayId(playId);
 
 	var data = {
 		return: true
 	};
 
-	getPlayWithPlayId(playId).currentQuestionIndex++;
+	play.currentQuestionIndex++;
 	sendWait(playId);
 
-	setTimeout(function() {
+	play.nextStepTimer = setTimeout(function() {
 		sendQuetion(playId);
-	}, 3000);
+	}, 5000);
 
 	res.send(data);
 });
@@ -782,6 +797,23 @@ router.post('/teacher/startPlay', function(req, res){
 
 	res.send(data);
 });
+
+function terminatePlay (playId) {
+	var data = {};
+	var play = getPlayWithPlayId(playId);
+	var quiz = play && getQuizWithQuizId(play.quizId);
+
+	data.playId = playId;
+	data.leaderBoard = [];
+	data.serverStatus = 'END';
+
+	getServerEvent.publish(JSON.stringify(data));
+
+	play && clearInterval(play.nextStepTimer);
+	play.nextStepTimer =  null;
+
+	deletePlayWithPlayId(playId);
+}
 
 function initialiseGetServerEventTeacherSSE(req, res) {
 	const playId = req.query.playId;
@@ -806,9 +838,9 @@ function initialiseGetServerEventTeacherSSE(req, res) {
 	}, 20000);
 
 	res.on('close', function close() {
-		clearInterval(keepAlive);
+		keepAlive && clearInterval(keepAlive);
+		terminatePlay(playId);
 
-		// TO DO: need to delete play with playId
 		// TO DO: need to send play end event to Students
 
 		getServerEventTeacher.unsubscribe(subscriber);
@@ -937,6 +969,8 @@ function removeStudentFromPlay (playId, studentId) {
 		for (let i = 0; i < play.studentPlayerList.length; i++) {
 			if (play.studentPlayerList[i].studentId == studentId) {
 				play.studentPlayerList.splice(i, 1);
+				clearInterval(play.nextStepTimer);
+				play.nextStepTimer =  null;
 				getServerEventTeacher.publish(JSON.stringify(play));
 				return;
 			}
@@ -968,7 +1002,7 @@ function initialiseGetServerEventSSE(req, res) {
 	}, 20000);
 
 	res.on('close', function close() {
-		clearInterval(keepAlive);
+		keepAlive && clearInterval(keepAlive);
 		getServerEvent.unsubscribe(subscriber);
 		removeStudentFromPlay(playId, studentId);
 	});
@@ -982,9 +1016,14 @@ function outputGetServerEventSSE(req, res, data) {
 }
 
 router.get("/getServerEvent", function(req, res) {
+	var data = {};
+	const playId = req.query.playId;
 	initialiseGetServerEventSSE(req, res);
 
-	getServerEvent.publish(JSON.stringify({serverStatus: 'WAIT'}));
+	data.playId = playId;
+	data.serverStatus = 'WAIT';
+
+	getServerEvent.publish(JSON.stringify(data));
 });
 
 module.exports = router

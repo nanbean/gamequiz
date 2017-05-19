@@ -1,5 +1,9 @@
-export default function studentPage (state = 'main', action) {
+const initialState = 'main';
+
+export default function studentPage (state = initialState, action) {
 	switch (action.type) {
+	case 'RESET_TO_HOME':
+		return initialState;
 	case 'SET_CHECK_PLAY_ID':
 		if (state === 'main' && action.payload.valid === true) {
 			return 'login';

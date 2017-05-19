@@ -30,6 +30,11 @@ export const setStudentPlayerList = params => ({
 	payload: params
 });
 
+export const resetToHome = params => ({
+	type: 'RESET_TO_HOME',
+	payload: params
+});
+
 function fetchCall (call, params) {
 	return fetch(call, {
 		method: 'post',
@@ -209,45 +214,48 @@ export const callGetTagSuggestions = params => dispatch => (
 
 export const callGetServerEventTeacher = params => (dispatch) => {
 	const source = new EventSource(`/api/teacher/getServerEventTeacher?playId=${params.playId}`);
+	const playId = params.playId;
 
 	source.addEventListener('message', (e) => {
 		const data = JSON.parse(e.data);
 
-		if (data.studentPlayerList) {
-			dispatch({
-				type: 'SET_STUDENT_PLAYER_LIST',
-				payload: data
-			});
-		}
-		if (data.serverStatus) {
-			dispatch({
-				type: 'SET_SERVER_STATUS',
-				payload: data
-			});
-		}
-		if (data.question) {
-			dispatch({
-				type: 'SET_PLAY_QUESTION',
-				payload: data
-			});
-		}
-		if (typeof data.timeOut !== 'undefined') {
-			dispatch({
-				type: 'SET_PLAY_TIME_OUT',
-				payload: data
-			});
-		}
-		if (typeof data.result !== 'undefined') {
-			dispatch({
-				type: 'SET_PLAY_RESULT',
-				payload: data
-			});
-		}
-		if (typeof data.leaderBoard !== 'undefined') {
-			dispatch({
-				type: 'SET_PLAY_LEADER_BOARD',
-				payload: data
-			});
+		if (data.playId === playId) {
+			if (data.studentPlayerList) {
+				dispatch({
+					type: 'SET_STUDENT_PLAYER_LIST',
+					payload: data
+				});
+			}
+			if (data.serverStatus) {
+				dispatch({
+					type: 'SET_SERVER_STATUS',
+					payload: data
+				});
+			}
+			if (data.question) {
+				dispatch({
+					type: 'SET_PLAY_QUESTION',
+					payload: data
+				});
+			}
+			if (typeof data.timeOut !== 'undefined') {
+				dispatch({
+					type: 'SET_PLAY_TIME_OUT',
+					payload: data
+				});
+			}
+			if (typeof data.result !== 'undefined') {
+				dispatch({
+					type: 'SET_PLAY_RESULT',
+					payload: data
+				});
+			}
+			if (typeof data.leaderBoard !== 'undefined') {
+				dispatch({
+					type: 'SET_PLAY_LEADER_BOARD',
+					payload: data
+				});
+			}
 		}
 	}, false);
 
@@ -309,9 +317,12 @@ export const callCheckPlayId = params => dispatch => (
 
 export const callGetServerEvent = params => (dispatch) => {
 	const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
+	const playId = params.playId;
 
 	source.addEventListener('message', (e) => {
-		if (e.data) {
+		const data = JSON.parse(e.data);
+
+		if (data.playId === playId) {
 			dispatch({
 				type: 'SET_SERVER_STATUS',
 				payload: JSON.parse(e.data)
