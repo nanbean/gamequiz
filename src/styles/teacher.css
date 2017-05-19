@@ -30,7 +30,6 @@
 
 .teacher-content {
 	clear: both;
-	height: 240px;
 	position: relative;
 }
 
@@ -114,4 +113,24 @@ div.teacher-tag-suggestions li mark {
 div.teacher-tag-suggestions ul li.teacher-tag-active-suggestion {
 	background: #b7cfe0;
 	cursor: pointer;
+}
+
+.teacher-play-title {
+	position: fixed;
+	top: 5px;
+	left: 5px;
+	right: 5px;
+}
+
+.teacher-play-timer {
+	position: fixed;
+	top: 100px;
+	left: 20px;
+}
+
+.teacher-play-example {
+	position: fixed;
+	bottom: 5px;
+	left: 5px;
+	right: 5px;
 }
