@@ -194,7 +194,7 @@ TeacherQuizEdit.propTypes = {
 	match: PropTypes.object.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
 	quiz: PropTypes.object.isRequired,
-	newQuizId: PropTypes.number.isRequired,
+	newQuizId: PropTypes.string.isRequired,
 	getQuestionList: PropTypes.object.isRequired
 };
 

@@ -131,6 +131,7 @@ router.post('/teacher/registerTeacher', function(req, res){
 router.post('/teacher/getQuizList', function(req, res){
 	var teacherId = req.body.teacherId;
 	var data = {
+		return: false,
 		quizList: []
 	};
 
@@ -145,6 +146,7 @@ router.post('/teacher/getQuizList', function(req, res){
 					return res.send(data);
 				}
 
+				data.return = true;
 				data.quizList = quizList;
 				res.send(data);
 			});
@@ -273,6 +275,7 @@ router.post('/teacher/deleteQuiz', function(req, res){
 router.post('/teacher/getQuestionList', function(req, res){
 	var quizId = req.body.quizId;
 	var data = {
+		return: false,
 		questionList: []
 	};
 
@@ -288,6 +291,7 @@ router.post('/teacher/getQuestionList', function(req, res){
 						return res.send(data);
 					}
 
+					data.return = true;
 					data.questionList = questionList;
 					res.send(data);
 				});
@@ -321,7 +325,7 @@ router.post('/teacher/editQuestion', function(req, res){
 				return res.send(data);
 			}
 
-			question.quizCategory = modifiedQuestion.quizCategory;
+			question.category = modifiedQuestion.category;
 			question.title = modifiedQuestion.title;
 			question.pictureUrl = modifiedQuestion.pictureUrl;
 			question.example1 = modifiedQuestion.example1;
@@ -338,6 +342,8 @@ router.post('/teacher/editQuestion', function(req, res){
 
 				data.return = true;
 				res.send(data);
+
+				updateSuggestions(modifiedQuestion.category);
 			});
 		});
 	} else {
@@ -355,7 +361,7 @@ router.post('/teacher/addQuestion', function(req, res){
 
 	if (newQuestion) {
 		var question = new Question();
-		question.quizCategory = newQuestion.quizCategory;
+		question.category = newQuestion.category;
 		question.title = newQuestion.title;
 		question.pictureUrl = newQuestion.pictureUrl;
 		question.example1 = newQuestion.example1;
@@ -383,8 +389,9 @@ router.post('/teacher/addQuestion', function(req, res){
 					}
 
 					data.return = true;
-					data.quizId = quizId;
 					res.send(data);
+
+					updateSuggestions(newQuestion.category);
 				});
 			});
 		});
@@ -420,7 +427,6 @@ router.post('/teacher/deleteQuestion', function(req, res){
 				}
 
 				data.return = true;
-				data.quizId = quizId;
 				res.send(data);
 			});
 		}
@@ -451,6 +457,22 @@ router.post('/teacher/uploadImage/:teacherId', upload.any(), function (req, res,
 		path: req.files[0].path
 	});
 });
+
+function updateSuggestions (categories) {
+	for (var i = 0 ; i <  categories.length; i++) {
+		var suggestion = {
+			category: categories[i].text
+		}
+		Suggestion.update(
+	    {category: suggestion.category},
+	    {$setOnInsert: suggestion},
+	    {upsert: true},
+	    function(err, numAffected) {
+	    	console.log(numAffected);
+	    }
+		);
+	}
+}
 
 router.post('/teacher/getTagSuggestions', function(req, res){
 	var data = {

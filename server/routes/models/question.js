@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var questionSchema = new Schema({
-	quizCategory: Array,
+	category: Array,
 	title: String,
 	pictureUrl: String,
 	example1: String,

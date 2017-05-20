@@ -22,12 +22,16 @@ class TeacherMy extends Component {
 	}
 
 	componentDidMount () {
-		this.props.callGetQuizList({
-			teacherId: this.props.teacherInfo.userID
-		});
-		this.props.callGetFeedBackList({
-			teacherId: this.props.teacherInfo.userID
-		});
+		const { history } = this.props;
+
+		if (history.action !== 'POP') {
+			this.props.callGetQuizList({
+				teacherId: this.props.teacherInfo.userID
+			});
+			this.props.callGetFeedBackList({
+				teacherId: this.props.teacherInfo.userID
+			});
+		}
 	}
 
 	componentWillReceiveProps (nextProps) {
