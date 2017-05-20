@@ -5,6 +5,11 @@ export const setQuizId = params => ({
 	payload: params
 });
 
+export const setNewQuizId = params => ({
+	type: 'SET_NEW_QUIZ_ID',
+	payload: params
+});
+
 export const setQuizName = params => ({
 	type: 'SET_QUIZ_NAME',
 	payload: params
@@ -93,12 +98,14 @@ export const callGetQuizList = params => dispatch => (
 			response.json()
 		)
 	).then(
-		result => (
-			dispatch({
-				type: 'SET_GET_QUIZ_LIST',
-				payload: result
-			})
-		)
+		(result) => {
+			if (result.return) {
+				dispatch({
+					type: 'SET_GET_QUIZ_LIST',
+					payload: result
+				});
+			}
+		}
 	)
 );
 
@@ -117,27 +124,65 @@ export const callGetFeedBackList = params => dispatch => (
 	)
 );
 
-export const callAddQuiz = params => dispatch => (
+export const callAddQuiz = params => (dispatch, getState) => (
 	fetchCall('/api/teacher/addQuiz', params).then(
 		response => (
 			response.json()
 		)
 	).then(
-		result => (
+		(result) => {
 			dispatch({
 				type: 'SET_ADD_QUIZ',
 				payload: result
-			})
-		)
+			});
+			const state = getState();
+			if (result.return) {
+				dispatch(
+					callGetQuizList({
+						teacherId: state.teacherInfo.userID
+					})
+				);
+			}
+		}
 	)
 );
 
-export const callEditQuiz = params => () => (
+export const callEditQuiz = params => (dispatch, getState) => (
 	fetchCall('/api/teacher/editQuiz', params).then(
 		response => (
 			response.json()
 		)
-	).then()
+	).then(
+		(result) => {
+			const state = getState();
+			if (result.return) {
+				dispatch(
+					callGetQuizList({
+						teacherId: state.teacherInfo.userID
+					})
+				);
+			}
+		}
+	)
+);
+
+export const callDeleteQuiz = params => (dispatch, getState) => (
+	fetchCall('/api/teacher/deleteQuiz', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		(result) => {
+			const state = getState();
+			if (result.return) {
+				dispatch(
+					callGetQuizList({
+						teacherId: state.teacherInfo.userID
+					})
+				);
+			}
+		}
+	)
 );
 
 export const callGetQuestionList = params => dispatch => (
@@ -146,29 +191,72 @@ export const callGetQuestionList = params => dispatch => (
 			response.json()
 		)
 	).then(
-		result => (
-			dispatch({
-				type: 'SET_GET_QUESTION_LIST',
-				payload: result
-			})
-		)
+		(result) => {
+			if (result.return) {
+				dispatch({
+					type: 'SET_GET_QUESTION_LIST',
+					payload: result
+				});
+			}
+		}
 	)
 );
 
-export const callAddQuestion = params => () => (
+export const callAddQuestion = params => (dispatch, getState) => (
 	fetchCall('/api/teacher/addQuestion', params).then(
 		response => (
 			response.json()
 		)
-	).then()
+	).then(
+		(result) => {
+			const state = getState();
+			if (result.return) {
+				dispatch(
+					callGetQuestionList({
+						quizId: state.quizId
+					})
+				);
+			}
+		}
+	)
 );
 
-export const callEditQuestion = params => () => (
+export const callEditQuestion = params => (dispatch, getState) => (
 	fetchCall('/api/teacher/editQuestion', params).then(
 		response => (
 			response.json()
 		)
-	).then()
+	).then(
+		(result) => {
+			const state = getState();
+			if (result.return) {
+				dispatch(
+					callGetQuestionList({
+						quizId: state.quizId
+					})
+				);
+			}
+		}
+	)
+);
+
+export const callDeleteQuestion = params => (dispatch, getState) => (
+	fetchCall('/api/teacher/deleteQuestion', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		(result) => {
+			const state = getState();
+			if (result.return) {
+				dispatch(
+					callGetQuestionList({
+						quizId: state.quizId
+					})
+				);
+			}
+		}
+	)
 );
 
 export const callUploadImage = params => (dispatch) => {

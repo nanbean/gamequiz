@@ -117,7 +117,7 @@ class TeacherWait extends Component {
 TeacherWait.propTypes = {
 	history: PropTypes.object.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
-	playId: PropTypes.number.isRequired,
+	playId: PropTypes.string.isRequired,
 	gameMode: PropTypes.object.isRequired,
 	studentPlayerList: PropTypes.array.isRequired,
 	callStartPlay: PropTypes.func.isRequired

@@ -6,7 +6,7 @@ import { Header, Divider, Grid, List, Button, Input } from 'semantic-ui-react';
 
 import TitleHeader from '../components/TitleHeader';
 
-import { setQuestion, callAddQuiz, callEditQuiz, callGetQuestionList } from '../actions';
+import { setNewQuizId, setQuestion, callEditQuiz, callDeleteQuestion, callGetQuestionList } from '../actions';
 
 import '../styles/teacher.css';
 
@@ -19,6 +19,7 @@ class TeacherQuizEdit extends Component {
 		this.onTitleChange = this.onTitleChange.bind(this);
 		this.onQuestionNewButton = this.onQuestionNewButton.bind(this);
 		this.onQuestionEditButton = this.onQuestionEditButton.bind(this);
+		this.onQuestionDeleteButton = this.onQuestionDeleteButton.bind(this);
 
 		this.state = {
 			title: this.props.quiz.quizTitle
@@ -29,16 +30,7 @@ class TeacherQuizEdit extends Component {
 		this.props.callGetQuestionList({
 			quizId: this.props.match.params.id
 		});
-		if (this.props.match.params.id === 'new') {
-			const quiz = {};
-			quiz.quizTitle = '';
-			quiz.questionList = [];
-
-			this.props.callAddQuiz({
-				teacherId: this.props.teacherInfo.userID,
-				quiz
-			});
-		}
+		this.props.setNewQuizId('');
 	}
 
 	componentWillReceiveProps (nextProps) {
@@ -49,16 +41,16 @@ class TeacherQuizEdit extends Component {
 
 	onSaveButton () {
 		const quiz = {};
-		quiz.quizId = this.props.match.params.id;
+		quiz._id = this.props.match.params.id;
 		quiz.quizTitle = this.state.title;
 		quiz.questionList = [];
 
 		for (let i = 0; i < this.props.getQuestionList.questionList.length; i += 1) {
-			quiz.questionList.push(this.props.getQuestionList.questionList[i].questionId);
+			quiz.questionList.push(this.props.getQuestionList.questionList[i]._id);
 		}
 
 		if (this.props.match.params.id === 'new') {
-			quiz.quizId = this.props.newQuizId;
+			quiz._id = this.props.newQuizId;
 			this.props.callEditQuiz({
 				quiz
 			});
@@ -82,7 +74,7 @@ class TeacherQuizEdit extends Component {
 
 	onQuestionEditButton (ev, refs) {
 		const questionList = this.props.getQuestionList && this.props.getQuestionList.questionList;
-		const data = questionList.find(item => item.questionId === refs.target);
+		const data = questionList.find(item => item._id === refs.target);
 		this.props.setQuestion(data);
 		this.props.history.push(`/questionedit/${refs.target}`);
 	}
@@ -92,22 +84,36 @@ class TeacherQuizEdit extends Component {
 		this.props.history.push('/questionedit/new');
 	}
 
-	renderQuestion (data) {
+	onQuestionDeleteButton (ev, refs) {
+		this.props.callDeleteQuestion({
+			teacherId: this.props.teacherInfo.userID,
+			quizId: this.props.match.params.id,
+			questionId: refs.target
+		});
+	}
+
+	renderQuestion (question) {
 		return (
-			<List.Item key={data.questionId}>
+			<List.Item key={question._id}>
 				<List.Content floated='right'>
 					<Button
 						content='Edit'
 						icon='edit'
 						labelPosition='left'
 						onClick={this.onQuestionEditButton}
-						target={data.questionId}
+						target={question._id}
 					/>
-					<Button content='Delete' icon='trash' labelPosition='left' />
+					<Button
+						content='Delete'
+						icon='trash'
+						labelPosition='left'
+						onClick={this.onQuestionDeleteButton}
+						target={question._id}
+					/>
 				</List.Content>
 				<List.Content className='teacher-quizlist-title-wrapper' floated='left'>
 					<Header className='teacher-quizlist-title' as='h2'>
-						{data.title}
+						{question.title}
 					</Header>
 				</List.Content>
 			</List.Item>
@@ -180,14 +186,15 @@ class TeacherQuizEdit extends Component {
 
 TeacherQuizEdit.propTypes = {
 	callGetQuestionList: PropTypes.func.isRequired,
-	callAddQuiz: PropTypes.func.isRequired,
 	callEditQuiz: PropTypes.func.isRequired,
+	callDeleteQuestion: PropTypes.func.isRequired,
+	setNewQuizId: PropTypes.func.isRequired,
 	setQuestion: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
 	quiz: PropTypes.object.isRequired,
-	newQuizId: PropTypes.number.isRequired,
+	newQuizId: PropTypes.string.isRequired,
 	getQuestionList: PropTypes.object.isRequired
 };
 
@@ -199,17 +206,20 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-	callAddQuiz (param) {
-		dispatch(callAddQuiz(param));
-	},
 	callEditQuiz (param) {
 		dispatch(callEditQuiz(param));
+	},
+	callDeleteQuestion (param) {
+		dispatch(callDeleteQuestion(param));
 	},
 	callGetQuestionList (param) {
 		dispatch(callGetQuestionList(param));
 	},
 	setQuestion (param) {
 		dispatch(setQuestion(param));
+	},
+	setNewQuizId (param) {
+		dispatch(setNewQuizId(param));
 	}
 });
 

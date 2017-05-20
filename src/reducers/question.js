@@ -1,6 +1,6 @@
 const initialState = {
 	questionId: -1,
-	quizCategory: [],
+	category: [],
 	title: '',
 	pictureUrl: '',
 	example1: '',
@@ -15,7 +15,7 @@ export default function question (state = initialState, action) {
 	switch (action.type) {
 	case 'SET_QUESTION':
 		if (action.payload) {
-			return Object.assign({}, state, action.payload);
+			return action.payload;
 		}
 		return initialState;
 	case 'CLEAR_QUESTION':
