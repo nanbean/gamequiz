@@ -1,9 +1,25 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
 const fs = require('fs');
-const multer  = require('multer')
-const getServerEventTeacher = require("./sse")
-const getServerEvent = require("./sse")
+const multer  = require('multer');
+const getServerEventTeacher = require("./sse");
+const getServerEvent = require("./sse");
+const mongoose = require('mongoose');
+
+const db = mongoose.connection;
+db.on('error', console.error);
+db.once('open', function(){
+		// CONNECTED TO MONGODB SERVER
+		console.log("Connected to mongod server");
+});
+
+mongoose.connect('mongodb://localhost/gamequiz');
+
+
+var Teacher = require('./models/teacher');
+var Quiz = require('./models/quiz');
+var Question = require('./models/question');
+var Suggestion = require('./models/suggestion');
 
 router.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*")
@@ -14,231 +30,6 @@ router.use(function(req, res, next) {
 router.get('/', function(req, res, next) {
 	res.json({})
 })
-
-var teacher = [
-	{
-		teacherId: 10155828101494882,
-		quizList: [1, 2, 3]
-	}
-];
-
-var quizzes = [
-	{
-		quizId: 0,
-		quizTitle: 'SEP521',
-		questionList: [
-			1
-		]
-	},
-	{
-		quizId: 1,
-		quizTitle: 'Math',
-		questionList: [
-			1,
-			6
-		]
-	},
-	{
-		quizId: 2,
-		quizTitle: 'Korean',
-		questionList: [
-			1,
-			2,
-			3,
-			4,
-			5,
-			6
-		]
-	},
-	{
-		quizId: 3,
-		quizTitle: 'Funny',
-		questionList: [
-			1,
-			2,
-			3
-		]
-	}
-];
-
-var questions = [
-	{
-		questionId: 0,
-		quizCategory: [
-			{
-				id: 1,
-				text: "덧셈"
-			},
-			{
-				id: 2,
-				text: "산수"
-			}
-		],
-		title: '1+1=?',
-		pictureUrl: '',
-		example1: '1',
-		example2: '2',
-		example3: '3',
-		example4: '4',
-		answer: 2,
-		timer: 20
-	},
-	{
-		questionId: 1,
-		quizCategory: [
-			{
-				id: 1,
-				text: "곱셈"
-			},
-			{
-				id: 2,
-				text: "산수"
-			}
-		],
-		title: '5x5=?',
-		pictureUrl: '',
-		example1: '10',
-		example2: '20',
-		example3: '25',
-		example4: '30',
-		answer: 3,
-		timer: 5
-	},
-	{
-		questionId: 2,
-		quizCategory: [
-			{
-				id: 1,
-				text: "지리"
-			},
-			{
-				id: 2,
-				text: "나라"
-			},
-			{
-				id: 3,
-				text: "수도"
-			}
-		],
-		title: '대한민국의 수도는?',
-		pictureUrl: '',
-		example1: '서울',
-		example2: '부산',
-		example3: '대구',
-		example4: '광주',
-		answer: 1,
-		timer: 10
-	},
-	{
-		questionId: 3,
-		quizCategory: [
-			{
-				id: 1,
-				text: "달력"
-			},
-			{
-				id: 2,
-				text: "생활"
-			}
-		],
-		title: '1월은 몇일까지 있을까요?',
-		pictureUrl: '',
-		example1: '29',
-		example2: '30',
-		example3: '31',
-		example4: '32',
-		answer: 3,
-		timer: 20
-	},
-	{
-		questionId: 4,
-		quizCategory: [
-			{
-				id: 1,
-				text: "덧셈"
-			},
-			{
-				id: 2,
-				text: "산수"
-			}
-		],
-		title: '1+1=?',
-		pictureUrl: '',
-		example1: '1',
-		example2: '2',
-		example3: '3',
-		example4: '4',
-		answer: 2,
-		timer: 20
-	},
-	{
-		questionId: 5,
-		quizCategory: [
-			{
-				id: 1,
-				text: "곱셈"
-			},
-			{
-				id: 2,
-				text: "산수"
-			}
-		],
-		title: '5x5=?',
-		pictureUrl: '',
-		example1: '10',
-		example2: '20',
-		example3: '25',
-		example4: '30',
-		answer: 1,
-		timer: 20
-	},
-	{
-		questionId: 6,
-		quizCategory: [
-			{
-				id: 1,
-				text: "지리"
-			},
-			{
-				id: 2,
-				text: "나라"
-			},
-			{
-				id: 3,
-				text: "수도"
-			}
-		],
-		title: '대한민국의 수도는?',
-		pictureUrl: '',
-		example1: '서울',
-		example2: '부산',
-		example3: '대구',
-		example4: '광주',
-		answer: 1,
-		timer: 10
-	},
-	{
-		questionId: 7,
-		quizCategory: [
-			{
-				id: 1,
-				text: "달력"
-			},
-			{
-				id: 2,
-				text: "생활"
-			}
-		],
-		title: '1월은 몇일까지 있을까요?',
-		pictureUrl: '',
-		example1: '29',
-		example2: '30',
-		example3: '31',
-		example4: '32',
-		answer: 3,
-		timer: 20
-	}
-];
 
 var feedback = [
 	{
@@ -290,26 +81,24 @@ var plays = [
 	// }
 ];
 
-function checkUserExist (teacherId) {
-	for (var i = 0; i < teacher.length; i++) {
-		if (teacher[i].teacherId == teacherId) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 router.post('/teacher/checkTeacher', function(req, res){
 	var teacherId = req.body.teacherId;
 	var data = {
 		valid: false
 	};
 
-	if (teacherId && checkUserExist(teacherId)) {
-		data.valid = true;
-	}
-	res.send(data);
+	Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
+		if (err) {
+			return res.send(data);
+		}
+
+		if (teacher) {
+			data.valid = true;
+			return res.send(data);
+		}
+
+		res.send(data);
+	});
 });
 
 router.post('/teacher/registerTeacher', function(req, res){
@@ -319,42 +108,50 @@ router.post('/teacher/registerTeacher', function(req, res){
 		return : false
 	};
 
-	if (teacherId && !checkUserExist(teacherId)) {
-		data.return = true;
-		teacher.push({
-			teacherId: teacherId,
-			quizList: [1, 2, 3]
-		});
-		checkUserExist(11111);
-	} else {
-		data.error = 'ALREADY_EXIST'
-	}
+	if (teacherId) {
+		var teacher = new Teacher();
+		teacher.teacherId = teacherId;
+		teacher.quizList = [];
 
-	res.send(data);
-});
-
-function getQuizList (teacherId) {
-	var result = [];
-
-	for (var i = 0; i < teacher.length; i++) {
-		if (teacher[i].teacherId == teacherId) {
-			for (var j = 0; j < teacher[i].quizList.length; j++) {
-				result.push(quizzes[teacher[i].quizList[j]]);
+		teacher.save(function(err){
+			if(err) {
+				data.error = 'DB_ERROR'
+				return res.send(data);
 			}
-			break;
-		}
-	}
 
-	return result;
-}
+			data.return = true;
+			res.send(data);
+		});
+	} else {
+		data.error = 'NO_TEACHER_ID'
+		res.send(data);
+	}
+});
 
 router.post('/teacher/getQuizList', function(req, res){
 	var teacherId = req.body.teacherId;
-	var data = {};
+	var data = {
+		quizList: []
+	};
 
-	data.quizList = getQuizList(teacherId);
+	if (teacherId) {
+		Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
+			if (err) {
+				return res.send(data);
+			}
 
-	res.send(data);
+			Quiz.find({_id: {$in: teacher.quizList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, quizList) {
+				if (err) {
+					return res.send(data);
+				}
+
+				data.quizList = quizList;
+				res.send(data);
+			});
+		});
+	} else {
+		res.send(data);
+	}
 });
 
 router.post('/teacher/getFeedBackList', function(req, res){
@@ -362,21 +159,6 @@ router.post('/teacher/getFeedBackList', function(req, res){
 		feedBackList: feedback
 	});
 });
-
-function getQuestionList (quizId) {
-	var result = [];
-
-	for (var i = 0; i < quizzes.length; i++) {
-		if (quizzes[i].quizId == quizId) {
-			for (var j = 0; j < quizzes[i].questionList.length; j++) {
-				result.push(questions[quizzes[i].questionList[j]]);
-			}
-			break;
-		}
-	}
-
-	return result;
-}
 
 function addQuiztoTeacher (teacherId, quizId) {
 	for (var i = 0; i < teacher.length; i++) {
@@ -386,80 +168,137 @@ function addQuiztoTeacher (teacherId, quizId) {
 	}
 }
 
-function addQuiz (quiz) {
-	var lastQuizId = 0;
-
-	for (var i = 0; i < quizzes.length; i++) {
-		if (quizzes[i].quizId > lastQuizId) {
-			lastQuizId = quizzes[i].quizId;
-		}
-	}
-
-	quiz.quizId = lastQuizId + 1;
-
-	quizzes.push(quiz);
-
-	return quiz.quizId;
-}
-
 router.post('/teacher/addQuiz', function(req, res){
 	var teacherId = req.body.teacherId;
-	var quiz = req.body.quiz;
+	var newQuiz = req.body.quiz;
 	var data = {
-		return: true
+		return: false
 	};
 
-	data.quizId = addQuiz(quiz);
+	if (teacherId && newQuiz) {
+		var quiz = new Quiz();
 
-	addQuiztoTeacher(teacherId, data.quizId);
+		quiz.quizTitle = newQuiz.quizTitle;
+		quiz.questionList = newQuiz.questionList;
 
-	res.send(data);
+		quiz.save(function(err){
+			if(err) {
+				return res.send(data);
+			}
+
+			Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
+				if (err) {
+					return res.send(data);
+				}
+
+				teacher.quizList.push(quiz._id);
+
+				teacher.save(function(err){
+					if (err) {
+						return res.send(data);
+					}
+
+					data.quizId = quiz._id
+					data.return = true;
+					res.send(data);
+				});
+			});
+		});
+	} else {
+		res.send(data);
+	}
 });
 
-function editQuiz (quiz) {
-	for (var i = 0; i < quizzes.length; i++) {
-		if (quizzes[i].quizId == quiz.quizId) {
-			quizzes[i] = quiz;
-			return true;
-		}
-	}
-
-	return false;
-}
-
 router.post('/teacher/editQuiz', function(req, res){
-	var quiz = req.body.quiz;
+	var quizModified = req.body.quiz;
 	var data = {
-		return: true
+		return: false
 	};
 
-	if (editQuiz(quiz)) {
+	Quiz.findById(quizModified._id, function(err, quiz){
+		if (err) {
+			return res.send(data);
+		}
 
-	} else {
-		data.return = false;
-	}
-	res.send(data);
+		quiz.quizTitle = quizModified.quizTitle;
+		quiz.questionList = quizModified.questionList;
+
+		quiz.save(function(err){
+			if (err) {
+				return res.send(data);
+			}
+
+			data.return = true;
+			res.send(data);
+		});
+	});
+});
+
+router.post('/teacher/deleteQuiz', function(req, res){
+	var teacherId = req.body.teacherId;
+	var quizId = req.body.quizId;
+	var data = {
+		return: false
+	};
+
+	Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
+		if (err) {
+			return res.send(data);
+		}
+
+		for (var i = 0; i < teacher.quizList.length; i++) {
+			if (teacher.quizList[i] == quizId) {
+				teacher.quizList.splice(i, 1);
+			}
+		}
+
+		teacher.save(function(err){
+			if (err) {
+				return res.send(data);
+			}
+
+			Quiz.remove({_id: quizId}, function(err, quiz){
+				if (err) {
+					return res.send(data);
+				}
+
+				data.return = true;
+				res.send(data);
+			});
+
+		});
+	});
 });
 
 router.post('/teacher/getQuestionList', function(req, res){
 	var quizId = req.body.quizId;
-	var data = {};
+	var data = {
+		questionList: []
+	};
 
-	data.questionList = getQuestionList(quizId);
+	if (quizId) {
+		Quiz.findById(quizId, function(err, quiz) {
+			if (err) {
+				return res.send(data);
+			}
 
-	res.send(data);
-});
+			if (quiz && quiz.questionList) {
+				Question.find({_id: {$in: quiz.questionList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, questionList) {
+					if (err) {
+						return res.send(data);
+					}
 
-function editQuestion (question) {
-	var result = [];
-
-	for (var i = 0; i < questions.length; i++) {
-		if (questions[i].questionId == question.questionId) {
-			questions[i] = question;
-			break;
-		}
+					data.questionList = questionList;
+					res.send(data);
+				});
+			} else {
+				res.send(data);
+			}
+		});
+	} else {
+		res.send(data);
 	}
-}
+});
 
 function addQuestiontoQuiz (quizId, questionId) {
 	for (var i = 0; i < quizzes.length; i++) {
@@ -471,33 +310,121 @@ function addQuestiontoQuiz (quizId, questionId) {
 }
 
 router.post('/teacher/editQuestion', function(req, res){
-	var question = req.body.question;
+	var modifiedQuestion = req.body.question;
 	var data = {
-		return: true
+		return: false
 	};
 
-	if (editQuestion(question)) {
+	if (modifiedQuestion) {
+		Question.findById(modifiedQuestion._id, function(err, question) {
+			if (err) {
+				return res.send(data);
+			}
 
+			question.quizCategory = modifiedQuestion.quizCategory;
+			question.title = modifiedQuestion.title;
+			question.pictureUrl = modifiedQuestion.pictureUrl;
+			question.example1 = modifiedQuestion.example1;
+			question.example2 = modifiedQuestion.example2;
+			question.example3 = modifiedQuestion.example3;
+			question.example4 = modifiedQuestion.example4;
+			question.answer = modifiedQuestion.answer;
+			question.timer = modifiedQuestion.timer;
+
+			question.save(function(err){
+				if (err) {
+					return res.send(data);
+				}
+
+				data.return = true;
+				res.send(data);
+			});
+		});
 	} else {
-		data.return = false;
+		res.send(data);
 	}
-	res.send(data);
 });
 
 router.post('/teacher/addQuestion', function(req, res){
-	var question = req.body.question;
+	var newQuestion = req.body.question;
 	var quizId = req.body.quizId;
 
 	var data = {
-		return: true
+		return: false
 	};
 
-	question.questionId = questions.length;
+	if (newQuestion) {
+		var question = new Question();
+		question.quizCategory = newQuestion.quizCategory;
+		question.title = newQuestion.title;
+		question.pictureUrl = newQuestion.pictureUrl;
+		question.example1 = newQuestion.example1;
+		question.example2 = newQuestion.example2;
+		question.example3 = newQuestion.example3;
+		question.example4 = newQuestion.example4;
+		question.answer = newQuestion.answer;
+		question.timer = newQuestion.timer;
 
-	addQuestiontoQuiz(quizId, question.questionId);
-	questions.push(question);
+		question.save(function(err){
+			if (err) {
+				return res.send(data);
+			}
 
-	res.send(data);
+			Quiz.findById(quizId, function(err, quiz) {
+				if (err) {
+					return res.send(data);
+				}
+
+				quiz.questionList.push(question._id);
+
+				quiz.save(function(err){
+					if (err) {
+						return res.send(data);
+					}
+
+					data.return = true;
+					data.quizId = quizId;
+					res.send(data);
+				});
+			});
+		});
+	} else {
+		res.send(data);
+	}
+});
+
+router.post('/teacher/deleteQuestion', function(req, res){
+	var teacherId = req.body.teacherId;
+	var quizId = req.body.quizId;
+	var questionId = req.body.questionId;
+	var data = {
+		return: false
+	};
+
+	Quiz.findById(quizId, function(err, quiz) {
+		if (err) {
+			return res.send(data);
+		}
+
+		if (quiz && quiz.questionList) {
+			for (var i = 0; i < quiz.questionList.length; i++) {
+				if (quiz.questionList[i] == questionId) {
+					quiz.questionList.splice(i, 1);
+					break;
+				}
+			}
+
+			quiz.save(function(err){
+				if (err) {
+					return res.send(data);
+				}
+
+				data.return = true;
+				data.quizId = quizId;
+				res.send(data);
+			});
+		}
+	});
 });
 
 let upload = multer({
@@ -526,27 +453,20 @@ router.post('/teacher/uploadImage/:teacherId', upload.any(), function (req, res,
 });
 
 router.post('/teacher/getTagSuggestions', function(req, res){
-	var suggestions = [];
-	var data = {};
+	var data = {
+		suggestions: []
+	};
 
-	for (var i = 0; i < questions.length; i++) {
-		for (var j = 0; j < questions[i].quizCategory.length; j++) {
-			if (questions[i].quizCategory[j] && questions[i].quizCategory[j].text) {
-				suggestions.push(questions[i].quizCategory[j].text);
-			}
-		}
-	}
-
-	data.suggestions = [...new Set(suggestions)];
-
-	res.send(data);
+	Suggestion.find({}, function(err, suggestions) {
+		data.suggestions = [...new Set(suggestions.map(function(o){ return o.category; }))];
+		res.send(data);
+	});
 });
 
 function startGameMode (quizId, gameMode) {
 	var playId;
-	var gameMode;
 
-	playId = Math.floor((Math.random() * 10000) + 1);
+	playId = Math.floor((Math.random() * 10000) + 1).toString();;
 
 	plays.push({
 		playId: playId,
@@ -614,96 +534,150 @@ function getQuestionWithQuestionId (questionId) {
 function sendLeaderBoard (playId) {
 	var data = {};
 	var play = getPlayWithPlayId(playId);
-	var quiz = play && getQuizWithQuizId(play.quizId);
+	var quizId = play && play.quizId;
 
-	if (play && quiz) {
-		data.playId = playId;
-		data.leaderBoard = [];
-		if (play.currentQuestionIndex < quiz.questionList.length - 1) {
-			data.serverStatus = 'LEADER_BOARD';
-
-			for (var i = 0; i < play.studentPlayerList.length; i++) {
-				var student = {};
-				var answerList = play.studentPlayerList[i].answerList;
-
-				student.studentId = play.studentPlayerList[i].studentId;
-				student.studentNick = play.studentPlayerList[i].studentNick;
-				student.score = 0;
-
-				if (answerList) {
-					for (var j = 0; j < answerList.length; j++) {
-						student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
-					}
-				}
-				data.leaderBoard.push(student);
-			}
-		} else {
-			data.serverStatus = 'END';
-
-			for (var i = 0; i < play.studentPlayerList.length; i++) {
-				var student = {};
-				var answerList = play.studentPlayerList[i].answerList;
-				student.studentId = play.studentPlayerList[i].studentId;
-				student.studentNick = play.studentPlayerList[i].studentNick;
-				student.score = 0;
-
-				if (answerList) {
-					for (var j = 0; j < answerList.length; j++) {
-						student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
-					}
-				}
-				data.leaderBoard.push(student);
+	if (play && quizId) {
+		Quiz.findById(quizId, function(err, quiz){
+			if (err) {
+				console.error(err);
 			}
 
-			deletePlayWithPlayId(playId);
-		}
+			data.playId = playId;
+			data.leaderBoard = [];
+			if (play.currentQuestionIndex < quiz.questionList.length - 1) {
+				data.serverStatus = 'LEADER_BOARD';
 
-		getServerEvent.publish(JSON.stringify(data));
-		getServerEventTeacher.publish(JSON.stringify(data));
+				for (var i = 0; i < play.studentPlayerList.length; i++) {
+					var student = {};
+					var answerList = play.studentPlayerList[i].answerList;
+
+					student.studentId = play.studentPlayerList[i].studentId;
+					student.studentNick = play.studentPlayerList[i].studentNick;
+					student.score = 0;
+
+					if (answerList) {
+						for (var j = 0; j < answerList.length; j++) {
+							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
+						}
+					}
+					data.leaderBoard.push(student);
+				}
+			} else {
+				data.serverStatus = 'END';
+
+				for (var i = 0; i < play.studentPlayerList.length; i++) {
+					var student = {};
+					var answerList = play.studentPlayerList[i].answerList;
+					student.studentId = play.studentPlayerList[i].studentId;
+					student.studentNick = play.studentPlayerList[i].studentNick;
+					student.score = 0;
+
+					if (answerList) {
+						for (var j = 0; j < answerList.length; j++) {
+							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
+						}
+					}
+					data.leaderBoard.push(student);
+				}
+
+				deletePlayWithPlayId(playId);
+			}
+
+			getServerEvent.publish(JSON.stringify(data));
+			getServerEventTeacher.publish(JSON.stringify(data));
+		});
 	}
 }
 
 function sendResult (playId) {
 	var data = {};
 	var play = getPlayWithPlayId(playId);
-	var quiz = play && getQuizWithQuizId(play.quizId);
-	var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
+	var quizId = play && play.quizId;
+	// var quiz = play && getQuizWithQuizId(play.quizId);
+	// var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
 
 	data.playId = playId;
 	data.serverStatus = 'RESULT';
 
-	if (play && quiz && question) {
-		data.result = {
-			answer: question.answer,
-			example1: 0,
-			example2: 0,
-			example3: 0,
-			example4: 0
-		};
+	if (play && quizId) {
+		Quiz.findById(quizId, function(err, quiz){
+			if (err) {
+				console.error(err);
+			}
 
-		for (var i = 0; i < play.studentPlayerList.length; i++) {
-			var answerList = play.studentPlayerList[i].answerList;
-			if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 1) {
-				data.result.example1++;
-			}
-			else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
-				data.result.example2++;
-			}
-			else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
-				data.result.example3++;
-			}
-			else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
-				data.result.example4++;
-			}
-		}
+			var questionId = quiz.questionList[play.currentQuestionIndex];
 
-		getServerEvent.publish(JSON.stringify(data));
-		getServerEventTeacher.publish(JSON.stringify(data));
+			Question.findById(questionId, function(err, question){
+				if (err) {
+					console.error(err);
+				}
 
-		play.nextStepTimer = setTimeout(function() {
-			sendLeaderBoard(playId);
-		}, 5000);
+				data.result = {
+					answer: question.answer,
+					example1: 0,
+					example2: 0,
+					example3: 0,
+					example4: 0
+				};
+
+				for (var i = 0; i < play.studentPlayerList.length; i++) {
+					var answerList = play.studentPlayerList[i].answerList;
+					if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 1) {
+						data.result.example1++;
+					}
+					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
+						data.result.example2++;
+					}
+					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
+						data.result.example3++;
+					}
+					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
+						data.result.example4++;
+					}
+				}
+
+				getServerEvent.publish(JSON.stringify(data));
+				getServerEventTeacher.publish(JSON.stringify(data));
+
+				play.nextStepTimer = setTimeout(function() {
+					sendLeaderBoard(playId);
+				}, 5000);
+			});
+		});
 	}
+
+	// if (play && quiz && question) {
+	// 	data.result = {
+	// 		answer: question.answer,
+	// 		example1: 0,
+	// 		example2: 0,
+	// 		example3: 0,
+	// 		example4: 0
+	// 	};
+
+	// 	for (var i = 0; i < play.studentPlayerList.length; i++) {
+	// 		var answerList = play.studentPlayerList[i].answerList;
+	// 		if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 1) {
+	// 			data.result.example1++;
+	// 		}
+	// 		else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
+	// 			data.result.example2++;
+	// 		}
+	// 		else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
+	// 			data.result.example3++;
+	// 		}
+	// 		else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
+	// 			data.result.example4++;
+	// 		}
+	// 	}
+
+	// 	getServerEvent.publish(JSON.stringify(data));
+	// 	getServerEventTeacher.publish(JSON.stringify(data));
+
+	// 	play.nextStepTimer = setTimeout(function() {
+	// 		sendLeaderBoard(playId);
+	// 	}, 5000);
+	// }
 }
 
 function sendWait (playId) {
@@ -720,38 +694,48 @@ function sendQuetion (playId) {
 	var data = {};
 	var timeOut;
 	var play = getPlayWithPlayId(playId);
-	var quiz = play && getQuizWithQuizId(play.quizId);
+	// var quiz = play && getQuizWithQuizId(play.quizId);
 
-	if (play && quiz) {
-		data.playId = playId;
-		data.serverStatus = 'PLAY';
-
-		for (var j = 0; j < questions.length; j++) {
-			if (questions[j].questionId === quiz.questionList[play.currentQuestionIndex]) {
-				data.question = questions[j];
-				timeOut = data.question.timer;
+	if (play) {
+		Quiz.findById(play.quizId, function(err, quiz){
+			if (err) {
+				console.error(err);
 			}
-		}
-		data.timeOut = timeOut
+			if (quiz) {
+				data.playId = playId;
+				data.serverStatus = 'PLAY';
 
-		play.presentationTime = new Date();
-		play.timeOut = timeOut;
+				Question.findById(quiz.questionList[play.currentQuestionIndex], function(err, question){
+					if (err) {
+						console.error(err);
+					}
+					data.question = question;
+					timeOut = question.timer;
+					data.timeOut = question.timer;
 
-		getServerEvent.publish(JSON.stringify(data));
-		getServerEventTeacher.publish(JSON.stringify(data));
+					play.presentationTime = new Date();
+					play.timeOut = timeOut;
 
-		play.nextStepTimer = setInterval(function() {
-			timeOut--;
-			data.timeOut = timeOut;
-			if ( timeOut >= 0) {
-				getServerEvent.publish(JSON.stringify(data));
-				getServerEventTeacher.publish(JSON.stringify(data));
-			} else {
-				play && clearInterval(play.nextStepTimer);
-				play.nextStepTimer =  null;
-				sendResult(playId);
+					getServerEvent.publish(JSON.stringify(data));
+					getServerEventTeacher.publish(JSON.stringify(data));
+
+					play.nextStepTimer = setInterval(function() {
+						timeOut--;
+						data.timeOut = timeOut;
+						if ( timeOut >= 0) {
+							getServerEvent.publish(JSON.stringify(data));
+							getServerEventTeacher.publish(JSON.stringify(data));
+						} else {
+							if (play && play.nextStepTimer) {
+								play && clearInterval(play.nextStepTimer);
+								play.nextStepTimer =  null;
+							}
+							sendResult(playId);
+						}
+					}, 1000);
+				});
 			}
-		}, 1000);
+		});
 	}
 }
 
@@ -809,8 +793,10 @@ function terminatePlay (playId) {
 
 	getServerEvent.publish(JSON.stringify(data));
 
-	play && clearInterval(play.nextStepTimer);
-	play.nextStepTimer =  null;
+	if (play && play.nextStepTimer) {
+		clearInterval(play.nextStepTimer);
+		play.nextStepTimer =  null;
+	}
 
 	deletePlayWithPlayId(playId);
 }
@@ -922,29 +908,50 @@ function calculateScore (playTimeOut, presentationTime, answerTime) {
 	var elapsedTime = answerTime - presentationTime;
 	var score = playTimeOut*25 - elapsedTime/1000*25;
 	// 25 is temporary number
+
 	return score;
 }
 
 function updateAnswerToPlay (playId, studentId, answer) {
 	var play = getPlayWithPlayId(playId);
-	var quiz = play && getQuizWithQuizId(play.quizId);
-	var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
+	var quizId = play && play.quizId;
+	// var quiz = play && getQuizWithQuizId(play.quizId);
+	// var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
 
-	if (question) {
-		for (var i = 0; i < play.studentPlayerList.length; i++) {
-			if ( play.studentPlayerList[i].studentId == studentId) {
-				if (!play.studentPlayerList[i].answerList) {
-					play.studentPlayerList[i].answerList = [];
-				}
-				play.studentPlayerList[i].answerList.push({
-					questionId: question.questionId,
-					answer: answer,
-					correct: question.answer == answer,
-					score: question.answer == answer ? calculateScore(play.timeOut, play.presentationTime, new Date()):0
-				});
+
+if (play && quizId) {
+		Quiz.findById(quizId, function(err, quiz){
+			if (err) {
+				console.error(err);
 			}
 
-		}
+			var questionId = quiz && quiz.questionList[play.currentQuestionIndex];
+
+			if (questionId) {
+				Question.findById(quiz.questionList[play.currentQuestionIndex], function(err, question){
+					if (err) {
+						console.error(err);
+					}
+
+					if (question) {
+						for (var i = 0; i < play.studentPlayerList.length; i++) {
+							if ( play.studentPlayerList[i].studentId == studentId) {
+								if (!play.studentPlayerList[i].answerList) {
+									play.studentPlayerList[i].answerList = [];
+								}
+
+								play.studentPlayerList[i].answerList.push({
+									questionId: question.questionId,
+									answer: answer,
+									correct: question.answer == answer,
+									score: question.answer == answer ? calculateScore(play.timeOut, play.presentationTime, new Date()):0
+								});
+							}
+						}
+					}
+				});
+			}
+		});
 	}
 }
 
@@ -969,8 +976,10 @@ function removeStudentFromPlay (playId, studentId) {
 		for (let i = 0; i < play.studentPlayerList.length; i++) {
 			if (play.studentPlayerList[i].studentId == studentId) {
 				play.studentPlayerList.splice(i, 1);
-				clearInterval(play.nextStepTimer);
-				play.nextStepTimer =  null;
+				if (play && play.nextStepTimer) {
+					clearInterval(play.nextStepTimer);
+					play.nextStepTimer =  null;
+				}
 				getServerEventTeacher.publish(JSON.stringify(play));
 				return;
 			}

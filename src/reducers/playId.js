@@ -1,6 +1,6 @@
-const initialState = -1;
+const initialState = '';
 
-export default function playId (state = -1, action) {
+export default function playId (state = initialState, action) {
 	switch (action.type) {
 	case 'RESET_TO_HOME':
 		return initialState;

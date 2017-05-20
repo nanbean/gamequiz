@@ -7,7 +7,7 @@ import { Header, Divider, Grid, List, Button, Table } from 'semantic-ui-react';
 import Avatar from '../components/Avatar';
 import TitleHeader from '../components/TitleHeader';
 
-import { setQuizId, setQuizName, setQuiz, callGetQuizList, callGetFeedBackList } from '../actions';
+import { setQuizId, setQuizName, setQuiz, callGetQuizList, callGetFeedBackList, callDeleteQuiz, callAddQuiz } from '../actions';
 
 import '../styles/teacher.css';
 
@@ -18,6 +18,7 @@ class TeacherMy extends Component {
 		this.onQuizEditButton = this.onQuizEditButton.bind(this);
 		this.onQuizAddButton = this.onQuizAddButton.bind(this);
 		this.onQuizStartButton = this.onQuizStartButton.bind(this);
+		this.onQuizDeleteButton = this.onQuizDeleteButton.bind(this);
 	}
 
 	componentDidMount () {
@@ -29,19 +30,41 @@ class TeacherMy extends Component {
 		});
 	}
 
+	componentWillReceiveProps (nextProps) {
+		const { newQuizId } = nextProps;
+
+		if (newQuizId) {
+			this.props.history.push(`/quizedit/${newQuizId}`);
+		}
+	}
+
 	onQuizAddButton () {
-		this.props.history.push('/quizedit/new');
+		const quiz = {};
+		quiz.quizTitle = '';
+		quiz.questionList = [];
+
+		this.props.callAddQuiz({
+			teacherId: this.props.teacherInfo.userID,
+			quiz
+		});
 	}
 
 	onQuizEditButton (ev, refs) {
 		const { getQuizList } = this.props;
 		this.props.setQuizId(refs.target);
 		for (let i = 0; i < getQuizList.quizList.length; i += 1) {
-			if (getQuizList.quizList[i].quizId === refs.target) {
+			if (getQuizList.quizList[i]._id === refs.target) {
 				this.props.setQuiz(getQuizList.quizList[i]);
 			}
 		}
 		this.props.history.push(`/quizedit/${refs.target}`);
+	}
+
+	onQuizDeleteButton (ev, refs) {
+		this.props.callDeleteQuiz({
+			teacherId: this.props.teacherInfo.userID,
+			quizId: refs.target
+		});
 	}
 
 	onQuizStartButton (ev, refs) {
@@ -49,35 +72,42 @@ class TeacherMy extends Component {
 
 		this.props.setQuizId(refs.target);
 		for (let i = 0; i < getQuizList.quizList.length; i += 1) {
-			if (getQuizList.quizList[i].quizId === refs.target) {
+			if (getQuizList.quizList[i]._id === refs.target) {
 				this.props.setQuizName(getQuizList.quizList[i].quizTitle);
 			}
 		}
 		this.props.history.push('/mode/');
 	}
 
-	renderQuiz (data) {
+	renderQuiz (quiz) {
 		return (
-			<List.Item key={data.quizId}>
+			<List.Item key={quiz._id}>
 				<List.Content floated='right'>
 					<Button
 						content='Start'
 						icon='play'
 						labelPosition='left'
 						onClick={this.onQuizStartButton}
-						target={data.quizId}
+						target={quiz._id}
 					/>
 					<Button
 						content='Edit'
 						icon='edit'
 						labelPosition='left'
 						onClick={this.onQuizEditButton}
-						target={data.quizId}
+						target={quiz._id}
+					/>
+					<Button
+						content='Delete'
+						icon='trash'
+						labelPosition='left'
+						onClick={this.onQuizDeleteButton}
+						target={quiz._id}
 					/>
 				</List.Content>
 				<List.Content floated='left'>
 					<Header as='h2'>
-						{data.quizTitle}
+						{quiz.quizTitle}
 					</Header>
 				</List.Content>
 			</List.Item>
@@ -172,19 +202,23 @@ class TeacherMy extends Component {
 TeacherMy.propTypes = {
 	callGetQuizList: PropTypes.func.isRequired,
 	callGetFeedBackList: PropTypes.func.isRequired,
+	callAddQuiz: PropTypes.func.isRequired,
+	callDeleteQuiz: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	setQuizId: PropTypes.func.isRequired,
 	setQuizName: PropTypes.func.isRequired,
 	setQuiz: PropTypes.func.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
 	getQuizList: PropTypes.object.isRequired,
-	getFeedBackList: PropTypes.object.isRequired
+	getFeedBackList: PropTypes.object.isRequired,
+	newQuizId: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
 	getQuizList: state.getQuizList,
-	getFeedBackList: state.getFeedBackList
+	getFeedBackList: state.getFeedBackList,
+	newQuizId: state.newQuizId
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -202,6 +236,12 @@ const mapDispatchToProps = dispatch => ({
 	},
 	callGetFeedBackList (param) {
 		dispatch(callGetFeedBackList(param));
+	},
+	callDeleteQuiz (param) {
+		dispatch(callDeleteQuiz(param));
+	},
+	callAddQuiz (param) {
+		dispatch(callAddQuiz(param));
 	}
 });
 

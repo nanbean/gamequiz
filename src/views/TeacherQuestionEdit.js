@@ -74,7 +74,7 @@ class TeacherQuestionEdit extends Component {
 	onSaveButton () {
 		const data = {};
 		data.question = {};
-		data.question.questionId = this.state.questionId;
+		data.question._id = this.state.questionId;
 		data.question.quizCategory = this.state.quizCategory;
 		data.question.title = this.state.title;
 		data.question.pictureUrl = this.state.pictureUrl;
@@ -353,8 +353,8 @@ TeacherQuestionEdit.propTypes = {
 	callUploadImage: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
-	quizId: PropTypes.number.isRequired,
-	questionId: PropTypes.number.isRequired,
+	quizId: PropTypes.string.isRequired,
+	questionId: PropTypes.string.isRequired,
 	quizCategory: PropTypes.array.isRequired,
 	title: PropTypes.string.isRequired,
 	pictureUrl: PropTypes.string.isRequired,
@@ -371,7 +371,7 @@ TeacherQuestionEdit.propTypes = {
 const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
 	quizId: state.quizId,
-	questionId: state.question.questionId,
+	questionId: state.question._id,
 	quizCategory: state.question.quizCategory,
 	title: state.question.title,
 	pictureUrl: state.question.pictureUrl,

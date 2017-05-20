@@ -18,6 +18,11 @@ class TeacherPlay extends Component {
 
 		this.onNextQuestionButton = this.onNextQuestionButton.bind(this);
 		this.waitTimer = this.waitTimer.bind(this);
+
+		this.state = {
+			waitTimerId: null,
+			waitCount: 0
+		};
 	}
 
 	componentDidMount () {
@@ -25,10 +30,10 @@ class TeacherPlay extends Component {
 		const { waitTimerId } = this.state;
 
 		if (serverStatus === 'WAIT' && !waitTimerId) {
-			this.state({
+			this.state = {
 				waitTimerId: setInterval(this.waitTimer, 1000),
 				waitCount: 5
-			});
+			};
 		} else {
 			this.state = {
 				waitTimerId: null,
@@ -301,7 +306,7 @@ class TeacherPlay extends Component {
 }
 
 TeacherPlay.propTypes = {
-	playId: PropTypes.number.isRequired,
+	playId: PropTypes.string.isRequired,
 	playQuestion: PropTypes.object.isRequired,
 	playTimeOut: PropTypes.number.isRequired,
 	playResult: PropTypes.object.isRequired,

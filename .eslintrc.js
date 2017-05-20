@@ -15,6 +15,7 @@ module.exports = {
     },
     "rules": {
         "no-tabs": "off",
+        "no-underscore-dangle": "off",
         "react/jsx-indent": [2, "tab"],
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
         "comma-dangle": ["error", "never"],
