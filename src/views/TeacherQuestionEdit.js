@@ -31,7 +31,7 @@ class TeacherQuestionEdit extends Component {
 		this.handleFileUpload = this.handleFileUpload.bind(this);
 
 		const { questionId, title, pictureUrl, example1, example2, example3, example4,
-			answer, timer, quizCategory, tagSuggestions } = this.props;
+			answer, timer, category, tagSuggestions } = this.props;
 
 		this.state = {
 			questionId,
@@ -43,7 +43,7 @@ class TeacherQuestionEdit extends Component {
 			example4,
 			answer,
 			timer,
-			quizCategory,
+			category,
 			tagSuggestions
 		};
 	}
@@ -54,7 +54,7 @@ class TeacherQuestionEdit extends Component {
 
 	componentWillReceiveProps (nextProps) {
 		const { questionId, title, pictureUrl, example1, example2, example3, example4,
-			answer, timer, quizCategory, tagSuggestions } = nextProps;
+			answer, timer, category, tagSuggestions } = nextProps;
 
 		this.setState({
 			questionId,
@@ -66,7 +66,7 @@ class TeacherQuestionEdit extends Component {
 			example4,
 			answer,
 			timer,
-			quizCategory,
+			category,
 			tagSuggestions
 		});
 	}
@@ -74,8 +74,8 @@ class TeacherQuestionEdit extends Component {
 	onSaveButton () {
 		const data = {};
 		data.question = {};
-		data.question.questionId = this.state.questionId;
-		data.question.quizCategory = this.state.quizCategory;
+		data.question._id = this.state.questionId;
+		data.question.category = this.state.category;
 		data.question.title = this.state.title;
 		data.question.pictureUrl = this.state.pictureUrl;
 		data.question.example1 = this.state.example1;
@@ -142,32 +142,32 @@ class TeacherQuestionEdit extends Component {
 	}
 
 	handleDelete (i) {
-		const quizCategory = this.state.quizCategory;
-		quizCategory.splice(i, 1);
+		const category = this.state.category;
+		category.splice(i, 1);
 		this.setState({
-			quizCategory
+			category
 		});
 	}
 
 	handleAddition (tag) {
-		const quizCategory = this.state.quizCategory;
-		quizCategory.push({
-			id: quizCategory.length + 1,
+		const category = this.state.category;
+		category.push({
+			id: category.length + 1,
 			text: tag
 		});
 		this.setState({
-			quizCategory
+			category
 		});
 	}
 
 	handleDrag (tag, currPos, newPos) {
-		const quizCategory = this.state.quizCategory;
+		const category = this.state.category;
 
-		quizCategory.splice(currPos, 1);
-		quizCategory.splice(newPos, 0, tag);
+		category.splice(currPos, 1);
+		category.splice(newPos, 0, tag);
 
 		this.setState({
-			quizCategory
+			category
 		});
 	}
 
@@ -201,7 +201,7 @@ class TeacherQuestionEdit extends Component {
 									activeSuggestion: 'teacher-tag-active-suggestion'
 								}}
 								placeholder='Add new category'
-								tags={this.state.quizCategory}
+								tags={this.state.category}
 								suggestions={this.state.tagSuggestions}
 								handleDelete={this.handleDelete}
 								handleAddition={this.handleAddition}
@@ -353,9 +353,9 @@ TeacherQuestionEdit.propTypes = {
 	callUploadImage: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
-	quizId: PropTypes.number.isRequired,
-	questionId: PropTypes.number.isRequired,
-	quizCategory: PropTypes.array.isRequired,
+	quizId: PropTypes.string.isRequired,
+	questionId: PropTypes.string,
+	category: PropTypes.array.isRequired,
 	title: PropTypes.string.isRequired,
 	pictureUrl: PropTypes.string.isRequired,
 	example1: PropTypes.string.isRequired,
@@ -368,11 +368,15 @@ TeacherQuestionEdit.propTypes = {
 	tagSuggestions: PropTypes.array.isRequired
 };
 
+TeacherQuestionEdit.defaultProps = {
+	questionId: ''
+};
+
 const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
 	quizId: state.quizId,
-	questionId: state.question.questionId,
-	quizCategory: state.question.quizCategory,
+	questionId: state.question._id,
+	category: state.question.category,
 	title: state.question.title,
 	pictureUrl: state.question.pictureUrl,
 	example1: state.question.example1,

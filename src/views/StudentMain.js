@@ -291,7 +291,7 @@ class StudentMain extends Component {
 }
 
 StudentMain.propTypes = {
-	playId: PropTypes.number.isRequired,
+	playId: PropTypes.string.isRequired,
 	studentId: PropTypes.number.isRequired,
 	studentPage: PropTypes.string.isRequired,
 	serverStatus: PropTypes.string.isRequired,
