@@ -30,21 +30,19 @@ class TeacherQuestionEdit extends Component {
 		this.handleDrag = this.handleDrag.bind(this);
 		this.handleFileUpload = this.handleFileUpload.bind(this);
 
-		const { questionId, title, pictureUrl, example1, example2, example3, example4,
-			answer, timer, category, tagSuggestions } = this.props;
+		const { questionId, title, example1, example2, example3, example4,
+			answer, timer, category } = this.props;
 
 		this.state = {
 			questionId,
 			title,
-			pictureUrl,
 			example1,
 			example2,
 			example3,
 			example4,
 			answer,
 			timer,
-			category,
-			tagSuggestions
+			category
 		};
 	}
 
@@ -52,24 +50,22 @@ class TeacherQuestionEdit extends Component {
 		this.props.callGetTagSuggestions({});
 	}
 
-	componentWillReceiveProps (nextProps) {
-		const { questionId, title, pictureUrl, example1, example2, example3, example4,
-			answer, timer, category, tagSuggestions } = nextProps;
+	// componentWillReceiveProps (nextProps) {
+	// 	const { questionId, title, example1, example2, example3, example4,
+	// 		answer, timer, category } = nextProps;
 
-		this.setState({
-			questionId,
-			title,
-			pictureUrl,
-			example1,
-			example2,
-			example3,
-			example4,
-			answer,
-			timer,
-			category,
-			tagSuggestions
-		});
-	}
+	// 	this.setState({
+	// 		questionId,
+	// 		title,
+	// 		example1,
+	// 		example2,
+	// 		example3,
+	// 		example4,
+	// 		answer,
+	// 		timer,
+	// 		category
+	// 	});
+	// }
 
 	onSaveButton () {
 		const data = {};
@@ -77,7 +73,7 @@ class TeacherQuestionEdit extends Component {
 		data.question._id = this.state.questionId;
 		data.question.category = this.state.category;
 		data.question.title = this.state.title;
-		data.question.pictureUrl = this.state.pictureUrl;
+		data.question.pictureUrl = this.props.pictureUrl;
 		data.question.example1 = this.state.example1;
 		data.question.example2 = this.state.example2;
 		data.question.example3 = this.state.example3;
@@ -202,7 +198,7 @@ class TeacherQuestionEdit extends Component {
 								}}
 								placeholder='Add new category'
 								tags={this.state.category}
-								suggestions={this.state.tagSuggestions}
+								suggestions={this.props.tagSuggestions}
 								handleDelete={this.handleDelete}
 								handleAddition={this.handleAddition}
 								handleDrag={this.handleDrag}
@@ -243,10 +239,10 @@ class TeacherQuestionEdit extends Component {
 						</Grid.Column>
 						<Grid.Column width={10}>
 							{
-								this.state.pictureUrl &&
+								this.props.pictureUrl &&
 								<Image
 									centered
-									src={`/${this.state.pictureUrl}`}
+									src={`/${this.props.pictureUrl}`}
 									height={200}
 								/>
 							}
