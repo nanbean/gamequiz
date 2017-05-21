@@ -17,8 +17,7 @@ export default function question (state = initialState, action) {
 		if (action.payload) {
 			return action.payload;
 		}
-		return initialState;
-	case 'CLEAR_QUESTION':
+		initialState.category = [];
 		return initialState;
 	case 'SET_IMAGE_UPLOAD':
 		if (action.payload) {
