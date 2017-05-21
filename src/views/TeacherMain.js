@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import FacebookLogin from 'react-facebook-login';
-import { Header } from 'semantic-ui-react';
+import GoogleLogin from 'react-google-login';
+import { Header, Icon } from 'semantic-ui-react';
 
 import { setTeacherInfo } from '../actions';
 
@@ -14,36 +15,59 @@ class TeacherMain extends Component {
 		super(props);
 
 		this.responseFacebook = this.responseFacebook.bind(this);
+		this.responseGoogle = this.responseGoogle.bind(this);
 	}
 
 	responseFacebook (ev) {
-		this.props.setTeacherInfo(ev);
+		if (typeof ev.userID !== 'undefined') {
+			const teacherInfo = ev;
+			teacherInfo.teacherLoginType = 'facebook';
+			this.props.setTeacherInfo(teacherInfo);
+		}
+	}
+
+	responseGoogle (ev) {
+		if (typeof ev.googleId !== 'undefined') {
+			const teacherInfo = ev;
+			teacherInfo.teacherLoginType = 'google';
+			this.props.setTeacherInfo(teacherInfo);
+		}
 	}
 
 	render () {
-		const { teacherInfo, checkTeacher } = this.props;
+		const { teacherId, checkTeacher } = this.props;
 		const validTeacher = checkTeacher && checkTeacher.valid;
-		const hasTeacherInfo = teacherInfo && teacherInfo.userID;
 
 		return (
 
 			<div className='teacher'>
 				{
-					validTeacher === true && hasTeacherInfo && <Redirect to='/my' />
+					validTeacher === true && teacherId && <Redirect to='/my' />
 				}
 				{
-					validTeacher === false && hasTeacherInfo && <Redirect to='/join' />
+					validTeacher === false && teacherId && <Redirect to='/join' />
 				}
 				<div className='teacher-outer'>
 					<div className='teacher-inner'>
 						<div className='teacher-logo' />
 						<Header as='h1'>Welcome to GameQuiz</Header>
-						<div>
+						<div className='teacher-button'>
+							<Icon bordered name='facebook' size='large' />
 							<FacebookLogin
+								cssClass='ui button teacher-login-button'
 								appId='1873315276258418'
-								autoLoad
 								fields='name,email,picture'
 								callback={this.responseFacebook}
+							/>
+						</div>
+						<div className='teacher-button'>
+							<Icon bordered name='google' size='large' />
+							<GoogleLogin
+								className='ui button teacher-login-button'
+								clientId='703855235482-2e3n67urm1ongdi9bmrjadjlqdqpidlc.apps.googleusercontent.com'
+								buttonText='Login with Google'
+								onSuccess={this.responseGoogle}
+								onFailure={this.responseGoogle}
 							/>
 						</div>
 					</div>
@@ -55,12 +79,12 @@ class TeacherMain extends Component {
 
 TeacherMain.propTypes = {
 	checkTeacher: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
+	teacherId: PropTypes.string.isRequired,
 	setTeacherInfo: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
+	teacherId: state.teacherId,
 	checkTeacher: state.checkTeacher
 });
 
