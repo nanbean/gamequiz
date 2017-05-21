@@ -12,6 +12,13 @@ import diamond from '../assets/diamond.svg';
 import circle from '../assets/circle.svg';
 import square from '../assets/square.svg';
 
+const exampleMap = [
+	<Image src={triangle} size='mini' spaced />,
+	<Image src={diamond} size='mini' spaced />,
+	<Image src={circle} size='mini' spaced />,
+	<Image src={square} size='mini' spaced />
+];
+
 class TeacherPlay extends Component {
 	constructor (props) {
 		super(props);
@@ -116,15 +123,23 @@ class TeacherPlay extends Component {
 					<div className='teacher-inner'>
 						{ serverStatus === 'WAIT' &&
 							<div>
-								<Header as='h2' icon>
-									<Icon name='hourglass start' />
-									Ready to go!
-									<Header.Subheader>
-										{'Let\'s get busy'}
-									</Header.Subheader>
-								</Header>
+								<div>
+									<div>
+										<Icon.Group size='huge'>
+											<Icon loading name='hourglass empty' />
+											<Icon size='big' name='sun' />
+										</Icon.Group>
+									</div>
+									<div style={{ margin: 20 }}>
+										<Header as='h2' icon>
+											Ready to go!
+											<Header.Subheader>
+												{'Let\'s get busy'}
+											</Header.Subheader>
+										</Header>
+									</div>
+								</div>
 								{
-									waitCount &&
 									<div className='teacher-play-timer'>
 										<Segment circular style={{ width: 100, height: 100 }}>
 											<Header as='h1' color='purple'>
@@ -205,28 +220,28 @@ class TeacherPlay extends Component {
 									<Icon name='idea' />
 										Result
 									<Header.Subheader>
-										The answer is {playResult.answer}
+										The answer is {exampleMap[playResult.answer - 1]}
 									</Header.Subheader>
 								</Header>
 								<Segment.Group piled>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example1} people(s) chose the example 1
+											{playResult.example1} people(s) chose the example {exampleMap[0]}
 										</Header>
 									</Segment>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example2} people(s) chose the example 2
+											{playResult.example2} people(s) chose the example {exampleMap[1]}
 										</Header>
 									</Segment>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example3} people(s) chose the example 3
+											{playResult.example3} people(s) chose the example {exampleMap[2]}
 										</Header>
 									</Segment>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example4} people(s) chose the example 4
+											{playResult.example4} people(s) chose the example {exampleMap[3]}
 										</Header>
 									</Segment>
 								</Segment.Group>
