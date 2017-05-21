@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Header, Divider, Grid, List, Button, Table } from 'semantic-ui-react';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 import Avatar from '../components/Avatar';
 import TitleHeader from '../components/TitleHeader';
@@ -164,37 +165,47 @@ class TeacherMy extends Component {
 							<Header as='h2'>
 								Quiz List
 							</Header>
-							<List divided verticalAlign='middle'>
-								{
-									quizList && quizList.map(this.renderQuiz, this)
-								}
-							</List>
-							<Button
-								fluid
-								size='huge'
-								onClick={this.onQuizAddButton}
+							<Scrollbars
+								autoHeight
+								autoHeightMax={750}
 							>
-								New Quiz
-							</Button>
+								<List divided verticalAlign='middle'>
+									{
+										quizList && quizList.map(this.renderQuiz, this)
+									}
+								</List>
+								<Button
+									fluid
+									size='huge'
+									onClick={this.onQuizAddButton}
+								>
+									New Quiz
+								</Button>
+							</Scrollbars>
 						</Grid.Column>
 						<Grid.Column>
 							<Header as='h2'>
 								Feedback List
 							</Header>
-							<Table celled selectable>
-								<Table.Header>
-									<Table.Row>
-										<Table.HeaderCell>Student</Table.HeaderCell>
-										<Table.HeaderCell>Wrong Count</Table.HeaderCell>
-									</Table.Row>
-								</Table.Header>
+							<Scrollbars
+								autoHeight
+								autoHeightMax={750}
+							>
+								<Table celled selectable>
+									<Table.Header>
+										<Table.Row>
+											<Table.HeaderCell>Student</Table.HeaderCell>
+											<Table.HeaderCell>Wrong Count</Table.HeaderCell>
+										</Table.Row>
+									</Table.Header>
 
-								<Table.Body>
-									{
-										feedBackList && feedBackList.map(this.renderFeedBack, this)
-									}
-								</Table.Body>
-							</Table>
+									<Table.Body>
+										{
+											feedBackList && feedBackList.map(this.renderFeedBack, this)
+										}
+									</Table.Body>
+								</Table>
+							</Scrollbars>
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>
