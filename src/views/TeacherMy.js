@@ -26,10 +26,10 @@ class TeacherMy extends Component {
 
 		if (history.action !== 'POP') {
 			this.props.callGetQuizList({
-				teacherId: this.props.teacherInfo.userID
+				teacherId: this.props.teacherId
 			});
 			this.props.callGetFeedBackList({
-				teacherId: this.props.teacherInfo.userID
+				teacherId: this.props.teacherId
 			});
 		}
 	}
@@ -48,7 +48,7 @@ class TeacherMy extends Component {
 		quiz.questionList = [];
 
 		this.props.callAddQuiz({
-			teacherId: this.props.teacherInfo.userID,
+			teacherId: this.props.teacherId,
 			quiz
 		});
 	}
@@ -66,7 +66,7 @@ class TeacherMy extends Component {
 
 	onQuizDeleteButton (ev, refs) {
 		this.props.callDeleteQuiz({
-			teacherId: this.props.teacherInfo.userID,
+			teacherId: this.props.teacherId,
 			quizId: refs.target
 		});
 	}
@@ -136,7 +136,7 @@ class TeacherMy extends Component {
 	}
 
 	render () {
-		const { teacherInfo, getFeedBackList, getQuizList } = this.props;
+		const { teacherInfo, teacherId, getFeedBackList, getQuizList } = this.props;
 		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
 		const quizList = getQuizList && getQuizList.quizList;
 		const feedBackList = getFeedBackList && getFeedBackList.feedBackList;
@@ -144,7 +144,7 @@ class TeacherMy extends Component {
 		return (
 			<div className='teacher'>
 				{
-					!teacherInfo.userID && <Redirect to='/teacher' />
+					!teacherId && <Redirect to='/teacher' />
 				}
 				<TitleHeader
 					icon='user'
@@ -213,6 +213,7 @@ TeacherMy.propTypes = {
 	setQuizName: PropTypes.func.isRequired,
 	setQuiz: PropTypes.func.isRequired,
 	teacherInfo: PropTypes.object.isRequired,
+	teacherId: PropTypes.string.isRequired,
 	getQuizList: PropTypes.object.isRequired,
 	getFeedBackList: PropTypes.object.isRequired,
 	newQuizId: PropTypes.string.isRequired
@@ -220,6 +221,7 @@ TeacherMy.propTypes = {
 
 const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
+	teacherId: state.teacherId,
 	getQuizList: state.getQuizList,
 	getFeedBackList: state.getFeedBackList,
 	newQuizId: state.newQuizId

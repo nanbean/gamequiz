@@ -17,6 +17,7 @@ class TeacherPlay extends Component {
 		super(props);
 
 		this.onNextQuestionButton = this.onNextQuestionButton.bind(this);
+		this.onHomeEnter = this.onHomeEnter.bind(this);
 		this.waitTimer = this.waitTimer.bind(this);
 
 		this.state = {
@@ -65,6 +66,10 @@ class TeacherPlay extends Component {
 		this.props.callNextPlayQuestion({
 			playId: this.props.playId
 		});
+	}
+
+	onHomeEnter () {
+		this.props.history.push('/my');
 	}
 
 	waitTimer () {
@@ -296,6 +301,15 @@ class TeacherPlay extends Component {
 										}
 									</Table.Body>
 								</Table>
+								<div>
+									<Button
+										className='teacher-home-button'
+										size='huge'
+										onClick={this.onHomeEnter}
+									>
+										Home
+									</Button>
+								</div>
 							</div>
 						}
 					</div>
@@ -306,6 +320,7 @@ class TeacherPlay extends Component {
 }
 
 TeacherPlay.propTypes = {
+	history: PropTypes.object.isRequired,
 	playId: PropTypes.string.isRequired,
 	playQuestion: PropTypes.object.isRequired,
 	playTimeOut: PropTypes.number.isRequired,

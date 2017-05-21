@@ -42,6 +42,11 @@
 	background-repeat: no-repeat;
 }
 
+.teacher-login-button {
+	width: 300px;
+	height: 50px;
+}
+
 .teacher-button {
 	margin: 5px;
 }
@@ -133,4 +138,9 @@ div.teacher-tag-suggestions ul li.teacher-tag-active-suggestion {
 	bottom: 5px;
 	left: 5px;
 	right: 5px;
+}
+
+.teacher-home-button {
+	width: 80%;
+	max-width: 300px;
 }

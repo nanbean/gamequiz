@@ -174,7 +174,7 @@ class TeacherQuestionEdit extends Component {
 	handleFileUpload (files) {
 		this.props.callUploadImage({
 			files,
-			teacherId: this.props.teacherInfo.userID
+			teacherId: this.props.teacherId
 		});
 	}
 
@@ -364,7 +364,7 @@ TeacherQuestionEdit.propTypes = {
 	example4: PropTypes.string.isRequired,
 	answer: PropTypes.number.isRequired,
 	timer: PropTypes.number.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
+	teacherId: PropTypes.string.isRequired,
 	tagSuggestions: PropTypes.array.isRequired
 };
 
@@ -373,7 +373,7 @@ TeacherQuestionEdit.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
+	teacherId: state.teacherId,
 	quizId: state.quizId,
 	questionId: state.question._id,
 	category: state.question.category,

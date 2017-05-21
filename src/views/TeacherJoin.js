@@ -20,19 +20,19 @@ class TeacherJoin extends Component {
 
 	onJoinButton () {
 		this.props.callRegisterTeacher({
-			teacherId: this.props.teacherInfo.userID
+			teacherId: this.props.teacherId
 		});
 	}
 
 	render () {
-		const { teacherInfo, registerTeacher } = this.props;
+		const { teacherInfo, teacherId, registerTeacher } = this.props;
 		const isRegistered = registerTeacher.return;
 		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
 
 		return (
 			<div className='teacher'>
 				{
-					!teacherInfo.userID && <Redirect to='/teacher' />
+					!teacherId && <Redirect to='/teacher' />
 				}
 				{
 					isRegistered && <Redirect to='/my' />
@@ -69,11 +69,13 @@ class TeacherJoin extends Component {
 TeacherJoin.propTypes = {
 	callRegisterTeacher: PropTypes.func.isRequired,
 	registerTeacher: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired
+	teacherInfo: PropTypes.object.isRequired,
+	teacherId: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
 	teacherInfo: state.teacherInfo,
+	teacherId: state.teacherId,
 	registerTeacher: state.registerTeacher
 });
 
