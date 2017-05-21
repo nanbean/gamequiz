@@ -533,16 +533,6 @@ function deletePlayWithPlayId (playId) {
 	}
 }
 
-function getQuizWithQuizId (quizId) {
-	for (var i = 0; i < quizzes.length; i++) {
-		if (quizzes[i].quizId == quizId) {
-			return quizzes[i];
-		}
-	}
-
-	return null;
-}
-
 function getQuestionWithQuestionId (questionId) {
 	for (var i = 0; i < questions.length; i++) {
 		if (questions[i].questionId == questionId) {
@@ -582,6 +572,7 @@ function sendLeaderBoard (playId) {
 							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
 						}
 					}
+
 					data.leaderBoard.push(student);
 				}
 			} else {
@@ -599,11 +590,14 @@ function sendLeaderBoard (playId) {
 							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
 						}
 					}
+
 					data.leaderBoard.push(student);
 				}
 
 				deletePlayWithPlayId(playId);
 			}
+
+			data.leaderBoard = data.leaderBoard.sort(function(a, b){return b.score-a.score});
 
 			getServerEvent.publish(JSON.stringify(data));
 			getServerEventTeacher.publish(JSON.stringify(data));
@@ -615,8 +609,6 @@ function sendResult (playId) {
 	var data = {};
 	var play = getPlayWithPlayId(playId);
 	var quizId = play && play.quizId;
-	// var quiz = play && getQuizWithQuizId(play.quizId);
-	// var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
 
 	data.playId = playId;
 	data.serverStatus = 'RESULT';
@@ -716,7 +708,6 @@ function sendQuetion (playId) {
 	var data = {};
 	var timeOut;
 	var play = getPlayWithPlayId(playId);
-	// var quiz = play && getQuizWithQuizId(play.quizId);
 
 	if (play) {
 		Quiz.findById(play.quizId, function(err, quiz){
@@ -807,7 +798,6 @@ router.post('/teacher/startPlay', function(req, res){
 function terminatePlay (playId) {
 	var data = {};
 	var play = getPlayWithPlayId(playId);
-	var quiz = play && getQuizWithQuizId(play.quizId);
 
 	data.playId = playId;
 	data.leaderBoard = [];
@@ -937,11 +927,8 @@ function calculateScore (playTimeOut, presentationTime, answerTime) {
 function updateAnswerToPlay (playId, studentId, answer) {
 	var play = getPlayWithPlayId(playId);
 	var quizId = play && play.quizId;
-	// var quiz = play && getQuizWithQuizId(play.quizId);
-	// var question = quiz && getQuestionWithQuestionId(quiz.questionList[play.currentQuestionIndex]);
 
-
-if (play && quizId) {
+	if (play && quizId) {
 		Quiz.findById(quizId, function(err, quiz){
 			if (err) {
 				console.error(err);
