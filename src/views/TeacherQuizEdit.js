@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Header, Divider, Grid, List, Button, Input } from 'semantic-ui-react';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 import TitleHeader from '../components/TitleHeader';
 
@@ -144,38 +145,44 @@ class TeacherQuizEdit extends Component {
 							<Header as='h2'>
 								Question List
 							</Header>
-							<List divided verticalAlign='middle'>
-								{
-									questionList && questionList.map(this.renderQuestion, this)
-								}
-							</List>
-							<div className='teacher-button'>
-								<Button
-									fluid
-									size='huge'
-									onClick={this.onQuestionNewButton}
-								>
-									New Question
-								</Button>
-							</div>
-							<div className='teacher-button'>
-								<Button
-									fluid
-									size='huge'
-									onClick={this.onSaveButton}
-								>
-									Save
-								</Button>
-							</div>
-							<div className='teacher-button'>
-								<Button
-									fluid
-									size='huge'
-									onClick={this.onCancelButton}
-								>
-									Cancel
-								</Button>
-							</div>
+							<Scrollbars
+								autoHeight
+								autoHeightMax={650}
+							>
+								<List divided verticalAlign='middle'>
+									{
+										questionList && questionList.map(this.renderQuestion, this)
+									}
+								</List>
+
+								<div className='teacher-button'>
+									<Button
+										fluid
+										size='huge'
+										onClick={this.onQuestionNewButton}
+									>
+										New Question
+									</Button>
+								</div>
+								<div className='teacher-button'>
+									<Button
+										fluid
+										size='huge'
+										onClick={this.onSaveButton}
+									>
+										Save
+									</Button>
+								</div>
+								<div className='teacher-button'>
+									<Button
+										fluid
+										size='huge'
+										onClick={this.onCancelButton}
+									>
+										Cancel
+									</Button>
+								</div>
+							</Scrollbars>
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>
