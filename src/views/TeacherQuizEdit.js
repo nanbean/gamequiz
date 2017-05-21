@@ -86,7 +86,7 @@ class TeacherQuizEdit extends Component {
 
 	onQuestionDeleteButton (ev, refs) {
 		this.props.callDeleteQuestion({
-			teacherId: this.props.teacherInfo.userID,
+			teacherId: this.props.teacherId,
 			quizId: this.props.match.params.id,
 			questionId: refs.target
 		});
@@ -192,14 +192,14 @@ TeacherQuizEdit.propTypes = {
 	setQuestion: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
+	teacherId: PropTypes.string.isRequired,
 	quiz: PropTypes.object.isRequired,
 	newQuizId: PropTypes.string.isRequired,
 	getQuestionList: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
+	teacherId: state.teacherId,
 	quiz: state.quiz,
 	newQuizId: state.newQuizId,
 	getQuestionList: state.getQuestionList

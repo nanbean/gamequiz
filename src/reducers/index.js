@@ -24,6 +24,8 @@ import playTimeOut from './playTimeOut';
 import playResult from './playResult';
 import playLeaderBoard from './playLeaderBoard';
 import studentAnswered from './studentAnswered';
+import teacherLoginType from './teacherLoginType';
+import teacherId from './teacherId';
 
 const gamequiz = combineReducers({
 	playId,
@@ -50,7 +52,9 @@ const gamequiz = combineReducers({
 	playQuestion,
 	playTimeOut,
 	playResult,
-	playLeaderBoard
+	playLeaderBoard,
+	teacherLoginType,
+	teacherId
 });
 
 export default gamequiz;

@@ -16,6 +16,7 @@
     "react-dom": "^15.5.4",
     "react-dropzone": "^3.13.1",
     "react-facebook-login": "^3.5.0",
+    "react-google-login": "^2.8.9",
     "react-redux": "^5.0.4",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",

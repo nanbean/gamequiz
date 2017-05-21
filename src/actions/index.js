@@ -67,14 +67,16 @@ export const checkTeacher = params => dispatch => (
 );
 
 export const setTeacherInfo = params => (dispatch) => {
-	if (params.userID) {
-		dispatch(checkTeacher({ teacherId: params.userID }));
-	}
-
 	dispatch({
 		type: 'SET_TEACHER_INFO',
 		payload: params
 	});
+
+	if (params.teacherLoginType === 'facebook') {
+		dispatch(checkTeacher({ teacherId: params.userID }));
+	} else if (params.teacherLoginType === 'google') {
+		dispatch(checkTeacher({ teacherId: params.googleId }));
+	}
 };
 
 export const callRegisterTeacher = params => dispatch => (
@@ -139,7 +141,7 @@ export const callAddQuiz = params => (dispatch, getState) => (
 			if (result.return) {
 				dispatch(
 					callGetQuizList({
-						teacherId: state.teacherInfo.userID
+						teacherId: state.teacherId
 					})
 				);
 			}
@@ -158,7 +160,7 @@ export const callEditQuiz = params => (dispatch, getState) => (
 			if (result.return) {
 				dispatch(
 					callGetQuizList({
-						teacherId: state.teacherInfo.userID
+						teacherId: state.teacherId
 					})
 				);
 			}
@@ -177,7 +179,7 @@ export const callDeleteQuiz = params => (dispatch, getState) => (
 			if (result.return) {
 				dispatch(
 					callGetQuizList({
-						teacherId: state.teacherInfo.userID
+						teacherId: state.teacherId
 					})
 				);
 			}

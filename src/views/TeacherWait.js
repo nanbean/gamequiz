@@ -61,7 +61,7 @@ class TeacherWait extends Component {
 	}
 
 	render () {
-		const { teacherInfo, playId, gameMode, studentPlayerList } = this.props;
+		const { teacherId, playId, gameMode, studentPlayerList } = this.props;
 		let icon = '';
 
 		if (gameMode === 'MARATHON') {
@@ -75,7 +75,7 @@ class TeacherWait extends Component {
 		return (
 			<div className='teacher'>
 				{
-					!teacherInfo.userID && <Redirect to='/teacher' />
+					!teacherId && <Redirect to='/teacher' />
 				}
 				<TitleHeader
 					icon='wait'
@@ -116,7 +116,7 @@ class TeacherWait extends Component {
 
 TeacherWait.propTypes = {
 	history: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
+	teacherId: PropTypes.string.isRequired,
 	playId: PropTypes.string.isRequired,
 	gameMode: PropTypes.object.isRequired,
 	studentPlayerList: PropTypes.array.isRequired,
@@ -124,7 +124,7 @@ TeacherWait.propTypes = {
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
+	teacherId: state.teacherId,
 	playId: state.playId,
 	gameMode: state.gameMode,
 	studentPlayerList: state.studentPlayerList

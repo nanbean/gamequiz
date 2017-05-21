@@ -14,6 +14,7 @@ module.exports = {
         "FormData": true
     },
     "rules": {
+        "linebreak-style": "off",
         "no-tabs": "off",
         "no-underscore-dangle": "off",
         "react/jsx-indent": [2, "tab"],
