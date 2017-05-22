@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Input, Loader, Grid, Button, Header, Icon } from 'semantic-ui-react';
+import { Input, Loader, Grid, Button, Header, Icon, Dimmer, Popup } from 'semantic-ui-react';
 
 import { callCheckPlayId, setPlayId, callSendStudentInfo, callGetServerEvent, callSendStudentAnswer, resetToHome } from '../actions';
 
@@ -32,7 +32,9 @@ class StudentMain extends Component {
 		this.state = {
 			playId: '',
 			name: '',
-			nick: ''
+			nick: '',
+			showNameHelp: false,
+			showNickHelp: false
 		};
 	}
 
@@ -76,6 +78,24 @@ class StudentMain extends Component {
 	}
 
 	onLoginEnter () {
+		const showNameHelp = !this.state.name;
+		const showNickHelp = !this.state.nick;
+
+		this.setState({
+			showNameHelp,
+			showNickHelp
+		});
+
+		if (showNameHelp || showNickHelp) {
+			this.helpTimeout = setTimeout(() => {
+				this.setState({
+					showNameHelp: false,
+					showNickHelp: false
+				});
+			}, 2000);
+			return;
+		}
+
 		this.props.callSendStudentInfo({
 			playId: this.props.playId,
 			studentName: this.state.name,
@@ -132,7 +152,8 @@ class StudentMain extends Component {
 	}
 
 	render () {
-		const { studentPage, serverStatus, studentAnswered } = this.props;
+		const { playIdCheck, studentPage, serverStatus, studentAnswered } = this.props;
+		const { showNameHelp, showNickHelp } = this.state;
 
 		return (
 			<div className='student'>
@@ -141,13 +162,21 @@ class StudentMain extends Component {
 						<div className='student-inner'>
 							<div className='student-logo' />
 							<div>
-								<Input
-									className='student-palyid-input'
-									size='huge'
-									icon='send'
-									placeholder='Type your game ID'
-									onKeyPress={this.onPlayIdEnter}
-									onChange={this.onPlayIdInput}
+								<Popup
+									trigger={
+										<Input
+											className='student-palyid-input'
+											size='huge'
+											icon='send'
+											placeholder='Type your game ID'
+											onKeyPress={this.onPlayIdEnter}
+											onChange={this.onPlayIdInput}
+										/>
+									}
+									size='large'
+									header='Check Game ID again'
+									content='Enter the displayed number or ask for your teacher.'
+									open={playIdCheck === 'invalid'}
 								/>
 							</div>
 							<div>
@@ -160,6 +189,12 @@ class StudentMain extends Component {
 								</Button>
 							</div>
 						</div>
+						{
+							playIdCheck === 'checking' &&
+							<Dimmer active inverted>
+								<Loader inverted content='Checking' />
+							</Dimmer>
+						}
 					</div>
 				}
 				{
@@ -168,22 +203,36 @@ class StudentMain extends Component {
 						<div className='student-inner'>
 							<div className='student-logo' />
 							<div>
-								<Input
-									className='student-name-input'
-									size='huge'
-									placeholder='Type your real name'
-									onChange={this.onNameInput}
-									defaultValue={this.state.name}
+								<Popup
+									trigger={
+										<Input
+											className='student-name-input'
+											size='huge'
+											placeholder='Type your real name'
+											onChange={this.onNameInput}
+											defaultValue={this.state.name}
+										/>
+									}
+									size='large'
+									content='Enter your real name.'
+									open={showNameHelp}
 								/>
 							</div>
 							<div>
-								<Input
-									className='student-nick-input'
-									size='huge'
-									placeholder='Type your nickname for the game'
-									onKeyPress={this.onNickKeyInput}
-									onChange={this.onNickInput}
-									defaultValue={this.state.nick}
+								<Popup
+									trigger={
+										<Input
+											className='student-nick-input'
+											size='huge'
+											placeholder='Type your nickname for the game'
+											onKeyPress={this.onNickKeyInput}
+											onChange={this.onNickInput}
+											defaultValue={this.state.nick}
+										/>
+									}
+									size='large'
+									content='Enter your nickname.'
+									open={showNickHelp}
 								/>
 							</div>
 							<div>
@@ -293,6 +342,7 @@ class StudentMain extends Component {
 StudentMain.propTypes = {
 	playId: PropTypes.string.isRequired,
 	studentId: PropTypes.number.isRequired,
+	playIdCheck: PropTypes.string.isRequired,
 	studentPage: PropTypes.string.isRequired,
 	serverStatus: PropTypes.string.isRequired,
 	studentAnswered: PropTypes.bool.isRequired,
@@ -306,6 +356,7 @@ StudentMain.propTypes = {
 const mapStateToProps = state => ({
 	studentPage: state.studentPage,
 	playId: state.playId,
+	playIdCheck: state.playIdCheck,
 	serverStatus: state.serverStatus,
 	studentId: state.studentId,
 	studentAnswered: state.studentAnswered

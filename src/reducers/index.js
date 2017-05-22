@@ -12,7 +12,6 @@ import quiz from './quiz';
 import question from './question';
 import tagSuggestions from './tagSuggestions';
 import gameMode from './gameMode';
-import checkPlayId from './checkPlayId';
 import studentNick from './studentNick';
 import studentId from './studentId';
 import studentPlayerList from './studentPlayerList';
@@ -27,6 +26,7 @@ import teacherLoginType from './teacherLoginType';
 import teacherId from './teacherId';
 import teacherName from './teacherName';
 import teacherImage from './teacherImage';
+import playIdCheck from './playIdCheck';
 
 const gamequiz = combineReducers({
 	playId,
@@ -42,7 +42,6 @@ const gamequiz = combineReducers({
 	getQuizList,
 	getFeedBackList,
 	getQuestionList,
-	checkPlayId,
 	studentId,
 	studentNick,
 	studentPlayerList,
@@ -56,7 +55,8 @@ const gamequiz = combineReducers({
 	teacherLoginType,
 	teacherId,
 	teacherName,
-	teacherImage
+	teacherImage,
+	playIdCheck
 });
 
 export default gamequiz;
