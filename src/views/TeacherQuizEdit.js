@@ -23,7 +23,8 @@ class TeacherQuizEdit extends Component {
 		this.onQuestionDeleteButton = this.onQuestionDeleteButton.bind(this);
 
 		this.state = {
-			title: this.props.quiz.quizTitle
+			title: this.props.quiz.quizTitle,
+			showTitleHelp: false
 		};
 	}
 
@@ -42,6 +43,14 @@ class TeacherQuizEdit extends Component {
 
 	onSaveButton () {
 		const quiz = {};
+
+		if (!this.state.title) {
+			this.setState({
+				showTitleHelp: true
+			});
+			return;
+		}
+
 		quiz._id = this.props.match.params.id;
 		quiz.quizTitle = this.state.title;
 		quiz.questionList = [];
@@ -142,6 +151,14 @@ class TeacherQuizEdit extends Component {
 								defaultValue={this.state.title}
 								onChange={this.onTitleChange}
 							/>
+							{
+								this.state.showTitleHelp &&
+								<Header as='h4' color='red' content='* You have to enter the title' />
+							}
+						</Grid.Column>
+					</Grid.Row>
+					<Grid.Row columns={1}>
+						<Grid.Column>
 							<Header as='h2'>
 								Question List
 							</Header>

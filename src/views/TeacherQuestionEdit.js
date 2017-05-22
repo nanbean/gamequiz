@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
-import { Divider, Input, Button, Grid, Checkbox, Image } from 'semantic-ui-react';
+import { Divider, Input, Button, Grid, Checkbox, Image, Header } from 'semantic-ui-react';
 import { WithContext as ReactTags } from 'react-tag-input';
 
 import TitleHeader from '../components/TitleHeader';
@@ -42,7 +42,10 @@ class TeacherQuestionEdit extends Component {
 			example4,
 			answer,
 			timer,
-			category
+			category,
+			showTitleHelp: false,
+			showExampleHelp: false,
+			showAnswerHelp: false
 		};
 	}
 
@@ -50,25 +53,23 @@ class TeacherQuestionEdit extends Component {
 		this.props.callGetTagSuggestions({});
 	}
 
-	// componentWillReceiveProps (nextProps) {
-	// 	const { questionId, title, example1, example2, example3, example4,
-	// 		answer, timer, category } = nextProps;
-
-	// 	this.setState({
-	// 		questionId,
-	// 		title,
-	// 		example1,
-	// 		example2,
-	// 		example3,
-	// 		example4,
-	// 		answer,
-	// 		timer,
-	// 		category
-	// 	});
-	// }
-
 	onSaveButton () {
 		const data = {};
+		const showTitleHelp = !this.state.title;
+		const showExampleHelp = !this.state.example1 || !this.state.example2 ||
+														!this.state.example3 || !this.state.example4;
+		const showAnswerHelp = this.state.answer === -1;
+
+		this.setState({
+			showTitleHelp,
+			showExampleHelp,
+			showAnswerHelp
+		});
+
+		if (showTitleHelp || showExampleHelp || showAnswerHelp) {
+			return;
+		}
+
 		data.question = {};
 		data.question._id = this.state.questionId;
 		data.question.category = this.state.category;
@@ -214,6 +215,10 @@ class TeacherQuestionEdit extends Component {
 								defaultValue={this.state.title}
 								onChange={this.onTitleChange}
 							/>
+							{
+								this.state.showTitleHelp &&
+								<Header as='h4' color='red' content='* You have to enter the title' />
+							}
 						</Grid.Column>
 						<Grid.Column width={3}>
 							<Input
@@ -319,6 +324,14 @@ class TeacherQuestionEdit extends Component {
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>
+				{
+					this.state.showExampleHelp &&
+					<Header as='h4' color='red' content='* You have to enter the all examples' />
+				}
+				{
+					this.state.showAnswerHelp &&
+					<Header as='h4' color='red' content='* You have to choose the answer' />
+				}
 				<div className='teacher-button'>
 					<Button
 						fluid
