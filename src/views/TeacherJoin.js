@@ -25,9 +25,8 @@ class TeacherJoin extends Component {
 	}
 
 	render () {
-		const { teacherInfo, teacherId, registerTeacher } = this.props;
+		const { teacherName, teacherImage, teacherId, registerTeacher } = this.props;
 		const isRegistered = registerTeacher.return;
-		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
 
 		return (
 			<div className='teacher'>
@@ -46,10 +45,10 @@ class TeacherJoin extends Component {
 					Do you want to join?
 				</Header>
 				{
-					avatarUrl &&
+					teacherName && teacherImage &&
 					<Avatar
-						url={teacherInfo.picture.data.url}
-						name={teacherInfo.name}
+						url={teacherImage}
+						name={teacherName}
 					/>
 				}
 				<Divider />
@@ -69,13 +68,15 @@ class TeacherJoin extends Component {
 TeacherJoin.propTypes = {
 	callRegisterTeacher: PropTypes.func.isRequired,
 	registerTeacher: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
-	teacherId: PropTypes.string.isRequired
+	teacherId: PropTypes.string.isRequired,
+	teacherName: PropTypes.string.isRequired,
+	teacherImage: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
 	teacherId: state.teacherId,
+	teacherName: state.teacherName,
+	teacherImage: state.teacherImage,
 	registerTeacher: state.registerTeacher
 });
 

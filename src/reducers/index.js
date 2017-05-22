@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux';
 import playId from './playId';
-import teacherInfo from './teacherInfo';
 import checkTeacher from './checkTeacher';
 import registerTeacher from './registerTeacher';
 import getQuizList from './getQuizList';
@@ -26,6 +25,8 @@ import playLeaderBoard from './playLeaderBoard';
 import studentAnswered from './studentAnswered';
 import teacherLoginType from './teacherLoginType';
 import teacherId from './teacherId';
+import teacherName from './teacherName';
+import teacherImage from './teacherImage';
 
 const gamequiz = combineReducers({
 	playId,
@@ -36,7 +37,6 @@ const gamequiz = combineReducers({
 	quiz,
 	question,
 	tagSuggestions,
-	teacherInfo,
 	checkTeacher,
 	registerTeacher,
 	getQuizList,
@@ -54,7 +54,9 @@ const gamequiz = combineReducers({
 	playResult,
 	playLeaderBoard,
 	teacherLoginType,
-	teacherId
+	teacherId,
+	teacherName,
+	teacherImage
 });
 
 export default gamequiz;

@@ -137,8 +137,7 @@ class TeacherMy extends Component {
 	}
 
 	render () {
-		const { teacherInfo, teacherId, getFeedBackList, getQuizList } = this.props;
-		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
+		const { teacherName, teacherImage, teacherId, getFeedBackList, getQuizList } = this.props;
 		const quizList = getQuizList && getQuizList.quizList;
 		const feedBackList = getFeedBackList && getFeedBackList.feedBackList;
 
@@ -153,10 +152,10 @@ class TeacherMy extends Component {
 				/>
 				<Divider />
 				{
-					avatarUrl &&
+					teacherName && teacherImage &&
 					<Avatar
-						url={teacherInfo.picture.data.url}
-						name={teacherInfo.name}
+						url={teacherImage}
+						name={teacherName}
 					/>
 				}
 				<Grid divided='vertically'>
@@ -223,16 +222,18 @@ TeacherMy.propTypes = {
 	setQuizId: PropTypes.func.isRequired,
 	setQuizName: PropTypes.func.isRequired,
 	setQuiz: PropTypes.func.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
 	teacherId: PropTypes.string.isRequired,
+	teacherName: PropTypes.string.isRequired,
+	teacherImage: PropTypes.string.isRequired,
 	getQuizList: PropTypes.object.isRequired,
 	getFeedBackList: PropTypes.object.isRequired,
 	newQuizId: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
 	teacherId: state.teacherId,
+	teacherName: state.teacherName,
+	teacherImage: state.teacherImage,
 	getQuizList: state.getQuizList,
 	getFeedBackList: state.getFeedBackList,
 	newQuizId: state.newQuizId
