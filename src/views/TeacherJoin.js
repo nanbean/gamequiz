@@ -9,6 +9,7 @@ import TitleHeader from '../components/TitleHeader';
 
 import { callRegisterTeacher } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherJoin extends Component {
@@ -25,9 +26,8 @@ class TeacherJoin extends Component {
 	}
 
 	render () {
-		const { teacherInfo, teacherId, registerTeacher } = this.props;
+		const { teacherName, teacherImage, teacherId, registerTeacher } = this.props;
 		const isRegistered = registerTeacher.return;
-		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
 
 		return (
 			<div className='teacher'>
@@ -39,17 +39,17 @@ class TeacherJoin extends Component {
 				}
 				<TitleHeader
 					icon='add user'
-					title='Join to GameQuiz'
+					title={strings.joinGameQuiz}
 				/>
 				<Divider />
 				<Header as='h1'>
-					Do you want to join?
+					{strings.wannaJoin}
 				</Header>
 				{
-					avatarUrl &&
+					teacherName && teacherImage &&
 					<Avatar
-						url={teacherInfo.picture.data.url}
-						name={teacherInfo.name}
+						url={teacherImage}
+						name={teacherName}
 					/>
 				}
 				<Divider />
@@ -58,7 +58,7 @@ class TeacherJoin extends Component {
 						size='huge'
 						onClick={this.onJoinButton}
 					>
-						Confirm
+						{strings.confirm}
 					</Button>
 				</div>
 			</div>
@@ -69,13 +69,15 @@ class TeacherJoin extends Component {
 TeacherJoin.propTypes = {
 	callRegisterTeacher: PropTypes.func.isRequired,
 	registerTeacher: PropTypes.object.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
-	teacherId: PropTypes.string.isRequired
+	teacherId: PropTypes.string.isRequired,
+	teacherName: PropTypes.string.isRequired,
+	teacherImage: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
 	teacherId: state.teacherId,
+	teacherName: state.teacherName,
+	teacherImage: state.teacherImage,
 	registerTeacher: state.registerTeacher
 });
 

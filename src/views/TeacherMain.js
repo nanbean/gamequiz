@@ -8,6 +8,7 @@ import { Header, Icon } from 'semantic-ui-react';
 
 import { setTeacherInfo } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherMain extends Component {
@@ -50,13 +51,14 @@ class TeacherMain extends Component {
 				<div className='teacher-outer'>
 					<div className='teacher-inner'>
 						<div className='teacher-logo' />
-						<Header as='h1'>Welcome to GameQuiz</Header>
+						<Header as='h1'>{strings.welcome}</Header>
 						<div className='teacher-button'>
 							<Icon bordered name='facebook' size='large' />
 							<FacebookLogin
 								cssClass='ui button teacher-login-button'
 								appId='1873315276258418'
 								fields='name,email,picture'
+								textButton={strings.facebookLogin}
 								callback={this.responseFacebook}
 							/>
 						</div>
@@ -65,7 +67,7 @@ class TeacherMain extends Component {
 							<GoogleLogin
 								className='ui button teacher-login-button'
 								clientId='703855235482-2e3n67urm1ongdi9bmrjadjlqdqpidlc.apps.googleusercontent.com'
-								buttonText='Login with Google'
+								buttonText={strings.googleLogin}
 								onSuccess={this.responseGoogle}
 								onFailure={this.responseGoogle}
 							/>

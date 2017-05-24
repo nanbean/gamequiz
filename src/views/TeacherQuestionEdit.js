@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
-import { Divider, Input, Button, Grid, Checkbox, Image } from 'semantic-ui-react';
+import { Divider, Input, Button, Grid, Checkbox, Image, Header } from 'semantic-ui-react';
 import { WithContext as ReactTags } from 'react-tag-input';
 
 import TitleHeader from '../components/TitleHeader';
 
 import { callGetTagSuggestions, callAddQuestion, callEditQuestion, callUploadImage } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherQuestionEdit extends Component {
@@ -42,7 +43,10 @@ class TeacherQuestionEdit extends Component {
 			example4,
 			answer,
 			timer,
-			category
+			category,
+			showTitleHelp: false,
+			showExampleHelp: false,
+			showAnswerHelp: false
 		};
 	}
 
@@ -50,25 +54,23 @@ class TeacherQuestionEdit extends Component {
 		this.props.callGetTagSuggestions({});
 	}
 
-	// componentWillReceiveProps (nextProps) {
-	// 	const { questionId, title, example1, example2, example3, example4,
-	// 		answer, timer, category } = nextProps;
-
-	// 	this.setState({
-	// 		questionId,
-	// 		title,
-	// 		example1,
-	// 		example2,
-	// 		example3,
-	// 		example4,
-	// 		answer,
-	// 		timer,
-	// 		category
-	// 	});
-	// }
-
 	onSaveButton () {
 		const data = {};
+		const showTitleHelp = !this.state.title;
+		const showExampleHelp = !this.state.example1 || !this.state.example2 ||
+														!this.state.example3 || !this.state.example4;
+		const showAnswerHelp = this.state.answer === -1;
+
+		this.setState({
+			showTitleHelp,
+			showExampleHelp,
+			showAnswerHelp
+		});
+
+		if (showTitleHelp || showExampleHelp || showAnswerHelp) {
+			return;
+		}
+
 		data.question = {};
 		data.question._id = this.state.questionId;
 		data.question.category = this.state.category;
@@ -133,7 +135,7 @@ class TeacherQuestionEdit extends Component {
 
 	onAnswerChange (ev, refs) {
 		this.setState({
-			answer: Number(refs.label.substr(6, 1))
+			answer: Number(refs.label.substr(refs.label.length - 1, 1))
 		});
 	}
 
@@ -179,7 +181,7 @@ class TeacherQuestionEdit extends Component {
 			<div className='teacher'>
 				<TitleHeader
 					icon='edit'
-					title='Question Edit'
+					title={strings.questionEdit}
 				/>
 				<Divider />
 				<Grid celled>
@@ -196,7 +198,7 @@ class TeacherQuestionEdit extends Component {
 									suggestions: 'teacher-tag-suggestions',
 									activeSuggestion: 'teacher-tag-active-suggestion'
 								}}
-								placeholder='Add new category'
+								placeholder={strings.addNewCategory}
 								tags={this.state.category}
 								suggestions={this.props.tagSuggestions}
 								handleDelete={this.handleDelete}
@@ -209,18 +211,22 @@ class TeacherQuestionEdit extends Component {
 						<Grid.Column width={13}>
 							<Input
 								fluid
-								label='Title'
-								placeholder='input Title'
+								label={strings.title}
+								placeholder={strings.inputTitle}
 								defaultValue={this.state.title}
 								onChange={this.onTitleChange}
 							/>
+							{
+								this.state.showTitleHelp &&
+								<Header as='h4' color='red' content={strings.questionTitleError} />
+							}
 						</Grid.Column>
 						<Grid.Column width={3}>
 							<Input
 								fluid
-								label='Time Out'
+								label={strings.timeOut}
 								type='number'
-								placeholder='input Time Out'
+								placeholder={strings.inputTimeOut}
 								defaultValue={this.state.timer}
 								onChange={this.onTimerChange}
 							/>
@@ -234,7 +240,7 @@ class TeacherQuestionEdit extends Component {
 								accept='image/*'
 								onDrop={this.handleFileUpload}
 							>
-								<p>Try dropping some files here, or click to select files to upload.</p>
+								<p>{strings.imageUploadHelp}</p>
 							</Dropzone>
 						</Grid.Column>
 						<Grid.Column width={10}>
@@ -255,14 +261,14 @@ class TeacherQuestionEdit extends Component {
 							<Input
 								fluid
 								label='1'
-								placeholder='Example 1'
+								placeholder={strings.example1}
 								defaultValue={this.state.example1}
 								onChange={this.onExample1Change}
 							/>
 						</Grid.Column>
 						<Grid.Column width={2}>
 							<Checkbox
-								label='Answer1'
+								label={strings.answer1}
 								checked={this.state.answer === 1}
 								onChange={this.onAnswerChange}
 							/>
@@ -271,14 +277,14 @@ class TeacherQuestionEdit extends Component {
 							<Input
 								fluid
 								label='2'
-								placeholder='Example 2'
+								placeholder={strings.example2}
 								defaultValue={this.state.example2}
 								onChange={this.onExample2Change}
 							/>
 						</Grid.Column>
 						<Grid.Column width={2}>
 							<Checkbox
-								label='Answer2'
+								label={strings.answer2}
 								checked={this.state.answer === 2}
 								onChange={this.onAnswerChange}
 							/>
@@ -289,14 +295,14 @@ class TeacherQuestionEdit extends Component {
 							<Input
 								fluid
 								label='3'
-								placeholder='Example 3'
+								placeholder={strings.example3}
 								defaultValue={this.state.example3}
 								onChange={this.onExample3Change}
 							/>
 						</Grid.Column>
 						<Grid.Column width={2}>
 							<Checkbox
-								label='Answer3'
+								label={strings.answer3}
 								checked={this.state.answer === 3}
 								onChange={this.onAnswerChange}
 							/>
@@ -305,27 +311,35 @@ class TeacherQuestionEdit extends Component {
 							<Input
 								fluid
 								label='4'
-								placeholder='Example 4'
+								placeholder={strings.example4}
 								defaultValue={this.state.example4}
 								onChange={this.onExample4Change}
 							/>
 						</Grid.Column>
 						<Grid.Column width={2}>
 							<Checkbox
-								label='Answer4'
+								label={strings.answer4}
 								checked={this.state.answer === 4}
 								onChange={this.onAnswerChange}
 							/>
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>
+				{
+					this.state.showExampleHelp &&
+					<Header as='h4' color='red' content={strings.exampleError} />
+				}
+				{
+					this.state.showAnswerHelp &&
+					<Header as='h4' color='red' content={strings.answerError} />
+				}
 				<div className='teacher-button'>
 					<Button
 						fluid
 						size='huge'
 						onClick={this.onSaveButton}
 					>
-						Save
+						{strings.save}
 					</Button>
 				</div>
 				<div className='teacher-button'>
@@ -334,7 +348,7 @@ class TeacherQuestionEdit extends Component {
 						size='huge'
 						onClick={this.onCancelButton}
 					>
-						Cancel
+						{strings.cancel}
 					</Button>
 				</div>
 			</div>

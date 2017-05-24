@@ -8,6 +8,7 @@ import TitleHeader from '../components/TitleHeader';
 
 import { callStartGameMode } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherMode extends Component {
@@ -51,7 +52,7 @@ class TeacherMode extends Component {
 				<div className='teacher-top'>
 					<TitleHeader
 						icon='law'
-						title='Select Game Mode'
+						title={strings.selectGameMode}
 					/>
 					<Divider />
 				</div>
@@ -67,14 +68,14 @@ class TeacherMode extends Component {
 							trigger={
 								<Button
 									className='teacher-mode-button'
-									content='Marathon'
+									content={strings.marathon}
 									icon='graduation'
 									size='massive'
 									labelPosition='left'
 									onClick={this.onQuizMarathonButton}
 								/>
 							}
-							content='Who can get the best score to the last?'
+							content={strings.marathonHelp}
 							position='right center'
 							hideOnScroll
 						/>
@@ -84,14 +85,14 @@ class TeacherMode extends Component {
 							trigger={
 								<Button
 									className='teacher-mode-button'
-									content='Survival'
+									content={strings.survival}
 									icon='child'
 									size='massive'
 									labelPosition='left'
 									onClick={this.onQuizSurvivalButton}
 								/>
 							}
-							content='Who is the last one?'
+							content={strings.survivalHelp}
 							position='right center'
 							hideOnScroll
 						/>
@@ -102,14 +103,14 @@ class TeacherMode extends Component {
 								<Button
 									disabled
 									className='teacher-mode-button'
-									content='Team'
+									content={strings.team}
 									icon='users'
 									size='massive'
 									labelPosition='left'
 									onClick={this.onQuizTeamButton}
 								/>
 							}
-							content='Which team is the best?'
+							content={strings.teamHelp}
 							position='right center'
 							hideOnScroll
 						/>

@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Input, Loader, Grid, Button, Header, Icon } from 'semantic-ui-react';
+import { Input, Loader, Grid, Button, Header, Icon, Dimmer, Popup } from 'semantic-ui-react';
 
 import { callCheckPlayId, setPlayId, callSendStudentInfo, callGetServerEvent, callSendStudentAnswer, resetToHome } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/student.css';
 import triangle from '../assets/triangle.svg';
 import diamond from '../assets/diamond.svg';
@@ -32,7 +33,9 @@ class StudentMain extends Component {
 		this.state = {
 			playId: '',
 			name: '',
-			nick: ''
+			nick: '',
+			showNameHelp: false,
+			showNickHelp: false
 		};
 	}
 
@@ -76,6 +79,24 @@ class StudentMain extends Component {
 	}
 
 	onLoginEnter () {
+		const showNameHelp = !this.state.name;
+		const showNickHelp = !this.state.nick;
+
+		this.setState({
+			showNameHelp,
+			showNickHelp
+		});
+
+		if (showNameHelp || showNickHelp) {
+			this.helpTimeout = setTimeout(() => {
+				this.setState({
+					showNameHelp: false,
+					showNickHelp: false
+				});
+			}, 2000);
+			return;
+		}
+
 		this.props.callSendStudentInfo({
 			playId: this.props.playId,
 			studentName: this.state.name,
@@ -132,7 +153,8 @@ class StudentMain extends Component {
 	}
 
 	render () {
-		const { studentPage, serverStatus, studentAnswered } = this.props;
+		const { playIdCheck, studentPage, serverStatus, studentAnswered } = this.props;
+		const { showNameHelp, showNickHelp } = this.state;
 
 		return (
 			<div className='student'>
@@ -141,13 +163,21 @@ class StudentMain extends Component {
 						<div className='student-inner'>
 							<div className='student-logo' />
 							<div>
-								<Input
-									className='student-palyid-input'
-									size='huge'
-									icon='send'
-									placeholder='Type your game ID'
-									onKeyPress={this.onPlayIdEnter}
-									onChange={this.onPlayIdInput}
+								<Popup
+									trigger={
+										<Input
+											className='student-palyid-input'
+											size='huge'
+											icon='send'
+											placeholder={strings.typeGameId}
+											onKeyPress={this.onPlayIdEnter}
+											onChange={this.onPlayIdInput}
+										/>
+									}
+									size='large'
+									header={strings.checkGameId}
+									content={strings.checkGameIdHep}
+									open={playIdCheck === 'invalid'}
 								/>
 							</div>
 							<div>
@@ -156,10 +186,16 @@ class StudentMain extends Component {
 									size='huge'
 									onClick={this.onPlayEnter}
 								>
-									Play
+									{strings.play}
 								</Button>
 							</div>
 						</div>
+						{
+							playIdCheck === 'checking' &&
+							<Dimmer active inverted>
+								<Loader inverted content={strings.checking} />
+							</Dimmer>
+						}
 					</div>
 				}
 				{
@@ -168,22 +204,36 @@ class StudentMain extends Component {
 						<div className='student-inner'>
 							<div className='student-logo' />
 							<div>
-								<Input
-									className='student-name-input'
-									size='huge'
-									placeholder='Type your real name'
-									onChange={this.onNameInput}
-									defaultValue={this.state.name}
+								<Popup
+									trigger={
+										<Input
+											className='student-name-input'
+											size='huge'
+											placeholder={strings.typeName}
+											onChange={this.onNameInput}
+											defaultValue={this.state.name}
+										/>
+									}
+									size='large'
+									content={strings.checkName}
+									open={showNameHelp}
 								/>
 							</div>
 							<div>
-								<Input
-									className='student-nick-input'
-									size='huge'
-									placeholder='Type your nickname for the game'
-									onKeyPress={this.onNickKeyInput}
-									onChange={this.onNickInput}
-									defaultValue={this.state.nick}
+								<Popup
+									trigger={
+										<Input
+											className='student-nick-input'
+											size='huge'
+											placeholder={strings.typeNick}
+											onKeyPress={this.onNickKeyInput}
+											onChange={this.onNickInput}
+											defaultValue={this.state.nick}
+										/>
+									}
+									size='large'
+									content={strings.checkNick}
+									open={showNickHelp}
 								/>
 							</div>
 							<div>
@@ -201,19 +251,19 @@ class StudentMain extends Component {
 				{
 					studentPage === 'play' && serverStatus === 'WAIT' &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.wait}</Loader>
 					</div>
 				}
 				{
 					studentPage === 'play' && serverStatus === 'RESULT' &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.result}</Loader>
 					</div>
 				}
 				{
 					studentPage === 'play' && serverStatus === 'LEADER_BOARD' &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.leaderBoard}</Loader>
 					</div>
 				}
 				{
@@ -223,7 +273,7 @@ class StudentMain extends Component {
 							<Header as='h2' icon textAlign='center'>
 								<Icon name='info' circular />
 								<Header.Content>
-									Game Over
+									{strings.gameOver}
 								</Header.Content>
 							</Header>
 							<div>
@@ -232,7 +282,7 @@ class StudentMain extends Component {
 									size='huge'
 									onClick={this.onHomeEnter}
 								>
-									Home
+									{strings.home}
 								</Button>
 							</div>
 						</div>
@@ -282,7 +332,7 @@ class StudentMain extends Component {
 				{
 					studentPage === 'play' && serverStatus === 'PLAY' && studentAnswered &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.wait}</Loader>
 					</div>
 				}
 			</div>
@@ -293,6 +343,7 @@ class StudentMain extends Component {
 StudentMain.propTypes = {
 	playId: PropTypes.string.isRequired,
 	studentId: PropTypes.number.isRequired,
+	playIdCheck: PropTypes.string.isRequired,
 	studentPage: PropTypes.string.isRequired,
 	serverStatus: PropTypes.string.isRequired,
 	studentAnswered: PropTypes.bool.isRequired,
@@ -306,6 +357,7 @@ StudentMain.propTypes = {
 const mapStateToProps = state => ({
 	studentPage: state.studentPage,
 	playId: state.playId,
+	playIdCheck: state.playIdCheck,
 	serverStatus: state.serverStatus,
 	studentId: state.studentId,
 	studentAnswered: state.studentAnswered
