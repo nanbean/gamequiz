@@ -6,6 +6,7 @@ import { Input, Loader, Grid, Button, Header, Icon, Dimmer, Popup } from 'semant
 
 import { callCheckPlayId, setPlayId, callSendStudentInfo, callGetServerEvent, callSendStudentAnswer, resetToHome } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/student.css';
 import triangle from '../assets/triangle.svg';
 import diamond from '../assets/diamond.svg';
@@ -168,14 +169,14 @@ class StudentMain extends Component {
 											className='student-palyid-input'
 											size='huge'
 											icon='send'
-											placeholder='Type your game ID'
+											placeholder={strings.typeGameId}
 											onKeyPress={this.onPlayIdEnter}
 											onChange={this.onPlayIdInput}
 										/>
 									}
 									size='large'
-									header='Check Game ID again'
-									content='Enter the displayed number or ask for your teacher.'
+									header={strings.checkGameId}
+									content={strings.checkGameIdHep}
 									open={playIdCheck === 'invalid'}
 								/>
 							</div>
@@ -185,14 +186,14 @@ class StudentMain extends Component {
 									size='huge'
 									onClick={this.onPlayEnter}
 								>
-									Play
+									{strings.play}
 								</Button>
 							</div>
 						</div>
 						{
 							playIdCheck === 'checking' &&
 							<Dimmer active inverted>
-								<Loader inverted content='Checking' />
+								<Loader inverted content={strings.checking} />
 							</Dimmer>
 						}
 					</div>
@@ -208,13 +209,13 @@ class StudentMain extends Component {
 										<Input
 											className='student-name-input'
 											size='huge'
-											placeholder='Type your real name'
+											placeholder={strings.typeName}
 											onChange={this.onNameInput}
 											defaultValue={this.state.name}
 										/>
 									}
 									size='large'
-									content='Enter your real name.'
+									content={strings.checkName}
 									open={showNameHelp}
 								/>
 							</div>
@@ -224,14 +225,14 @@ class StudentMain extends Component {
 										<Input
 											className='student-nick-input'
 											size='huge'
-											placeholder='Type your nickname for the game'
+											placeholder={strings.typeNick}
 											onKeyPress={this.onNickKeyInput}
 											onChange={this.onNickInput}
 											defaultValue={this.state.nick}
 										/>
 									}
 									size='large'
-									content='Enter your nickname.'
+									content={strings.checkNick}
 									open={showNickHelp}
 								/>
 							</div>
@@ -250,19 +251,19 @@ class StudentMain extends Component {
 				{
 					studentPage === 'play' && serverStatus === 'WAIT' &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.wait}</Loader>
 					</div>
 				}
 				{
 					studentPage === 'play' && serverStatus === 'RESULT' &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.result}</Loader>
 					</div>
 				}
 				{
 					studentPage === 'play' && serverStatus === 'LEADER_BOARD' &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.leaderBoard}</Loader>
 					</div>
 				}
 				{
@@ -272,7 +273,7 @@ class StudentMain extends Component {
 							<Header as='h2' icon textAlign='center'>
 								<Icon name='info' circular />
 								<Header.Content>
-									Game Over
+									{strings.gameOver}
 								</Header.Content>
 							</Header>
 							<div>
@@ -281,7 +282,7 @@ class StudentMain extends Component {
 									size='huge'
 									onClick={this.onHomeEnter}
 								>
-									Home
+									{strings.home}
 								</Button>
 							</div>
 						</div>
@@ -331,7 +332,7 @@ class StudentMain extends Component {
 				{
 					studentPage === 'play' && serverStatus === 'PLAY' && studentAnswered &&
 					<div>
-						<Loader active>{serverStatus}</Loader>
+						<Loader active>{strings.wait}</Loader>
 					</div>
 				}
 			</div>

@@ -10,6 +10,7 @@ import TitleHeader from '../components/TitleHeader';
 
 import { setQuizId, setQuizName, setQuiz, callGetQuizList, callGetFeedBackList, callDeleteQuiz, callAddQuiz } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherMy extends Component {
@@ -89,21 +90,21 @@ class TeacherMy extends Component {
 			<List.Item key={quiz._id}>
 				<List.Content floated='right'>
 					<Button
-						content='Start'
+						content={strings.start}
 						icon='play'
 						labelPosition='left'
 						onClick={this.onQuizStartButton}
 						target={quiz._id}
 					/>
 					<Button
-						content='Edit'
+						content={strings.edit}
 						icon='edit'
 						labelPosition='left'
 						onClick={this.onQuizEditButton}
 						target={quiz._id}
 					/>
 					<Button
-						content='Delete'
+						content={strings.delete}
 						icon='trash'
 						labelPosition='left'
 						onClick={this.onQuizDeleteButton}
@@ -148,7 +149,7 @@ class TeacherMy extends Component {
 				}
 				<TitleHeader
 					icon='user'
-					title='My GameQuiz'
+					title={strings.myGameQuiz}
 				/>
 				<Divider />
 				{
@@ -162,7 +163,7 @@ class TeacherMy extends Component {
 					<Grid.Row columns={2}>
 						<Grid.Column>
 							<Header as='h2'>
-								Quiz List
+								{strings.quizList}
 							</Header>
 							<Scrollbars
 								autoHeight
@@ -178,13 +179,13 @@ class TeacherMy extends Component {
 									size='huge'
 									onClick={this.onQuizAddButton}
 								>
-									New Quiz
+									{strings.newQuiz}
 								</Button>
 							</Scrollbars>
 						</Grid.Column>
 						<Grid.Column>
 							<Header as='h2'>
-								Feedback List
+								{strings.feedBackList}
 							</Header>
 							<Scrollbars
 								autoHeight
@@ -193,8 +194,8 @@ class TeacherMy extends Component {
 								<Table celled selectable>
 									<Table.Header>
 										<Table.Row>
-											<Table.HeaderCell>Student</Table.HeaderCell>
-											<Table.HeaderCell>Wrong Count</Table.HeaderCell>
+											<Table.HeaderCell>{strings.student}</Table.HeaderCell>
+											<Table.HeaderCell>{strings.wrongCount}</Table.HeaderCell>
 										</Table.Row>
 									</Table.Header>
 

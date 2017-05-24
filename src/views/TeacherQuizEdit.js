@@ -9,6 +9,7 @@ import TitleHeader from '../components/TitleHeader';
 
 import { setNewQuizId, setQuestion, callEditQuiz, callDeleteQuestion, callGetQuestionList } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherQuizEdit extends Component {
@@ -107,14 +108,14 @@ class TeacherQuizEdit extends Component {
 			<List.Item key={question._id}>
 				<List.Content floated='right'>
 					<Button
-						content='Edit'
+						content={strings.edit}
 						icon='edit'
 						labelPosition='left'
 						onClick={this.onQuestionEditButton}
 						target={question._id}
 					/>
 					<Button
-						content='Delete'
+						content={strings.delete}
 						icon='trash'
 						labelPosition='left'
 						onClick={this.onQuestionDeleteButton}
@@ -138,7 +139,7 @@ class TeacherQuizEdit extends Component {
 			<div className='teacher'>
 				<TitleHeader
 					icon='edit'
-					title='Quiz Edit'
+					title={strings.quizEdit}
 				/>
 				<Divider />
 				<Grid divided='vertically'>
@@ -147,20 +148,20 @@ class TeacherQuizEdit extends Component {
 							<Input
 								className='teacher-quizname-input'
 								size='huge'
-								placeholder='Quiz Name'
+								placeholder={strings.quizName}
 								defaultValue={this.state.title}
 								onChange={this.onTitleChange}
 							/>
 							{
 								this.state.showTitleHelp &&
-								<Header as='h4' color='red' content='* You have to enter the title' />
+								<Header as='h4' color='red' content={strings.titleError} />
 							}
 						</Grid.Column>
 					</Grid.Row>
 					<Grid.Row columns={1}>
 						<Grid.Column>
 							<Header as='h2'>
-								Question List
+								{strings.questionList}
 							</Header>
 							<Scrollbars
 								autoHeight
@@ -178,7 +179,7 @@ class TeacherQuizEdit extends Component {
 										size='huge'
 										onClick={this.onQuestionNewButton}
 									>
-										New Question
+										{strings.newQuestion}
 									</Button>
 								</div>
 								<div className='teacher-button'>
@@ -187,7 +188,7 @@ class TeacherQuizEdit extends Component {
 										size='huge'
 										onClick={this.onSaveButton}
 									>
-										Save
+										{strings.save}
 									</Button>
 								</div>
 								<div className='teacher-button'>
@@ -196,7 +197,7 @@ class TeacherQuizEdit extends Component {
 										size='huge'
 										onClick={this.onCancelButton}
 									>
-										Cancel
+										{strings.cancel}
 									</Button>
 								</div>
 							</Scrollbars>

@@ -6,6 +6,7 @@ import { Grid, Header, Button, Icon, Segment, Table, Image } from 'semantic-ui-r
 
 import { callNextPlayQuestion } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 import triangle from '../assets/triangle.svg';
 import diamond from '../assets/diamond.svg';
@@ -132,9 +133,9 @@ class TeacherPlay extends Component {
 									</div>
 									<div style={{ margin: 20 }}>
 										<Header as='h2' icon>
-											Ready to go!
+											{strings.readyToGo}
 											<Header.Subheader>
-												{'Let\'s get busy'}
+												{strings.getBusy}
 											</Header.Subheader>
 										</Header>
 									</div>
@@ -220,28 +221,28 @@ class TeacherPlay extends Component {
 									<Icon name='idea' />
 										Result
 									<Header.Subheader>
-										The answer is {exampleMap[playResult.answer - 1]}
+										{strings.answerIs} {exampleMap[playResult.answer - 1]}
 									</Header.Subheader>
 								</Header>
 								<Segment.Group piled>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example1} people(s) chose the example {exampleMap[0]}
+											{playResult.example1} {strings.choseTheExample} {exampleMap[0]}
 										</Header>
 									</Segment>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example2} people(s) chose the example {exampleMap[1]}
+											{playResult.example2} {strings.choseTheExample} {exampleMap[1]}
 										</Header>
 									</Segment>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example3} people(s) chose the example {exampleMap[2]}
+											{playResult.example3} {strings.choseTheExample} {exampleMap[2]}
 										</Header>
 									</Segment>
 									<Segment>
 										<Header as='h2' icon>
-											{playResult.example4} people(s) chose the example {exampleMap[3]}
+											{playResult.example4} {strings.choseTheExample} {exampleMap[3]}
 										</Header>
 									</Segment>
 								</Segment.Group>
@@ -251,22 +252,22 @@ class TeacherPlay extends Component {
 							<div>
 								<Header as='h2' icon>
 									<Icon name='trophy' />
-										Leader Board
+									{strings.leaderBoard}
 									<Header.Subheader>
-										The score is.....
+										{strings.scoreis}
 									</Header.Subheader>
 								</Header>
 								<Table celled selectable>
 									<Table.Header>
 										<Table.Row>
 											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>Ranking</Header>
+												<Header as='h3' textAlign='center'>{strings.ranking}</Header>
 											</Table.HeaderCell>
 											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>NickName</Header>
+												<Header as='h3' textAlign='center'>{strings.nickName}</Header>
 											</Table.HeaderCell>
 											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>Score</Header>
+												<Header as='h3' textAlign='center'>{strings.score}</Header>
 											</Table.HeaderCell>
 										</Table.Row>
 									</Table.Header>
@@ -282,7 +283,7 @@ class TeacherPlay extends Component {
 									size='huge'
 									onClick={this.onNextQuestionButton}
 								>
-									Next Question
+									{strings.nextQuestion}
 								</Button>
 							</div>
 						}
@@ -290,22 +291,22 @@ class TeacherPlay extends Component {
 							<div>
 								<Header as='h2' icon>
 									<Icon name='trophy' />
-										End of Play
+									{strings.endOfPlay}
 									<Header.Subheader>
-										Good job!
+										{strings.goodJob}
 									</Header.Subheader>
 								</Header>
 								<Table celled selectable>
 									<Table.Header>
 										<Table.Row>
 											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>Ranking</Header>
+												<Header as='h3' textAlign='center'>{strings.ranking}</Header>
 											</Table.HeaderCell>
 											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>NickName</Header>
+												<Header as='h3' textAlign='center'>{strings.nickName}</Header>
 											</Table.HeaderCell>
 											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>Score</Header>
+												<Header as='h3' textAlign='center'>{strings.score}</Header>
 											</Table.HeaderCell>
 										</Table.Row>
 									</Table.Header>
@@ -322,7 +323,7 @@ class TeacherPlay extends Component {
 										size='huge'
 										onClick={this.onHomeEnter}
 									>
-										Home
+										{strings.home}
 									</Button>
 								</div>
 							</div>

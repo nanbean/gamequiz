@@ -9,6 +9,7 @@ import TitleHeader from '../components/TitleHeader';
 
 import { callRegisterTeacher } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherJoin extends Component {
@@ -38,11 +39,11 @@ class TeacherJoin extends Component {
 				}
 				<TitleHeader
 					icon='add user'
-					title='Join to GameQuiz'
+					title={strings.joinGameQuiz}
 				/>
 				<Divider />
 				<Header as='h1'>
-					Do you want to join?
+					{strings.wannaJoin}
 				</Header>
 				{
 					teacherName && teacherImage &&
@@ -57,7 +58,7 @@ class TeacherJoin extends Component {
 						size='huge'
 						onClick={this.onJoinButton}
 					>
-						Confirm
+						{strings.confirm}
 					</Button>
 				</div>
 			</div>
