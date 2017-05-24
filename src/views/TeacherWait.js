@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Header, Divider, List, Button, Label, Segment, Icon } from 'semantic-ui-react';
+import { Header, Divider, Button, Label, Segment, Icon } from 'semantic-ui-react';
 
 import TitleHeader from '../components/TitleHeader';
 
 import { setStudentPlayerList, callStartPlay } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherWait extends Component {
@@ -24,26 +25,16 @@ class TeacherWait extends Component {
 		this.props.history.push('/play/');
 	}
 
-	renderQuiz (data) {
-		return (
-			<List.Item key={data.quizId}>
-				<List.Content floated='right'>
-					<Button content='Start' icon='play' labelPosition='left' />
-					<Button
-						content='Edit'
-						icon='edit'
-						labelPosition='left'
-						onClick={this.onQuizEditButton}
-						target={data.quizId}
-					/>
-				</List.Content>
-				<List.Content floated='left'>
-					<Header as='h2'>
-						{data.quizTitle}
-					</Header>
-				</List.Content>
-			</List.Item>
-		);
+	getGameModeName (gameMode) {
+		this.gameMode = gameMode;
+
+		if (this.gameMode === 'MARATHON') {
+			return strings.marathon;
+		} else if (this.gameMode === 'SURVIVAL') {
+			return strings.survival;
+		}
+
+		return strings.team;
 	}
 
 	renderStudentPlayer (data) {
@@ -79,11 +70,11 @@ class TeacherWait extends Component {
 				}
 				<TitleHeader
 					icon='wait'
-					title='Wait your game'
+					title={strings.waitGame}
 				/>
 				<Divider />
 				<Segment padded>
-					<Label attached='top'>Join with</Label>
+					<Label attached='top'>{strings.joinWith}</Label>
 					<Header size='huge'>
 						{playId}
 					</Header>
@@ -91,7 +82,7 @@ class TeacherWait extends Component {
 				<Button
 					fluid
 					size='huge'
-					content='Start'
+					content={strings.start}
 					icon='play'
 					labelPosition='left'
 					onClick={this.onQuizStartButton}
@@ -100,7 +91,7 @@ class TeacherWait extends Component {
 				<Header as='h2' icon textAlign='center'>
 					<Icon name={icon} />
 					<Header.Content>
-						{gameMode} Mode
+						{this.getGameModeName(gameMode)} {strings.mode}
 					</Header.Content>
 				</Header>
 				<Divider />

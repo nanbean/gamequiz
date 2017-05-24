@@ -10,6 +10,7 @@ import TitleHeader from '../components/TitleHeader';
 
 import { setQuizId, setQuizName, setQuiz, callGetQuizList, callGetFeedBackList, callDeleteQuiz, callAddQuiz } from '../actions';
 
+import strings from '../resources/strings';
 import '../styles/teacher.css';
 
 class TeacherMy extends Component {
@@ -89,21 +90,21 @@ class TeacherMy extends Component {
 			<List.Item key={quiz._id}>
 				<List.Content floated='right'>
 					<Button
-						content='Start'
+						content={strings.start}
 						icon='play'
 						labelPosition='left'
 						onClick={this.onQuizStartButton}
 						target={quiz._id}
 					/>
 					<Button
-						content='Edit'
+						content={strings.edit}
 						icon='edit'
 						labelPosition='left'
 						onClick={this.onQuizEditButton}
 						target={quiz._id}
 					/>
 					<Button
-						content='Delete'
+						content={strings.delete}
 						icon='trash'
 						labelPosition='left'
 						onClick={this.onQuizDeleteButton}
@@ -137,8 +138,7 @@ class TeacherMy extends Component {
 	}
 
 	render () {
-		const { teacherInfo, teacherId, getFeedBackList, getQuizList } = this.props;
-		const avatarUrl = teacherInfo && teacherInfo.picture && teacherInfo.picture.data.url;
+		const { teacherName, teacherImage, teacherId, getFeedBackList, getQuizList } = this.props;
 		const quizList = getQuizList && getQuizList.quizList;
 		const feedBackList = getFeedBackList && getFeedBackList.feedBackList;
 
@@ -149,21 +149,21 @@ class TeacherMy extends Component {
 				}
 				<TitleHeader
 					icon='user'
-					title='My GameQuiz'
+					title={strings.myGameQuiz}
 				/>
 				<Divider />
 				{
-					avatarUrl &&
+					teacherName && teacherImage &&
 					<Avatar
-						url={teacherInfo.picture.data.url}
-						name={teacherInfo.name}
+						url={teacherImage}
+						name={teacherName}
 					/>
 				}
 				<Grid divided='vertically'>
 					<Grid.Row columns={2}>
 						<Grid.Column>
 							<Header as='h2'>
-								Quiz List
+								{strings.quizList}
 							</Header>
 							<Scrollbars
 								autoHeight
@@ -179,13 +179,13 @@ class TeacherMy extends Component {
 									size='huge'
 									onClick={this.onQuizAddButton}
 								>
-									New Quiz
+									{strings.newQuiz}
 								</Button>
 							</Scrollbars>
 						</Grid.Column>
 						<Grid.Column>
 							<Header as='h2'>
-								Feedback List
+								{strings.feedBackList}
 							</Header>
 							<Scrollbars
 								autoHeight
@@ -194,8 +194,8 @@ class TeacherMy extends Component {
 								<Table celled selectable>
 									<Table.Header>
 										<Table.Row>
-											<Table.HeaderCell>Student</Table.HeaderCell>
-											<Table.HeaderCell>Wrong Count</Table.HeaderCell>
+											<Table.HeaderCell>{strings.student}</Table.HeaderCell>
+											<Table.HeaderCell>{strings.wrongCount}</Table.HeaderCell>
 										</Table.Row>
 									</Table.Header>
 
@@ -223,16 +223,18 @@ TeacherMy.propTypes = {
 	setQuizId: PropTypes.func.isRequired,
 	setQuizName: PropTypes.func.isRequired,
 	setQuiz: PropTypes.func.isRequired,
-	teacherInfo: PropTypes.object.isRequired,
 	teacherId: PropTypes.string.isRequired,
+	teacherName: PropTypes.string.isRequired,
+	teacherImage: PropTypes.string.isRequired,
 	getQuizList: PropTypes.object.isRequired,
 	getFeedBackList: PropTypes.object.isRequired,
 	newQuizId: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
-	teacherInfo: state.teacherInfo,
 	teacherId: state.teacherId,
+	teacherName: state.teacherName,
+	teacherImage: state.teacherImage,
 	getQuizList: state.getQuizList,
 	getFeedBackList: state.getFeedBackList,
 	newQuizId: state.newQuizId

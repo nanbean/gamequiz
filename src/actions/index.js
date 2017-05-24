@@ -390,7 +390,12 @@ export const callNextPlayQuestion = params => () => (
 	).then()
 );
 
-export const callCheckPlayId = params => dispatch => (
+export const callCheckPlayId = params => (dispatch) => {
+	dispatch({
+		type: 'SET_PLAY_ID_CHECK',
+		payload: 'checking'
+	});
+
 	fetchCall('/api/student/checkPlayId', params).then(
 		response => (
 			response.json()
@@ -398,12 +403,12 @@ export const callCheckPlayId = params => dispatch => (
 	).then(
 		result => (
 			dispatch({
-				type: 'SET_CHECK_PLAY_ID',
-				payload: result
+				type: 'SET_PLAY_ID_CHECK',
+				payload: result.valid ? 'valid' : 'invalid'
 			})
 		)
-	)
-);
+	);
+};
 
 export const callGetServerEvent = params => (dispatch) => {
 	const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
