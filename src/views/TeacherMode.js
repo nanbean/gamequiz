@@ -22,6 +22,7 @@ class TeacherMode extends Component {
 
 	onQuizMarathonButton () {
 		this.props.callStartGameMode({
+			teacherId: this.props.teacherId,
 			quizId: this.props.quizId,
 			gameMode: 'MARATHON'
 		});
@@ -124,11 +125,13 @@ class TeacherMode extends Component {
 TeacherMode.propTypes = {
 	callStartGameMode: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
+	teacherId: PropTypes.string.isRequired,
 	quizId: PropTypes.number.isRequired,
 	quizName: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
+	teacherId: state.teacherId,
 	quizId: state.quizId,
 	quizName: state.quizName
 });

@@ -20,6 +20,7 @@ var Teacher = require('./models/teacher');
 var Quiz = require('./models/quiz');
 var Question = require('./models/question');
 var Suggestion = require('./models/suggestion');
+var Feedback = require('./models/feedback');
 
 router.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*")
@@ -72,9 +73,24 @@ var feedback = [
 var plays = [
 	// {
 	// 	playId: 1234,
+	// 	teacherId: '',
 	// 	quizId: 3,
 	// 	gameMode: 'NORMAL'
-	// 	studentPlayerList: [],
+	// 	studentPlayerList: [
+	// 		{
+	// 			studentId: '',
+	// 			studentName: '',
+	// 			studentNick: '',
+	// 			answerList: [
+	// 				{
+	// 					questionId: '',
+	// 					answer: 1,
+	// 					correct: true,
+	// 					score: 100
+	// 				}
+	// 			]
+	// 		}
+	// 	],
 	// 	currentQuestionIndex: 0
 	// 	presentationTime: new Date()
 	// 	nextStepTimer: new Date()
@@ -157,8 +173,18 @@ router.post('/teacher/getQuizList', function(req, res){
 });
 
 router.post('/teacher/getFeedBackList', function(req, res){
-	res.send({
-		feedBackList: feedback
+	var teacherId = req.body.teacherId;
+	var data = {
+		feedBackList: []
+	};
+
+	Feedback.find({teacherId: teacherId}, function(err, feedBackList) {
+		if (err) {
+			return res.send(data);
+		}
+
+		data.feedBackList = feedBackList;
+		res.send(data);
 	});
 });
 
@@ -464,12 +490,12 @@ function updateSuggestions (categories) {
 			category: categories[i].text
 		}
 		Suggestion.update(
-	    {category: suggestion.category},
-	    {$setOnInsert: suggestion},
-	    {upsert: true},
-	    function(err, numAffected) {
-	    	console.log(numAffected);
-	    }
+			{category: suggestion.category},
+			{$setOnInsert: suggestion},
+			{upsert: true},
+			function(err, numAffected) {
+				console.log(numAffected);
+			}
 		);
 	}
 }
@@ -485,18 +511,19 @@ router.post('/teacher/getTagSuggestions', function(req, res){
 	});
 });
 
-function startGameMode (quizId, gameMode) {
+function startGameMode (teacherId, quizId, gameMode) {
 	var playId;
 
 	playId = Math.floor((Math.random() * 10000) + 1).toString();;
 
 	plays.push({
 		playId: playId,
+		teacherId: teacherId,
 		quizId: quizId,
 		gameMode: gameMode,
 		studentPlayerList: [],
 		currentQuestionIndex: 0
-	})
+	});
 
 	return {
 		playId: playId,
@@ -505,12 +532,13 @@ function startGameMode (quizId, gameMode) {
 }
 
 router.post('/teacher/startGameMode', function(req, res){
+	var teacherId = req.body.teacherId;
 	var quizId = req.body.quizId;
 	var gameMode = req.body.gameMode;
 
 	var data = {};
 
-	data = startGameMode(quizId, gameMode);
+	data = startGameMode(teacherId, quizId, gameMode);
 
 	res.send(data);
 });
@@ -531,6 +559,46 @@ function deletePlayWithPlayId (playId) {
 			plays.splice(i, 1);
 		}
 	}
+}
+
+function updateFeedbackAndDeletePlay (playId) {
+	var play = getPlayWithPlayId(playId);
+	for (var i = 0; i < play.studentPlayerList.length; i++) {
+		const player = play.studentPlayerList[i];
+		var wrongQuestions = [];
+
+		for (var j = 0; j < player.answerList.length; j++) {
+			if (player.answerList[j].correct === false) {
+				wrongQuestions.push(player.answerList[j].questionId);
+			}
+		}
+
+		Feedback.update(
+			{studentName: player.studentName, teacherId: play.teacherId},
+			{$push: {wrongQuestions: {$each: wrongQuestions}}},
+			{upsert: true},
+			function(err, numAffected) {
+				if (i >= play.studentPlayerList.length - 1) {
+					deletePlayWithPlayId(playId);
+				}
+			}
+		);
+	}
+	// 	studentPlayerList: [
+	// 		{
+	// 			studentId: '',
+	// 			studentName: '',
+	// 			studentNick: '',
+	// 			answerList: [
+	// 				{
+	// 					questionId: '',
+	// 					answer: 1,
+	// 					correct: true,
+	// 					score: 100
+	// 				}
+	// 			]
+	// 		}
+	// 	],
 }
 
 function getQuestionWithQuestionId (questionId) {
@@ -594,7 +662,7 @@ function sendLeaderBoard (playId) {
 					data.leaderBoard.push(student);
 				}
 
-				deletePlayWithPlayId(playId);
+				updateFeedbackAndDeletePlay(playId);
 			}
 
 			data.leaderBoard = data.leaderBoard.sort(function(a, b){return b.score-a.score});
@@ -903,6 +971,7 @@ function addStudentPalyer (playId, student) {
 
 router.post('/student/sendStudentInfo', function(req, res){
 	const studentNick = req.body.studentNick;
+	const studentName = req.body.studentName;
 	const playId = req.body.playId;
 
 	var data = {};
@@ -910,6 +979,7 @@ router.post('/student/sendStudentInfo', function(req, res){
 	data.playId = playId;
 	data.studentId = Math.floor((Math.random() * 10000) + 1);
 	data.studentNick = studentNick;
+	data.studentName = studentName;
 
 	addStudentPalyer(playId, data)
 
@@ -950,7 +1020,7 @@ function updateAnswerToPlay (playId, studentId, answer) {
 								}
 
 								play.studentPlayerList[i].answerList.push({
-									questionId: question.questionId,
+									questionId: question._id,
 									answer: answer,
 									correct: question.answer == answer,
 									score: question.answer == answer ? calculateScore(play.timeOut, play.presentationTime, new Date()):0
