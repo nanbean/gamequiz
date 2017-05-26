@@ -3,7 +3,7 @@ import playId from './playId';
 import checkTeacher from './checkTeacher';
 import registerTeacher from './registerTeacher';
 import getQuizList from './getQuizList';
-import getFeedBackList from './getFeedBackList';
+import feedBackList from './feedBackList';
 import getQuestionList from './getQuestionList';
 import quizId from './quizId';
 import quizName from './quizName';
@@ -40,7 +40,7 @@ const gamequiz = combineReducers({
 	checkTeacher,
 	registerTeacher,
 	getQuizList,
-	getFeedBackList,
+	feedBackList,
 	getQuestionList,
 	studentId,
 	studentNick,
