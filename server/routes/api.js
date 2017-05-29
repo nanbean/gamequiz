@@ -20,6 +20,7 @@ var Teacher = require('./models/teacher');
 var Quiz = require('./models/quiz');
 var Question = require('./models/question');
 var Suggestion = require('./models/suggestion');
+var Feedback = require('./models/feedback');
 
 router.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*")
@@ -72,9 +73,25 @@ var feedback = [
 var plays = [
 	// {
 	// 	playId: 1234,
+	// 	teacherId: '',
 	// 	quizId: 3,
 	// 	gameMode: 'NORMAL'
-	// 	studentPlayerList: [],
+	// 	studentPlayerList: [
+	// 		{
+	// 			studentId: '',
+	// 			studentName: '',
+	// 			studentNick: '',
+	// 			answerList: [
+	// 				{
+	// 					questionId: '',
+	// 					answer: 1,
+	// 					correct: true,
+	// 					score: 100
+	// 				}
+	// 			]
+	// 		}
+	// 	],
+	// 	survivors: []
 	// 	currentQuestionIndex: 0
 	// 	presentationTime: new Date()
 	// 	nextStepTimer: new Date()
@@ -157,8 +174,18 @@ router.post('/teacher/getQuizList', function(req, res){
 });
 
 router.post('/teacher/getFeedBackList', function(req, res){
-	res.send({
-		feedBackList: feedback
+	var teacherId = req.body.teacherId;
+	var data = {
+		feedBackList: []
+	};
+
+	Feedback.find({teacherId: teacherId}, function(err, feedBackList) {
+		if (err) {
+			return res.send(data);
+		}
+
+		data.feedBackList = feedBackList;
+		res.send(data);
 	});
 });
 
@@ -464,12 +491,12 @@ function updateSuggestions (categories) {
 			category: categories[i].text
 		}
 		Suggestion.update(
-	    {category: suggestion.category},
-	    {$setOnInsert: suggestion},
-	    {upsert: true},
-	    function(err, numAffected) {
-	    	console.log(numAffected);
-	    }
+			{category: suggestion.category},
+			{$setOnInsert: suggestion},
+			{upsert: true},
+			function(err, numAffected) {
+				console.log(numAffected);
+			}
 		);
 	}
 }
@@ -485,18 +512,20 @@ router.post('/teacher/getTagSuggestions', function(req, res){
 	});
 });
 
-function startGameMode (quizId, gameMode) {
+function startGameMode (teacherId, quizId, gameMode) {
 	var playId;
 
 	playId = Math.floor((Math.random() * 10000) + 1).toString();;
 
 	plays.push({
 		playId: playId,
+		teacherId: teacherId,
 		quizId: quizId,
 		gameMode: gameMode,
 		studentPlayerList: [],
+		survivors: [],
 		currentQuestionIndex: 0
-	})
+	});
 
 	return {
 		playId: playId,
@@ -505,12 +534,13 @@ function startGameMode (quizId, gameMode) {
 }
 
 router.post('/teacher/startGameMode', function(req, res){
+	var teacherId = req.body.teacherId;
 	var quizId = req.body.quizId;
 	var gameMode = req.body.gameMode;
 
 	var data = {};
 
-	data = startGameMode(quizId, gameMode);
+	data = startGameMode(teacherId, quizId, gameMode);
 
 	res.send(data);
 });
@@ -531,6 +561,46 @@ function deletePlayWithPlayId (playId) {
 			plays.splice(i, 1);
 		}
 	}
+}
+
+function updateFeedbackAndDeletePlay (playId) {
+	var play = getPlayWithPlayId(playId);
+	for (var i = 0; i < play.studentPlayerList.length; i++) {
+		const player = play.studentPlayerList[i];
+		var wrongQuestions = [];
+
+		for (var j = 0; j < player.answerList.length; j++) {
+			if (player.answerList[j].correct === false) {
+				wrongQuestions.push(player.answerList[j].questionId);
+			}
+		}
+
+		Feedback.update(
+			{studentName: player.studentName, teacherId: play.teacherId},
+			{$push: {wrongQuestions: {$each: wrongQuestions}}},
+			{upsert: true},
+			function(err, numAffected) {
+				if (i >= play.studentPlayerList.length - 1) {
+					deletePlayWithPlayId(playId);
+				}
+			}
+		);
+	}
+	// 	studentPlayerList: [
+	// 		{
+	// 			studentId: '',
+	// 			studentName: '',
+	// 			studentNick: '',
+	// 			answerList: [
+	// 				{
+	// 					questionId: '',
+	// 					answer: 1,
+	// 					correct: true,
+	// 					score: 100
+	// 				}
+	// 			]
+	// 		}
+	// 	],
 }
 
 function getQuestionWithQuestionId (questionId) {
@@ -556,26 +626,12 @@ function sendLeaderBoard (playId) {
 
 			data.playId = playId;
 			data.leaderBoard = [];
-			if (play.currentQuestionIndex < quiz.questionList.length - 1) {
-				data.serverStatus = 'LEADER_BOARD';
 
-				for (var i = 0; i < play.studentPlayerList.length; i++) {
-					var student = {};
-					var answerList = play.studentPlayerList[i].answerList;
+			if (play.gameMode === 'SURVIVAL') {
+				data.survivors = play.survivors.map(function(student){ return {studentId: student.studentId, studentNick: student.studentNick}; });
+			}
 
-					student.studentId = play.studentPlayerList[i].studentId;
-					student.studentNick = play.studentPlayerList[i].studentNick;
-					student.score = 0;
-
-					if (answerList) {
-						for (var j = 0; j < answerList.length; j++) {
-							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
-						}
-					}
-
-					data.leaderBoard.push(student);
-				}
-			} else {
+			if (play.currentQuestionIndex >= quiz.questionList.length - 1 || (play.gameMode === 'SURVIVAL' && data.survivors.length < 1)) {
 				data.serverStatus = 'END';
 
 				for (var i = 0; i < play.studentPlayerList.length; i++) {
@@ -594,7 +650,30 @@ function sendLeaderBoard (playId) {
 					data.leaderBoard.push(student);
 				}
 
-				deletePlayWithPlayId(playId);
+				if (play.gameMode === 'MARATHON') {
+					updateFeedbackAndDeletePlay(playId);
+				} else if (play.gameMode === 'SURVIVAL') {
+					deletePlayWithPlayId(playId);
+				}
+			} else {
+				data.serverStatus = 'LEADER_BOARD';
+
+				for (var i = 0; i < play.studentPlayerList.length; i++) {
+					var student = {};
+					var answerList = play.studentPlayerList[i].answerList;
+
+					student.studentId = play.studentPlayerList[i].studentId;
+					student.studentNick = play.studentPlayerList[i].studentNick;
+					student.score = 0;
+
+					if (answerList) {
+						for (var j = 0; j < answerList.length; j++) {
+							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
+						}
+					}
+
+					data.leaderBoard.push(student);
+				}
 			}
 
 			data.leaderBoard = data.leaderBoard.sort(function(a, b){return b.score-a.score});
@@ -648,6 +727,10 @@ function sendResult (playId) {
 					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
 						data.result.example4++;
 					}
+				}
+
+				if (play.gameMode === 'SURVIVAL') {
+					data.result.survivors = play.survivors.map(function(student){ return {studentId: student.studentId, studentNick: student.studentNick}; });
 				}
 
 				getServerEvent.publish(JSON.stringify(data));
@@ -896,13 +979,15 @@ function addStudentPalyer (playId, student) {
 	var play = getPlayWithPlayId(playId);
 
 	if (play) {
-		getPlayWithPlayId(playId).studentPlayerList.push(student);
+		play.studentPlayerList.push(student);
+		play.survivors.push(student);
 		getServerEventTeacher.publish(JSON.stringify(play));
 	}
 }
 
 router.post('/student/sendStudentInfo', function(req, res){
 	const studentNick = req.body.studentNick;
+	const studentName = req.body.studentName;
 	const playId = req.body.playId;
 
 	var data = {};
@@ -910,6 +995,7 @@ router.post('/student/sendStudentInfo', function(req, res){
 	data.playId = playId;
 	data.studentId = Math.floor((Math.random() * 10000) + 1);
 	data.studentNick = studentNick;
+	data.studentName = studentName;
 
 	addStudentPalyer(playId, data)
 
@@ -943,6 +1029,16 @@ function updateAnswerToPlay (playId, studentId, answer) {
 					}
 
 					if (question) {
+						if (play.gameMode === 'SURVIVAL') {
+							if (question.answer !== answer) {
+								for (var i = 0; i < play.survivors.length; i++) {
+									if ( play.survivors[i].studentId == studentId) {
+										play.survivors.splice(i, 1);
+									}
+								}
+							}
+						}
+
 						for (var i = 0; i < play.studentPlayerList.length; i++) {
 							if ( play.studentPlayerList[i].studentId == studentId) {
 								if (!play.studentPlayerList[i].answerList) {
@@ -950,7 +1046,7 @@ function updateAnswerToPlay (playId, studentId, answer) {
 								}
 
 								play.studentPlayerList[i].answerList.push({
-									questionId: question.questionId,
+									questionId: question._id,
 									answer: answer,
 									correct: question.answer == answer,
 									score: question.answer == answer ? calculateScore(play.timeOut, play.presentationTime, new Date()):0

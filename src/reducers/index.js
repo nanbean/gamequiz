@@ -3,7 +3,7 @@ import playId from './playId';
 import checkTeacher from './checkTeacher';
 import registerTeacher from './registerTeacher';
 import getQuizList from './getQuizList';
-import getFeedBackList from './getFeedBackList';
+import feedBackList from './feedBackList';
 import getQuestionList from './getQuestionList';
 import quizId from './quizId';
 import quizName from './quizName';
@@ -27,6 +27,8 @@ import teacherId from './teacherId';
 import teacherName from './teacherName';
 import teacherImage from './teacherImage';
 import playIdCheck from './playIdCheck';
+import survivor from './survivor';
+import playSurvivors from './playSurvivors';
 
 const gamequiz = combineReducers({
 	playId,
@@ -40,7 +42,7 @@ const gamequiz = combineReducers({
 	checkTeacher,
 	registerTeacher,
 	getQuizList,
-	getFeedBackList,
+	feedBackList,
 	getQuestionList,
 	studentId,
 	studentNick,
@@ -56,7 +58,9 @@ const gamequiz = combineReducers({
 	teacherId,
 	teacherName,
 	teacherImage,
-	playIdCheck
+	playIdCheck,
+	survivor,
+	playSurvivors
 });
 
 export default gamequiz;

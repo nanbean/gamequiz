@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Grid, Header, Button, Icon, Segment, Table, Image } from 'semantic-ui-react';
 
-import { callNextPlayQuestion } from '../actions';
+import { callNextPlayQuestion, resetToHome } from '../actions';
 
 import strings from '../resources/strings';
 import '../styles/teacher.css';
@@ -78,6 +78,7 @@ class TeacherPlay extends Component {
 
 	onHomeEnter () {
 		this.props.history.push('/my');
+		this.props.resetToHome();
 	}
 
 	waitTimer () {
@@ -114,8 +115,21 @@ class TeacherPlay extends Component {
 		);
 	}
 
+	renderSurvivors (data) {
+		this.studentNick = data.studentNick;
+
+		return (
+			<Table.Row key={this.studentId}>
+				<Table.Cell>
+					<Header as='h2' textAlign='center'>{this.studentNick}</Header>
+				</Table.Cell>
+			</Table.Row>
+		);
+	}
+
 	render () {
 		const { serverStatus, playQuestion, playTimeOut, playResult, playLeaderBoard } = this.props;
+		const { gameMode, playSurvivors } = this.props;
 		const { waitCount } = this.state;
 
 		return (
@@ -248,7 +262,7 @@ class TeacherPlay extends Component {
 								</Segment.Group>
 							</div>
 						}
-						{ serverStatus === 'LEADER_BOARD' &&
+						{ gameMode === 'MARATHON' && serverStatus === 'LEADER_BOARD' &&
 							<div>
 								<Header as='h2' icon>
 									<Icon name='trophy' />
@@ -287,7 +301,7 @@ class TeacherPlay extends Component {
 								</Button>
 							</div>
 						}
-						{ serverStatus === 'END' &&
+						{ gameMode === 'MARATHON' && serverStatus === 'END' &&
 							<div>
 								<Header as='h2' icon>
 									<Icon name='trophy' />
@@ -328,6 +342,74 @@ class TeacherPlay extends Component {
 								</div>
 							</div>
 						}
+						{ gameMode === 'SURVIVAL' && serverStatus === 'LEADER_BOARD' &&
+							<div>
+								<Header as='h2' icon>
+									<Icon name='trophy' />
+									{strings.survivors}
+									<Header.Subheader>
+										{strings.whoSurvived}
+									</Header.Subheader>
+								</Header>
+								<Table celled selectable>
+									<Table.Header>
+										<Table.Row>
+											<Table.HeaderCell>
+												<Header as='h3' textAlign='center'>{strings.survivors}</Header>
+											</Table.HeaderCell>
+										</Table.Row>
+									</Table.Header>
+
+									<Table.Body>
+										{
+											playSurvivors && playSurvivors.map(this.renderSurvivors, this)
+										}
+									</Table.Body>
+								</Table>
+								<Button
+									fluid
+									size='huge'
+									onClick={this.onNextQuestionButton}
+								>
+									{strings.nextQuestion}
+								</Button>
+							</div>
+						}
+						{ gameMode === 'SURVIVAL' && serverStatus === 'END' &&
+							<div>
+								<Header as='h2' icon>
+									<Icon name='trophy' />
+									{strings.endOfPlay}
+									<Header.Subheader>
+										{strings.goodJob}
+									</Header.Subheader>
+								</Header>
+								<Table celled selectable>
+									<Table.Header>
+										<Table.Row>
+											<Table.HeaderCell>
+												<Header as='h3' textAlign='center'>{strings.survivors}</Header>
+											</Table.HeaderCell>
+										</Table.Row>
+									</Table.Header>
+
+									<Table.Body>
+										{
+											playSurvivors && playSurvivors.map(this.renderSurvivors, this)
+										}
+									</Table.Body>
+								</Table>
+								<div>
+									<Button
+										className='teacher-home-button'
+										size='huge'
+										onClick={this.onHomeEnter}
+									>
+										{strings.home}
+									</Button>
+								</div>
+							</div>
+						}
 					</div>
 				</div>
 			</div>
@@ -343,6 +425,9 @@ TeacherPlay.propTypes = {
 	playResult: PropTypes.object.isRequired,
 	serverStatus: PropTypes.string.isRequired,
 	playLeaderBoard: PropTypes.array.isRequired,
+	gameMode: PropTypes.string.isRequired,
+	playSurvivors: PropTypes.arrayOf(PropTypes.object).isRequired,
+	resetToHome: PropTypes.func.isRequired,
 	callNextPlayQuestion: PropTypes.func.isRequired
 };
 
@@ -352,12 +437,17 @@ const mapStateToProps = state => ({
 	playTimeOut: state.playTimeOut,
 	playId: state.playId,
 	playResult: state.playResult,
-	playLeaderBoard: state.playLeaderBoard
+	playLeaderBoard: state.playLeaderBoard,
+	gameMode: state.gameMode,
+	playSurvivors: state.playSurvivors
 });
 
 const mapDispatchToProps = dispatch => ({
 	callNextPlayQuestion (param) {
 		dispatch(callNextPlayQuestion(param));
+	},
+	resetToHome () {
+		dispatch(resetToHome());
 	}
 });
 

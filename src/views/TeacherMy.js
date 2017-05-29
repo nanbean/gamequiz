@@ -120,10 +120,10 @@ class TeacherMy extends Component {
 		);
 	}
 
-	renderFeedBack (data) {
-		this.studentId = data.studentId;
-		this.studentName = data.studentName;
-		this.wrongQuestionList = data.wrongQuestionList;
+	renderFeedBack (feedback) {
+		this.studentId = feedback.studentId;
+		this.studentName = feedback.studentName;
+		this.wrongQuestions = feedback.wrongQuestions;
 
 		return (
 			<Table.Row key={this.studentId}>
@@ -131,16 +131,15 @@ class TeacherMy extends Component {
 					{this.studentName}
 				</Table.Cell>
 				<Table.Cell>
-					{this.wrongQuestionList.length}
+					{this.wrongQuestions.length}
 				</Table.Cell>
 			</Table.Row>
 		);
 	}
 
 	render () {
-		const { teacherName, teacherImage, teacherId, getFeedBackList, getQuizList } = this.props;
+		const { teacherName, teacherImage, teacherId, feedBackList, getQuizList } = this.props;
 		const quizList = getQuizList && getQuizList.quizList;
-		const feedBackList = getFeedBackList && getFeedBackList.feedBackList;
 
 		return (
 			<div className='teacher'>
@@ -227,7 +226,7 @@ TeacherMy.propTypes = {
 	teacherName: PropTypes.string.isRequired,
 	teacherImage: PropTypes.string.isRequired,
 	getQuizList: PropTypes.object.isRequired,
-	getFeedBackList: PropTypes.object.isRequired,
+	feedBackList: PropTypes.arrayOf(PropTypes.object).isRequired,
 	newQuizId: PropTypes.string.isRequired
 };
 
@@ -236,7 +235,7 @@ const mapStateToProps = state => ({
 	teacherName: state.teacherName,
 	teacherImage: state.teacherImage,
 	getQuizList: state.getQuizList,
-	getFeedBackList: state.getFeedBackList,
+	feedBackList: state.feedBackList,
 	newQuizId: state.newQuizId
 });
 
