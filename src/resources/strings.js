@@ -76,9 +76,12 @@ const strings = new LocalizedStrings({
 		home: 'Home',
 		gameOver: 'Game Over',
 		wait: 'WAIT',
-		result: 'RESULT'
+		result: 'RESULT',
+		survivors: 'Survivors',
+		whoSurvived: 'Who did survive?',
+		survivalFail: 'You could not survive.'
 	},
-	ko:{
+	ko: {
 		typeGameId: '게임 번호를 입력하세요',
 		checkGameId: '게임 번호를 다시 확인해주세요',
 		play: '시작',
@@ -147,13 +150,16 @@ const strings = new LocalizedStrings({
 		ranking: '순위',
 		nickName: '별명',
 		score: '점수',
-		endOfPlay: 'End of Play',
+		endOfPlay: '게임이 끝났습니다',
 		goodJob: '잘하셨습니다.',
 		home: '홈',
 		gameOver: '게임이 종료되었습니다.',
 		wait: '기다리세요',
-		result: '정답을 확인하세요'
+		result: '정답을 확인하세요',
+		survivors: '생존자',
+		whoSurvived: '누가 남아 있나?',
+		survivalFail: '서바이벌 모드에서 살아남지 못했습니다.'
 	}
 });
 
-export default strings
+export default strings;

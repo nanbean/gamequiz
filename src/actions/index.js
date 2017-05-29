@@ -410,7 +410,7 @@ export const callCheckPlayId = params => (dispatch) => {
 	);
 };
 
-export const callGetServerEvent = params => (dispatch) => {
+export const callGetServerEvent = params => (dispatch, getState) => {
 	const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 	const playId = params.playId;
 
@@ -418,9 +418,21 @@ export const callGetServerEvent = params => (dispatch) => {
 		const data = JSON.parse(e.data);
 
 		if (data.playId === playId) {
+			if (data.result && data.result.survivors) {
+				const state = getState();
+				let survived = false;
+
+				for (let i = 0; i < data.result.survivors.length; i += 1) {
+					if (data.result.survivors[i].studentId === state.studentId) {
+						survived = true;
+					}
+				}
+				data.survived = survived;
+			}
+
 			dispatch({
 				type: 'SET_SERVER_STATUS',
-				payload: JSON.parse(e.data)
+				payload: data
 			});
 		}
 	}, false);

@@ -153,7 +153,7 @@ class StudentMain extends Component {
 	}
 
 	render () {
-		const { playIdCheck, studentPage, serverStatus, studentAnswered } = this.props;
+		const { playIdCheck, studentPage, serverStatus, studentAnswered, survivor } = this.props;
 		const { showNameHelp, showNickHelp } = this.state;
 
 		return (
@@ -267,13 +267,13 @@ class StudentMain extends Component {
 					</div>
 				}
 				{
-					studentPage === 'play' && serverStatus === 'END' &&
+					studentPage === 'end' &&
 					<div className='student-outer'>
 						<div className='student-inner'>
 							<Header as='h2' icon textAlign='center'>
 								<Icon name='info' circular />
 								<Header.Content>
-									{strings.gameOver}
+									{survivor === true ? strings.gameOver : strings.survivalFail}
 								</Header.Content>
 							</Header>
 							<div>
@@ -347,6 +347,7 @@ StudentMain.propTypes = {
 	studentPage: PropTypes.string.isRequired,
 	serverStatus: PropTypes.string.isRequired,
 	studentAnswered: PropTypes.bool.isRequired,
+	survivor: PropTypes.bool.isRequired,
 	callCheckPlayId: PropTypes.func.isRequired,
 	setPlayId: PropTypes.func.isRequired,
 	resetToHome: PropTypes.func.isRequired,
@@ -360,7 +361,8 @@ const mapStateToProps = state => ({
 	playIdCheck: state.playIdCheck,
 	serverStatus: state.serverStatus,
 	studentId: state.studentId,
-	studentAnswered: state.studentAnswered
+	studentAnswered: state.studentAnswered,
+	survivor: state.survivor
 });
 
 const mapDispatchToProps = dispatch => ({
