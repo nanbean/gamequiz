@@ -14,6 +14,13 @@ export default function studentPage (state = initialState, action) {
 			return 'play';
 		}
 		return state;
+	case 'SET_SERVER_STATUS':
+		if (action.payload.serverStatus === 'END') {
+			return 'end';
+		} else if (state === 'play' && action.payload.survived === false) {
+			return 'end';
+		}
+		return state;
 	default:
 		return state;
 	}
