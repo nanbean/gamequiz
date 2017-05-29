@@ -75,7 +75,7 @@ var plays = [
 	// 	playId: 1234,
 	// 	teacherId: '',
 	// 	quizId: 3,
-	// 	gameMode: 'NORMAL'
+	// 	gameMode: 'NORMAL',
 	// 	studentPlayerList: [
 	// 		{
 	// 			studentId: '',
@@ -91,9 +91,10 @@ var plays = [
 	// 			]
 	// 		}
 	// 	],
-	// 	survivors: []
-	// 	currentQuestionIndex: 0
-	// 	presentationTime: new Date()
+	// 	survivors: [],
+	// 	previousRank: [],
+	// 	currentQuestionIndex: 0,
+	// 	presentationTime: new Date(),
 	// 	nextStepTimer: new Date()
 	// }
 ];
@@ -641,8 +642,11 @@ function sendLeaderBoard (playId) {
 					student.studentNick = play.studentPlayerList[i].studentNick;
 					student.score = 0;
 
+					console.log('student.studentNick: ' + student.studentNick);
+
 					if (answerList) {
 						for (var j = 0; j < answerList.length; j++) {
+							console.log('score ' + j + ' : ' + play.studentPlayerList[i].answerList[j].score);
 							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
 						}
 					}
@@ -666,8 +670,11 @@ function sendLeaderBoard (playId) {
 					student.studentNick = play.studentPlayerList[i].studentNick;
 					student.score = 0;
 
+					console.log('student.studentNick: ' + student.studentNick);
+
 					if (answerList) {
 						for (var j = 0; j < answerList.length; j++) {
+							console.log('score ' + j + ' : ' + play.studentPlayerList[i].answerList[j].score);
 							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
 						}
 					}
@@ -677,6 +684,30 @@ function sendLeaderBoard (playId) {
 			}
 
 			data.leaderBoard = data.leaderBoard.sort(function(a, b){return b.score-a.score});
+
+			if (play.previousRank) {
+				for (var k = 0; k < 3; k++) {
+					var newRanker = true;
+					var rocket = true;
+					for (var q = 0; q < 3; q++) {
+						if (data.leaderBoard[k].studentId === play.previousRank[q].studentId) {
+							newRanker = false;
+						}
+					}
+
+					if (!newRanker) {
+						for (var q = 0; q <= k; q++) {
+							if (data.leaderBoard[k].studentId === play.previousRank[q].studentId) {
+								rocket = false
+							}
+						}
+					}
+					data.leaderBoard[k].newRanker = newRanker;
+					data.leaderBoard[k].rocket = !newRanker && rocket;
+				}
+			}
+
+			play.previousRank = data.leaderBoard;
 
 			getServerEvent.publish(JSON.stringify(data));
 			getServerEventTeacher.publish(JSON.stringify(data));
@@ -1006,6 +1037,10 @@ function calculateScore (playTimeOut, presentationTime, answerTime) {
 	var elapsedTime = answerTime - presentationTime;
 	var score = playTimeOut*25 - elapsedTime/1000*25;
 	// 25 is temporary number
+
+	if (score < 0) {
+		score = 0;
+	}
 
 	return score;
 }
