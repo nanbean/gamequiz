@@ -686,10 +686,15 @@ function sendLeaderBoard (playId) {
 			data.leaderBoard = data.leaderBoard.sort(function(a, b){return b.score-a.score});
 
 			if (play.previousRank) {
-				for (var k = 0; k < 3; k++) {
+				var maxRank = 3;
+				if (play.studentPlayerList.length < maxRank) {
+					maxRank = play.studentPlayerList.length;
+				}
+
+				for (var k = 0; k < maxRank; k++) {
 					var newRanker = true;
 					var rocket = true;
-					for (var q = 0; q < 3; q++) {
+					for (var q = 0; q < maxRank; q++) {
 						if (data.leaderBoard[k].studentId === play.previousRank[q].studentId) {
 							newRanker = false;
 						}
