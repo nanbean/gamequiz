@@ -15,8 +15,8 @@ import square from '../assets/square.svg';
 import gold from '../assets/gold.png';
 import silver from '../assets/silver.png';
 import bronze from '../assets/bronze.png';
-import newRanker from '../assets/newRanker.png';
-import rocket from '../assets/rocket.png';
+import newRanker from '../assets/newRanker.gif';
+import rocket from '../assets/rocket.gif';
 
 const exampleMap = [
 	<Image src={triangle} size='mini' spaced />,
