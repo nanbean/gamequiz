@@ -40,6 +40,11 @@ export const resetToHome = params => ({
 	payload: params
 });
 
+export const resetToMain = params => ({
+	type: 'RESET_TO_MAIN',
+	payload: params
+});
+
 function fetchCall (call, params) {
 	return fetch(call, {
 		method: 'post',
@@ -91,6 +96,15 @@ export const callRegisterTeacher = params => dispatch => (
 				payload: result
 			})
 		)
+	)
+);
+
+export const callUnRegisterTeacher = params => () => (
+	fetchCall('/api/teacher/unRegisterTeacher', params).then(
+		response => (
+			response.json()
+		)
+	).then(
 	)
 );
 

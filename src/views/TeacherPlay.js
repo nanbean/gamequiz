@@ -12,6 +12,11 @@ import triangle from '../assets/triangle.svg';
 import diamond from '../assets/diamond.svg';
 import circle from '../assets/circle.svg';
 import square from '../assets/square.svg';
+import gold from '../assets/gold.png';
+import silver from '../assets/silver.png';
+import bronze from '../assets/bronze.png';
+import newRanker from '../assets/newRanker.gif';
+import rocket from '../assets/rocket.gif';
 
 const exampleMap = [
 	<Image src={triangle} size='mini' spaced />,
@@ -99,14 +104,40 @@ class TeacherPlay extends Component {
 		this.studentId = data.studentId;
 		this.studentNick = data.studentNick;
 		this.score = data.score;
+		this.newRanker = data.newRanker;
+		this.rocket = data.rocket;
 
 		return (
 			<Table.Row key={this.studentId}>
 				<Table.Cell>
-					<Header as='h2' textAlign='center'>{index + 1}</Header>
+					<Header as='h2' textAlign='center'>
+						{
+							index === 0 &&
+							<Image src={gold} size='mini' spaced />
+						}
+						{
+							index === 1 &&
+							<Image src={silver} size='mini' spaced />
+						}
+						{
+							index === 2 &&
+							<Image src={bronze} size='mini' spaced />
+						}
+						{index + 1}
+					</Header>
 				</Table.Cell>
 				<Table.Cell>
-					<Header as='h2' textAlign='center'>{this.studentNick}</Header>
+					<Header as='h2' textAlign='center'>
+						{this.studentNick}
+						{
+							this.newRanker === true &&
+							<Image src={newRanker} size='mini' spaced />
+						}
+						{
+							this.rocket === true &&
+							<Image src={rocket} size='mini' spaced />
+						}
+					</Header>
 				</Table.Cell>
 				<Table.Cell>
 					<Header as='h2' textAlign='center'>{this.score}</Header>
@@ -233,7 +264,7 @@ class TeacherPlay extends Component {
 							<div>
 								<Header as='h2' icon>
 									<Icon name='idea' />
-										Result
+									{strings.result}
 									<Header.Subheader>
 										{strings.answerIs} {exampleMap[playResult.answer - 1]}
 									</Header.Subheader>

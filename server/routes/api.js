@@ -75,7 +75,7 @@ var plays = [
 	// 	playId: 1234,
 	// 	teacherId: '',
 	// 	quizId: 3,
-	// 	gameMode: 'NORMAL'
+	// 	gameMode: 'NORMAL',
 	// 	studentPlayerList: [
 	// 		{
 	// 			studentId: '',
@@ -91,9 +91,10 @@ var plays = [
 	// 			]
 	// 		}
 	// 	],
-	// 	survivors: []
-	// 	currentQuestionIndex: 0
-	// 	presentationTime: new Date()
+	// 	survivors: [],
+	// 	previousRank: [],
+	// 	currentQuestionIndex: 0,
+	// 	presentationTime: new Date(),
 	// 	nextStepTimer: new Date()
 	// }
 ];
@@ -145,6 +146,33 @@ router.post('/teacher/registerTeacher', function(req, res){
 	}
 });
 
+router.post('/teacher/unRegisterTeacher', function(req, res){
+	var teacherId = req.body.teacherId;
+	var data = {
+		error: '',
+		return : false
+	};
+
+	if (teacherId) {
+		Teacher.remove({teacherId: teacherId}, function(err, teacher) {
+			if (err) {
+				return res.send(data);
+			}
+
+			if (teacher) {
+				data.valid = true;
+				return res.send(data);
+			}
+
+			res.send(data);
+		});
+	} else {
+		data.error = 'NO_TEACHER_ID'
+		res.send(data);
+	}
+});
+
+
 router.post('/teacher/getQuizList', function(req, res){
 	var teacherId = req.body.teacherId;
 	var data = {
@@ -158,15 +186,19 @@ router.post('/teacher/getQuizList', function(req, res){
 				return res.send(data);
 			}
 
-			Quiz.find({_id: {$in: teacher.quizList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, quizList) {
-				if (err) {
-					return res.send(data);
-				}
+			if (teacher) {
+				Quiz.find({_id: {$in: teacher.quizList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, quizList) {
+					if (err) {
+						return res.send(data);
+					}
 
-				data.return = true;
-				data.quizList = quizList;
+					data.return = true;
+					data.quizList = quizList;
+					res.send(data);
+				});
+			} else {
 				res.send(data);
-			});
+			}
 		});
 	} else {
 		res.send(data);
@@ -641,8 +673,11 @@ function sendLeaderBoard (playId) {
 					student.studentNick = play.studentPlayerList[i].studentNick;
 					student.score = 0;
 
+					console.log('student.studentNick: ' + student.studentNick);
+
 					if (answerList) {
 						for (var j = 0; j < answerList.length; j++) {
+							console.log('score ' + j + ' : ' + play.studentPlayerList[i].answerList[j].score);
 							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
 						}
 					}
@@ -666,8 +701,11 @@ function sendLeaderBoard (playId) {
 					student.studentNick = play.studentPlayerList[i].studentNick;
 					student.score = 0;
 
+					console.log('student.studentNick: ' + student.studentNick);
+
 					if (answerList) {
 						for (var j = 0; j < answerList.length; j++) {
+							console.log('score ' + j + ' : ' + play.studentPlayerList[i].answerList[j].score);
 							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
 						}
 					}
@@ -677,6 +715,35 @@ function sendLeaderBoard (playId) {
 			}
 
 			data.leaderBoard = data.leaderBoard.sort(function(a, b){return b.score-a.score});
+
+			if (play.previousRank) {
+				var maxRank = 3;
+				if (play.studentPlayerList.length < maxRank) {
+					maxRank = play.studentPlayerList.length;
+				}
+
+				for (var k = 0; k < maxRank; k++) {
+					var newRanker = true;
+					var rocket = true;
+					for (var q = 0; q < maxRank; q++) {
+						if (data.leaderBoard[k].studentId === play.previousRank[q].studentId) {
+							newRanker = false;
+						}
+					}
+
+					if (!newRanker) {
+						for (var q = 0; q <= k; q++) {
+							if (data.leaderBoard[k].studentId === play.previousRank[q].studentId) {
+								rocket = false
+							}
+						}
+					}
+					data.leaderBoard[k].newRanker = newRanker;
+					data.leaderBoard[k].rocket = !newRanker && rocket;
+				}
+			}
+
+			play.previousRank = data.leaderBoard;
 
 			getServerEvent.publish(JSON.stringify(data));
 			getServerEventTeacher.publish(JSON.stringify(data));
@@ -1006,6 +1073,10 @@ function calculateScore (playTimeOut, presentationTime, answerTime) {
 	var elapsedTime = answerTime - presentationTime;
 	var score = playTimeOut*25 - elapsedTime/1000*25;
 	// 25 is temporary number
+
+	if (score < 0) {
+		score = 0;
+	}
 
 	return score;
 }
