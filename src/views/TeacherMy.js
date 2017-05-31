@@ -56,48 +56,55 @@ class TeacherMy extends Component {
 		});
 	}
 
-	onQuizEditButton (ev, refs) {
+	onQuizEditButton (ev) {
 		const { getQuizList } = this.props;
-		this.props.setQuizId(refs.target);
+		const { id } = ev.target;
+
+		this.props.setQuizId(id);
 		for (let i = 0; i < getQuizList.quizList.length; i += 1) {
-			if (getQuizList.quizList[i]._id === refs.target) {
+			if (getQuizList.quizList[i]._id === id) {
 				this.props.setQuiz(getQuizList.quizList[i]);
 			}
 		}
-		this.props.history.push(`/quizedit/${refs.target}`);
+		this.props.history.push(`/quizedit/${id}`);
 	}
 
-	onQuizDeleteButton (ev, refs) {
+	onQuizDeleteButton (ev) {
+		const { id } = ev.target;
+
 		this.props.callDeleteQuiz({
 			teacherId: this.props.teacherId,
-			quizId: refs.target
+			quizId: id
 		});
 	}
 
-	onQuizStartButton (ev, refs) {
+	onQuizStartButton (ev) {
 		const { getQuizList } = this.props;
+		const { id } = ev.target;
 
-		this.props.setQuizId(refs.target);
+		this.props.setQuizId(id);
 		for (let i = 0; i < getQuizList.quizList.length; i += 1) {
-			if (getQuizList.quizList[i]._id === refs.target) {
+			if (getQuizList.quizList[i]._id === id) {
 				this.props.setQuizName(getQuizList.quizList[i].quizTitle);
 			}
 		}
 		this.props.history.push('/mode/');
 	}
 
-	renderQuiz (quiz) {
+	renderQuiz (quiz, index) {
+		this.index = index;
+
 		return (
-			<List.Item key={quiz._id}>
+			<List.Item key={this.index}>
 				<List.Content floated='right'>
 					<Popup
 						trigger={
 							<Button
+								id={quiz._id}
 								content={strings.start}
 								icon='play'
 								labelPosition='left'
 								onClick={this.onQuizStartButton}
-								target={quiz._id}
 							/>
 						}
 						on='hover'
@@ -107,11 +114,11 @@ class TeacherMy extends Component {
 					<Popup
 						trigger={
 							<Button
+								id={quiz._id}
 								content={strings.edit}
 								icon='edit'
 								labelPosition='left'
 								onClick={this.onQuizEditButton}
-								target={quiz._id}
 							/>
 						}
 						on='hover'
@@ -121,11 +128,11 @@ class TeacherMy extends Component {
 					<Popup
 						trigger={
 							<Button
+								id={quiz._id}
 								content={strings.delete}
 								icon='trash'
 								labelPosition='left'
 								onClick={this.onQuizDeleteButton}
-								target={quiz._id}
 							/>
 						}
 						on='hover'
@@ -142,13 +149,14 @@ class TeacherMy extends Component {
 		);
 	}
 
-	renderFeedBack (feedback) {
+	renderFeedBack (feedback, index) {
 		this.studentId = feedback.studentId;
 		this.studentName = feedback.studentName;
 		this.wrongQuestions = feedback.wrongQuestions;
+		this.index = index;
 
 		return (
-			<Table.Row key={this.studentId}>
+			<Table.Row key={this.index}>
 				<Table.Cell>
 					{this.studentName}
 				</Table.Cell>
@@ -183,7 +191,7 @@ class TeacherMy extends Component {
 				<Grid divided='vertically'>
 					<Grid.Row columns={2}>
 						<Grid.Column>
-							<Header as='h2'>
+							<Header as='h1'>
 								{strings.quizList}
 								<QuestionHelp content={strings.quizListHelp} />
 							</Header>
@@ -216,7 +224,7 @@ class TeacherMy extends Component {
 							</Scrollbars>
 						</Grid.Column>
 						<Grid.Column>
-							<Header as='h2'>
+							<Header as='h1'>
 								{strings.feedBackList}
 								<QuestionHelp content={strings.feedBackListHelp} />
 							</Header>

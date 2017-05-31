@@ -11,6 +11,8 @@ export default function teacherLoginType (state = initialState, action) {
 			return action.payload.googleId;
 		}
 		return state;
+	case 'RESET_TO_MAIN':
+		return initialState;
 	default:
 		return state;
 	}

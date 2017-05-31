@@ -80,12 +80,22 @@ const strings = new LocalizedStrings({
 		survivors: 'Survivors',
 		whoSurvived: 'Who did survive?',
 		survivalFail: 'You could not survive.',
-		newQuizHelp: 'You can create quiz and start the game with the quiz',
+		newQuizHelp: 'You can create new quiz and start the game with the quiz',
 		startGameHelp: 'You can start the game now.',
 		editQuizHelp: 'You can edit the quiz. You can edit quiz name and add/delete/edit the question.',
 		deleteQuizHelp: 'You can delete the quiz. You can\'t restore the deleted quiz',
 		quizListHelp: 'This is your quiz list.',
-		feedBackListHelp: 'This is your feedback list.'
+		feedBackListHelp: 'This is your feedback list.',
+		newQuestionHelp: 'You can create new question.',
+		quizSaveHelp: 'You can go back to My GameQuiz with saving your changes.',
+		quizCancelHelp: 'You can go back to My GameQuiz without saving your changes. But you can\'t restore the deleted question.',
+		questionListHelp: 'This is the question list of the quiz.',
+		editQuestionHelp: 'You can edit the question.',
+		deleteQuestionHelp: 'You can delete the question. You can\'t restore the deleted question',
+		deleteAccountConfirmHeader: 'Delete Your Account',
+		deleteAccountConfirmContent: 'Are you sure you want to delete your account',
+		yes: 'Yes',
+		no: 'No'
 	},
 	ko: {
 		typeGameId: '게임 번호를 입력하세요',
@@ -153,6 +163,7 @@ const strings = new LocalizedStrings({
 		choseTheExample: '명은 선택했습니다',
 		leaderBoard: '순위',
 		scoreis: '점수는.....',
+		nextQuestion: '다음 문제',
 		ranking: '순위',
 		nickName: '별명',
 		score: '점수',
@@ -170,7 +181,17 @@ const strings = new LocalizedStrings({
 		editQuizHelp: '퀴즈를 편집하세요. 퀴즈 이름을 바꾸고 문제를 추가/삭제/편집 할 수 있습니다.',
 		deleteQuizHelp: '퀴즈를 삭제합니다. 삭제된 퀴즈는 다시 복구할 수 없습니다.',
 		quizListHelp: '가지고 있는 퀴즈 리스트입니다.',
-		feedBackListHelp: '학생들의 피드백 리스트입니다.'
+		feedBackListHelp: '학생들의 피드백 리스트입니다.',
+		newQuestionHelp: '새로운 문제를 추가하세요.',
+		quizSaveHelp: '변경 사항을 저장하고 내 게임퀴즈로 돌아갑니다.',
+		quizCancelHelp: '변경 사항을 취소하고 내 게임퀴즈로 돌아갑니다. 단 삭제된 문제는 복구되지 않습니다.',
+		questionListHelp: '퀴즈의 문제 리스트 입니다.',
+		editQuestionHelp: '문제를 편집하세요.',
+		deleteQuestionHelp: '문제를 삭제합니다. ek삭제된 문제는 다시 복구할 수 없습니다.',
+		deleteAccountConfirmHeader: '회원 정보를 삭제합니다',
+		deleteAccountConfirmContent: '정말 회원 정보를 삭제하나요? 퀴즈와 문제는 모두 복구할 수 없습니다.',
+		yes: '네',
+		no: '아니오'
 	}
 });
 

@@ -146,6 +146,33 @@ router.post('/teacher/registerTeacher', function(req, res){
 	}
 });
 
+router.post('/teacher/unRegisterTeacher', function(req, res){
+	var teacherId = req.body.teacherId;
+	var data = {
+		error: '',
+		return : false
+	};
+
+	if (teacherId) {
+		Teacher.remove({teacherId: teacherId}, function(err, teacher) {
+			if (err) {
+				return res.send(data);
+			}
+
+			if (teacher) {
+				data.valid = true;
+				return res.send(data);
+			}
+
+			res.send(data);
+		});
+	} else {
+		data.error = 'NO_TEACHER_ID'
+		res.send(data);
+	}
+});
+
+
 router.post('/teacher/getQuizList', function(req, res){
 	var teacherId = req.body.teacherId;
 	var data = {
@@ -159,15 +186,19 @@ router.post('/teacher/getQuizList', function(req, res){
 				return res.send(data);
 			}
 
-			Quiz.find({_id: {$in: teacher.quizList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, quizList) {
-				if (err) {
-					return res.send(data);
-				}
+			if (teacher) {
+				Quiz.find({_id: {$in: teacher.quizList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, quizList) {
+					if (err) {
+						return res.send(data);
+					}
 
-				data.return = true;
-				data.quizList = quizList;
+					data.return = true;
+					data.quizList = quizList;
+					res.send(data);
+				});
+			} else {
 				res.send(data);
-			});
+			}
 		});
 	} else {
 		res.send(data);

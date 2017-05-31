@@ -264,7 +264,7 @@ class TeacherPlay extends Component {
 							<div>
 								<Header as='h2' icon>
 									<Icon name='idea' />
-										Result
+									{strings.result}
 									<Header.Subheader>
 										{strings.answerIs} {exampleMap[playResult.answer - 1]}
 									</Header.Subheader>
