@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Header, Divider, Grid, List, Button, Table } from 'semantic-ui-react';
+import { Header, Divider, Grid, List, Button, Table, Popup } from 'semantic-ui-react';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 import Avatar from '../components/Avatar';
 import TitleHeader from '../components/TitleHeader';
+import QuestionHelp from '../components/QuestionHelp';
 
 import { setQuizId, setQuizName, setQuiz, callGetQuizList, callGetFeedBackList, callDeleteQuiz, callAddQuiz } from '../actions';
 
@@ -89,26 +90,47 @@ class TeacherMy extends Component {
 		return (
 			<List.Item key={quiz._id}>
 				<List.Content floated='right'>
-					<Button
-						content={strings.start}
-						icon='play'
-						labelPosition='left'
-						onClick={this.onQuizStartButton}
-						target={quiz._id}
+					<Popup
+						trigger={
+							<Button
+								content={strings.start}
+								icon='play'
+								labelPosition='left'
+								onClick={this.onQuizStartButton}
+								target={quiz._id}
+							/>
+						}
+						on='hover'
+						size='large'
+						content={strings.startGameHelp}
 					/>
-					<Button
-						content={strings.edit}
-						icon='edit'
-						labelPosition='left'
-						onClick={this.onQuizEditButton}
-						target={quiz._id}
+					<Popup
+						trigger={
+							<Button
+								content={strings.edit}
+								icon='edit'
+								labelPosition='left'
+								onClick={this.onQuizEditButton}
+								target={quiz._id}
+							/>
+						}
+						on='hover'
+						size='large'
+						content={strings.editQuizHelp}
 					/>
-					<Button
-						content={strings.delete}
-						icon='trash'
-						labelPosition='left'
-						onClick={this.onQuizDeleteButton}
-						target={quiz._id}
+					<Popup
+						trigger={
+							<Button
+								content={strings.delete}
+								icon='trash'
+								labelPosition='left'
+								onClick={this.onQuizDeleteButton}
+								target={quiz._id}
+							/>
+						}
+						on='hover'
+						size='large'
+						content={strings.deleteQuizHelp}
 					/>
 				</List.Content>
 				<List.Content floated='left'>
@@ -163,6 +185,7 @@ class TeacherMy extends Component {
 						<Grid.Column>
 							<Header as='h2'>
 								{strings.quizList}
+								<QuestionHelp content={strings.quizListHelp} />
 							</Header>
 							<Scrollbars
 								autoHeight
@@ -173,18 +196,29 @@ class TeacherMy extends Component {
 										quizList && quizList.map(this.renderQuiz, this)
 									}
 								</List>
-								<Button
-									fluid
-									size='huge'
-									onClick={this.onQuizAddButton}
-								>
-									{strings.newQuiz}
-								</Button>
+								<div>
+									<Popup
+										trigger={
+											<Button
+												fluid
+												size='huge'
+												onClick={this.onQuizAddButton}
+											>
+												{strings.newQuiz}
+											</Button>
+										}
+										on='hover'
+										size='large'
+										content={strings.newQuizHelp}
+										position='bottom center'
+									/>
+								</div>
 							</Scrollbars>
 						</Grid.Column>
 						<Grid.Column>
 							<Header as='h2'>
 								{strings.feedBackList}
+								<QuestionHelp content={strings.feedBackListHelp} />
 							</Header>
 							<Scrollbars
 								autoHeight

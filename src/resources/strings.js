@@ -79,7 +79,13 @@ const strings = new LocalizedStrings({
 		result: 'RESULT',
 		survivors: 'Survivors',
 		whoSurvived: 'Who did survive?',
-		survivalFail: 'You could not survive.'
+		survivalFail: 'You could not survive.',
+		newQuizHelp: 'You can create quiz and start the game with the quiz',
+		startGameHelp: 'You can start the game now.',
+		editQuizHelp: 'You can edit the quiz. You can edit quiz name and add/delete/edit the question.',
+		deleteQuizHelp: 'You can delete the quiz. You can\'t restore the deleted quiz',
+		quizListHelp: 'This is your quiz list.',
+		feedBackListHelp: 'This is your feedback list.'
 	},
 	ko: {
 		typeGameId: '게임 번호를 입력하세요',
@@ -158,7 +164,13 @@ const strings = new LocalizedStrings({
 		result: '정답을 확인하세요',
 		survivors: '생존자',
 		whoSurvived: '누가 남아 있나?',
-		survivalFail: '서바이벌 모드에서 살아남지 못했습니다.'
+		survivalFail: '서바이벌 모드에서 살아남지 못했습니다.',
+		newQuizHelp: '새로운 퀴즈를 만들고 게임을 시작해보세요.',
+		startGameHelp: '게임을 시작하세요.',
+		editQuizHelp: '퀴즈를 편집하세요. 퀴즈 이름을 바꾸고 문제를 추가/삭제/편집 할 수 있습니다.',
+		deleteQuizHelp: '퀴즈를 삭제합니다. 삭제된 퀴즈는 다시 복구할 수 없습니다.',
+		quizListHelp: '가지고 있는 퀴즈 리스트입니다.',
+		feedBackListHelp: '학생들의 피드백 리스트입니다.'
 	}
 });
 
