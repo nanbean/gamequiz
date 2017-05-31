@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Header, Divider, Grid, List, Button, Input } from 'semantic-ui-react';
+import { Header, Divider, Grid, List, Button, Input, Popup } from 'semantic-ui-react';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 import TitleHeader from '../components/TitleHeader';
+import QuestionHelp from '../components/QuestionHelp';
 
 import { setNewQuizId, setQuestion, callEditQuiz, callDeleteQuestion, callGetQuestionList } from '../actions';
 
@@ -83,11 +84,13 @@ class TeacherQuizEdit extends Component {
 		});
 	}
 
-	onQuestionEditButton (ev, refs) {
+	onQuestionEditButton (ev) {
+		const { id } = ev.target;
 		const questionList = this.props.getQuestionList && this.props.getQuestionList.questionList;
-		const data = questionList.find(item => item._id === refs.target);
+		const data = questionList.find(item => item._id === id);
+
 		this.props.setQuestion(data);
-		this.props.history.push(`/questionedit/${refs.target}`);
+		this.props.history.push(`/questionedit/${id}`);
 	}
 
 	onQuestionNewButton () {
@@ -95,11 +98,13 @@ class TeacherQuizEdit extends Component {
 		this.props.history.push('/questionedit/new');
 	}
 
-	onQuestionDeleteButton (ev, refs) {
+	onQuestionDeleteButton (ev) {
+		const { id } = ev.target;
+
 		this.props.callDeleteQuestion({
 			teacherId: this.props.teacherId,
 			quizId: this.props.match.params.id,
-			questionId: refs.target
+			questionId: id
 		});
 	}
 
@@ -107,19 +112,33 @@ class TeacherQuizEdit extends Component {
 		return (
 			<List.Item key={question._id}>
 				<List.Content floated='right'>
-					<Button
-						content={strings.edit}
-						icon='edit'
-						labelPosition='left'
-						onClick={this.onQuestionEditButton}
-						target={question._id}
+					<Popup
+						trigger={
+							<Button
+								id={question._id}
+								content={strings.edit}
+								icon='edit'
+								labelPosition='left'
+								onClick={this.onQuestionEditButton}
+							/>
+						}
+						on='hover'
+						size='large'
+						content={strings.editQuestionHelp}
 					/>
-					<Button
-						content={strings.delete}
-						icon='trash'
-						labelPosition='left'
-						onClick={this.onQuestionDeleteButton}
-						target={question._id}
+					<Popup
+						trigger={
+							<Button
+								id={question._id}
+								content={strings.delete}
+								icon='trash'
+								labelPosition='left'
+								onClick={this.onQuestionDeleteButton}
+							/>
+						}
+						on='hover'
+						size='large'
+						content={strings.deleteQuestionHelp}
 					/>
 				</List.Content>
 				<List.Content className='teacher-quizlist-title-wrapper' floated='left'>
@@ -162,6 +181,7 @@ class TeacherQuizEdit extends Component {
 						<Grid.Column>
 							<Header as='h2'>
 								{strings.questionList}
+								<QuestionHelp content={strings.questionListHelp} />
 							</Header>
 							<Scrollbars
 								autoHeight
@@ -172,34 +192,54 @@ class TeacherQuizEdit extends Component {
 										questionList && questionList.map(this.renderQuestion, this)
 									}
 								</List>
-
-								<div className='teacher-button'>
-									<Button
-										fluid
-										size='huge'
-										onClick={this.onQuestionNewButton}
-									>
-										{strings.newQuestion}
-									</Button>
-								</div>
-								<div className='teacher-button'>
-									<Button
-										fluid
-										size='huge'
-										onClick={this.onSaveButton}
-									>
-										{strings.save}
-									</Button>
-								</div>
-								<div className='teacher-button'>
-									<Button
-										fluid
-										size='huge'
-										onClick={this.onCancelButton}
-									>
-										{strings.cancel}
-									</Button>
-								</div>
+								<Popup
+									trigger={
+										<div className='teacher-button'>
+											<Button
+												fluid
+												size='huge'
+												onClick={this.onQuestionNewButton}
+											>
+												{strings.newQuestion}
+											</Button>
+										</div>
+									}
+									on='hover'
+									size='large'
+									content={strings.newQuestionHelp}
+								/>
+								<Popup
+									trigger={
+										<div className='teacher-button'>
+											<Button
+												fluid
+												size='huge'
+												onClick={this.onSaveButton}
+											>
+												{strings.save}
+											</Button>
+										</div>
+									}
+									on='hover'
+									size='large'
+									content={strings.quizSaveHelp}
+								/>
+								<Popup
+									trigger={
+										<div className='teacher-button'>
+											<Button
+												fluid
+												size='huge'
+												onClick={this.onCancelButton}
+											>
+												{strings.cancel}
+											</Button>
+										</div>
+									}
+									on='hover'
+									size='large'
+									content={strings.quizCancelHelp}
+								/>
 							</Scrollbars>
 						</Grid.Column>
 					</Grid.Row>
