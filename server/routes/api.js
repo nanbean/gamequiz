@@ -76,6 +76,7 @@ var plays = [
 	// 	teacherId: '',
 	// 	quizId: 3,
 	// 	gameMode: 'NORMAL',
+	// 	status: 'WAIT',
 	// 	studentPlayerList: [
 	// 		{
 	// 			studentId: '',
@@ -554,6 +555,7 @@ function startGameMode (teacherId, quizId, gameMode) {
 		teacherId: teacherId,
 		quizId: quizId,
 		gameMode: gameMode,
+		status: 'INIT_WAIT',
 		studentPlayerList: [],
 		survivors: [],
 		currentQuestionIndex: 0
@@ -601,22 +603,24 @@ function updateFeedbackAndDeletePlay (playId) {
 		const player = play.studentPlayerList[i];
 		var wrongQuestions = [];
 
-		for (var j = 0; j < player.answerList.length; j++) {
-			if (player.answerList[j].correct === false) {
-				wrongQuestions.push(player.answerList[j].questionId);
-			}
-		}
-
-		Feedback.update(
-			{studentName: player.studentName, teacherId: play.teacherId},
-			{$push: {wrongQuestions: {$each: wrongQuestions}}},
-			{upsert: true},
-			function(err, numAffected) {
-				if (i >= play.studentPlayerList.length - 1) {
-					deletePlayWithPlayId(playId);
+		if (player && player.answerList) {
+			for (var j = 0; j < player.answerList.length; j++) {
+				if (player.answerList[j].correct === false) {
+					wrongQuestions.push(player.answerList[j].questionId);
 				}
 			}
-		);
+
+			Feedback.update(
+				{studentName: player.studentName, teacherId: play.teacherId},
+				{$push: {wrongQuestions: {$each: wrongQuestions}}},
+				{upsert: true},
+				function(err, numAffected) {
+					if (i >= play.studentPlayerList.length - 1) {
+						deletePlayWithPlayId(playId);
+					}
+				}
+			);
+		}
 	}
 	// 	studentPlayerList: [
 	// 		{
@@ -666,6 +670,8 @@ function sendLeaderBoard (playId) {
 			if (play.currentQuestionIndex >= quiz.questionList.length - 1 || (play.gameMode === 'SURVIVAL' && data.survivors.length < 1)) {
 				data.serverStatus = 'END';
 
+				play.status = 'END';
+
 				for (var i = 0; i < play.studentPlayerList.length; i++) {
 					var student = {};
 					var answerList = play.studentPlayerList[i].answerList;
@@ -692,6 +698,8 @@ function sendLeaderBoard (playId) {
 				}
 			} else {
 				data.serverStatus = 'LEADER_BOARD';
+
+				play.status = 'LEADER_BOARD';
 
 				for (var i = 0; i < play.studentPlayerList.length; i++) {
 					var student = {};
@@ -758,6 +766,8 @@ function sendResult (playId) {
 
 	data.playId = playId;
 	data.serverStatus = 'RESULT';
+
+	play.status = 'RESULT';
 
 	if (play && quizId) {
 		Quiz.findById(quizId, function(err, quiz){
@@ -845,10 +855,13 @@ function sendResult (playId) {
 }
 
 function sendWait (playId) {
+	var play = getPlayWithPlayId(playId);
 	var data = {};
 
 	data.playId = playId;
 	data.serverStatus = 'WAIT';
+
+	play.status = 'WAIT';
 
 	getServerEvent.publish(JSON.stringify(data));
 	getServerEventTeacher.publish(JSON.stringify(data));
@@ -867,6 +880,8 @@ function sendQuetion (playId) {
 			if (quiz) {
 				data.playId = playId;
 				data.serverStatus = 'PLAY';
+
+				play.status = 'PLAY';
 
 				Question.findById(quiz.questionList[play.currentQuestionIndex], function(err, question){
 					if (err) {
@@ -909,7 +924,7 @@ function startPlay (playId) {
 
 	play.nextStepTimer = setTimeout(function() {
 		sendQuetion(playId);
-	}, 5000);
+	}, 2000);
 }
 
 router.post('/teacher/nextPlayQuestion', function(req, res){
@@ -925,7 +940,7 @@ router.post('/teacher/nextPlayQuestion', function(req, res){
 
 	play.nextStepTimer = setTimeout(function() {
 		sendQuetion(playId);
-	}, 5000);
+	}, 2000);
 
 	res.send(data);
 });
@@ -1031,10 +1046,13 @@ router.get("/teacher/getServerEventTeacher", function(req, res) {
 
 router.post('/student/checkPlayId', function(req, res){
 	var playId = req.body.playId;
+	var play = playId && getPlayWithPlayId(playId);
 	var data = {};
 
 	if (getPlayWithPlayId(playId)) {
-		data.valid = true;
+		if (play.status == 'INIT_WAIT') {
+			data.valid = true;
+		}
 	} else {
 		data.valid = false;
 	}
@@ -1048,7 +1066,10 @@ function addStudentPalyer (playId, student) {
 	if (play) {
 		play.studentPlayerList.push(student);
 		play.survivors.push(student);
-		getServerEventTeacher.publish(JSON.stringify(play));
+
+		if (play.status == 'INIT_WAIT') {
+			getServerEventTeacher.publish(JSON.stringify(play));
+		}
 	}
 }
 
@@ -1056,15 +1077,20 @@ router.post('/student/sendStudentInfo', function(req, res){
 	const studentNick = req.body.studentNick;
 	const studentName = req.body.studentName;
 	const playId = req.body.playId;
+	const play = playId && getPlayWithPlayId(playId);
 
-	var data = {};
+	var data = {
+		return: false
+	};
 
-	data.playId = playId;
-	data.studentId = Math.floor((Math.random() * 10000) + 1);
-	data.studentNick = studentNick;
-	data.studentName = studentName;
-
-	addStudentPalyer(playId, data)
+	if (play && play.status === 'INIT_WAIT') {
+		data.playId = playId;
+		data.studentId = Math.floor((Math.random() * 10000) + 1);
+		data.studentNick = studentNick;
+		data.studentName = studentName;
+		addStudentPalyer(playId, data);
+		data.return = true;
+	}
 
 	res.send(data);
 });
@@ -1152,11 +1178,14 @@ function removeStudentFromPlay (playId, studentId) {
 		for (let i = 0; i < play.studentPlayerList.length; i++) {
 			if (play.studentPlayerList[i].studentId == studentId) {
 				play.studentPlayerList.splice(i, 1);
-				if (play && play.nextStepTimer) {
-					clearInterval(play.nextStepTimer);
-					play.nextStepTimer =  null;
+				// if (play && play.nextStepTimer) {
+				// 	clearInterval(play.nextStepTimer);
+				// 	play.nextStepTimer =  null;
+				// }
+
+				if (play.status == 'INIT_WAIT') {
+					getServerEventTeacher.publish(JSON.stringify(play));
 				}
-				getServerEventTeacher.publish(JSON.stringify(play));
 				return;
 			}
 		}
