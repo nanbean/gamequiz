@@ -465,14 +465,18 @@ export const callSendStudentInfo = params => dispatch => (
 		)
 	).then(
 		(result) => {
-			dispatch({
-				type: 'SET_SEND_STUDENT_INFO',
-				payload: result
-			});
-			dispatch(callGetServerEvent({
-				playId: result.playId,
-				studentId: result.studentId
-			}));
+			if (result.return === true) {
+				dispatch({
+					type: 'SET_SEND_STUDENT_INFO',
+					payload: result
+				});
+				dispatch(callGetServerEvent({
+					playId: result.playId,
+					studentId: result.studentId
+				}));
+			} else {
+				dispatch(resetToHome());
+			}
 		}
 	)
 );

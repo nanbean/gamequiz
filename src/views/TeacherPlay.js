@@ -46,7 +46,7 @@ class TeacherPlay extends Component {
 		if (serverStatus === 'WAIT' && !waitTimerId) {
 			this.state = {
 				waitTimerId: setInterval(this.waitTimer, 1000),
-				waitCount: 5
+				waitCount: 2
 			};
 		} else {
 			this.state = {
@@ -63,7 +63,7 @@ class TeacherPlay extends Component {
 		if (serverStatus === 'WAIT' && !waitTimerId) {
 			this.setState({
 				waitTimerId: setInterval(this.waitTimer, 1000),
-				waitCount: 5
+				waitCount: 2
 			});
 		}
 	}

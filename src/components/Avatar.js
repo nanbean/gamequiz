@@ -9,8 +9,6 @@ import { callUnRegisterTeacher, resetToMain } from '../actions';
 import strings from '../resources/strings';
 
 const options = [
-	{ key: 'user', text: 'Account', icon: 'user', value: 'user' },
-	{ key: 'settings', text: 'Settings', icon: 'settings', value: 'settings' },
 	{ key: 'delete-account', text: 'Delete My Account', icon: 'remove user', value: 'delete-account' },
 	{ key: 'sign-out', text: 'Sign Out', icon: 'sign out', value: 'sign-out' }
 ];
