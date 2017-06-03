@@ -5,6 +5,7 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "compression": "^1.6.2",
+    "eventsource-polyfill": "^0.9.6",
     "express": "^4.15.2",
     "ignore-styles": "^5.0.1",
     "import-export": "^1.0.1",
@@ -47,5 +48,5 @@
     "eject": "react-scripts eject"
   },
   "homepage": "http://gamequiz.xyz",
-  "proxy": "http://gamequiz.xyz:3001"
+  "proxy": "http://gamequiz.xyz:3005"
 }
