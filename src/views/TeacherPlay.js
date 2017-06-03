@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Grid, Header, Button, Icon, Segment, Table, Image } from 'semantic-ui-react';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 import { callNextPlayQuestion, resetToHome } from '../actions';
 
@@ -302,27 +303,32 @@ class TeacherPlay extends Component {
 										{strings.scoreis}
 									</Header.Subheader>
 								</Header>
-								<Table celled selectable>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.ranking}</Header>
-											</Table.HeaderCell>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.nickName}</Header>
-											</Table.HeaderCell>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.score}</Header>
-											</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
+								<Scrollbars
+									autoHeight
+									autoHeightMax={450}
+								>
+									<Table celled selectable>
+										<Table.Header>
+											<Table.Row>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.ranking}</Header>
+												</Table.HeaderCell>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.nickName}</Header>
+												</Table.HeaderCell>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.score}</Header>
+												</Table.HeaderCell>
+											</Table.Row>
+										</Table.Header>
 
-									<Table.Body>
-										{
-											playLeaderBoard && playLeaderBoard.map(this.renderLeaderBoard, this)
-										}
-									</Table.Body>
-								</Table>
+										<Table.Body>
+											{
+												playLeaderBoard && playLeaderBoard.map(this.renderLeaderBoard, this)
+											}
+										</Table.Body>
+									</Table>
+								</Scrollbars>
 								<Button
 									fluid
 									size='huge'
@@ -341,27 +347,32 @@ class TeacherPlay extends Component {
 										{strings.goodJob}
 									</Header.Subheader>
 								</Header>
-								<Table celled selectable>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.ranking}</Header>
-											</Table.HeaderCell>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.nickName}</Header>
-											</Table.HeaderCell>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.score}</Header>
-											</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
+								<Scrollbars
+									autoHeight
+									autoHeightMax={450}
+								>
+									<Table celled selectable>
+										<Table.Header>
+											<Table.Row>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.ranking}</Header>
+												</Table.HeaderCell>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.nickName}</Header>
+												</Table.HeaderCell>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.score}</Header>
+												</Table.HeaderCell>
+											</Table.Row>
+										</Table.Header>
 
-									<Table.Body>
-										{
-											playLeaderBoard && playLeaderBoard.map(this.renderLeaderBoard, this)
-										}
-									</Table.Body>
-								</Table>
+										<Table.Body>
+											{
+												playLeaderBoard && playLeaderBoard.map(this.renderLeaderBoard, this)
+											}
+										</Table.Body>
+									</Table>
+								</Scrollbars>
 								<div>
 									<Button
 										className='teacher-home-button'
@@ -382,21 +393,26 @@ class TeacherPlay extends Component {
 										{strings.whoSurvived}
 									</Header.Subheader>
 								</Header>
-								<Table celled selectable>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.survivors}</Header>
-											</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
+								<Scrollbars
+									autoHeight
+									autoHeightMax={450}
+								>
+									<Table celled selectable>
+										<Table.Header>
+											<Table.Row>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.survivors}</Header>
+												</Table.HeaderCell>
+											</Table.Row>
+										</Table.Header>
 
-									<Table.Body>
-										{
-											playSurvivors && playSurvivors.map(this.renderSurvivors, this)
-										}
-									</Table.Body>
-								</Table>
+										<Table.Body>
+											{
+												playSurvivors && playSurvivors.map(this.renderSurvivors, this)
+											}
+										</Table.Body>
+									</Table>
+								</Scrollbars>
 								<Button
 									fluid
 									size='huge'
@@ -415,21 +431,26 @@ class TeacherPlay extends Component {
 										{strings.goodJob}
 									</Header.Subheader>
 								</Header>
-								<Table celled selectable>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell>
-												<Header as='h3' textAlign='center'>{strings.survivors}</Header>
-											</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
+								<Scrollbars
+									autoHeight
+									autoHeightMax={450}
+								>
+									<Table celled selectable>
+										<Table.Header>
+											<Table.Row>
+												<Table.HeaderCell>
+													<Header as='h3' textAlign='center'>{strings.survivors}</Header>
+												</Table.HeaderCell>
+											</Table.Row>
+										</Table.Header>
 
-									<Table.Body>
-										{
-											playSurvivors && playSurvivors.map(this.renderSurvivors, this)
-										}
-									</Table.Body>
-								</Table>
+										<Table.Body>
+											{
+												playSurvivors && playSurvivors.map(this.renderSurvivors, this)
+											}
+										</Table.Body>
+									</Table>
+								</Scrollbars>
 								<div>
 									<Button
 										className='teacher-home-button'

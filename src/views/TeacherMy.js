@@ -172,7 +172,7 @@ class TeacherMy extends Component {
 		const quizList = getQuizList && getQuizList.quizList;
 
 		return (
-			<div className='teacher'>
+			<div className='teacher-normal'>
 				{
 					!teacherId && <Redirect to='/teacher' />
 				}

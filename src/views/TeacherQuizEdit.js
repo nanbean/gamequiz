@@ -155,7 +155,7 @@ class TeacherQuizEdit extends Component {
 		const questionList = getQuestionList && getQuestionList.questionList;
 
 		return (
-			<div className='teacher'>
+			<div className='teacher-normal'>
 				<TitleHeader
 					icon='edit'
 					title={strings.quizEdit}
