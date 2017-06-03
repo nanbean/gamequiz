@@ -42,12 +42,14 @@ class TeacherWait extends Component {
 		this.studentNick = data.studentNick;
 
 		return (
-			<Header key={this.studentId} as='h3'>
-				<Icon name='detective' />
-				<Header.Content>
-					{this.studentNick}
-				</Header.Content>
-			</Header>
+			<div className='teacher-wait-student'>
+				<Header key={this.studentId} as='h3'>
+					<Icon name='detective' />
+					<Header.Content>
+						{this.studentNick}
+					</Header.Content>
+				</Header>
+			</div>
 		);
 	}
 
@@ -64,7 +66,7 @@ class TeacherWait extends Component {
 		}
 
 		return (
-			<div className='teacher'>
+			<div className='teacher-normal'>
 				{
 					!teacherId && <Redirect to='/teacher' />
 				}
@@ -95,7 +97,7 @@ class TeacherWait extends Component {
 					</Header.Content>
 				</Header>
 				<Divider />
-				<div>
+				<div className='teacher-wait-student-list'>
 					{
 						studentPlayerList && studentPlayerList.map(this.renderStudentPlayer, this)
 					}
