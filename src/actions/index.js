@@ -425,37 +425,72 @@ export const callCheckPlayId = params => (dispatch) => {
 };
 
 export const callGetServerEvent = params => (dispatch, getState) => {
-	const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 	const playId = params.playId;
 
-	source.addEventListener('message', (e) => {
-		const data = JSON.parse(e.data);
+	if (typeof EventSource === 'undefined') {
+		const EventSource = require( 'eventsource-polyfill');
+		const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 
-		if (data.playId === playId) {
-			if (data.result && data.result.survivors) {
-				const state = getState();
-				let survived = false;
+		source.addEventListener('message', (e) => {
+			const data = JSON.parse(e.data);
 
-				for (let i = 0; i < data.result.survivors.length; i += 1) {
-					if (data.result.survivors[i].studentId === state.studentId) {
-						survived = true;
+			if (data.playId === playId) {
+				if (data.result && data.result.survivors) {
+					const state = getState();
+					let survived = false;
+
+					for (let i = 0; i < data.result.survivors.length; i += 1) {
+						if (data.result.survivors[i].studentId === state.studentId) {
+							survived = true;
+						}
 					}
+					data.survived = survived;
 				}
-				data.survived = survived;
+
+				dispatch({
+					type: 'SET_SERVER_STATUS',
+					payload: data
+				});
 			}
+		}, false);
 
-			dispatch({
-				type: 'SET_SERVER_STATUS',
-				payload: data
-			});
-		}
-	}, false);
+		source.addEventListener('open', () => {
+		}, false);
 
-	source.addEventListener('open', () => {
-	}, false);
+		source.addEventListener('error', () => {
+		}, false);
+	} else {
+		const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 
-	source.addEventListener('error', () => {
-	}, false);
+		source.addEventListener('message', (e) => {
+			const data = JSON.parse(e.data);
+
+			if (data.playId === playId) {
+				if (data.result && data.result.survivors) {
+					const state = getState();
+					let survived = false;
+
+					for (let i = 0; i < data.result.survivors.length; i += 1) {
+						if (data.result.survivors[i].studentId === state.studentId) {
+							survived = true;
+						}
+					}
+					data.survived = survived;
+				}
+
+				dispatch({
+					type: 'SET_SERVER_STATUS',
+					payload: data
+				});
+			}
+		}, false);
+
+		source.addEventListener('open', () => {
+		}, false);
+
+		source.addEventListener('error', () => {
+		}, false);
+	}
 };
 
 export const callSendStudentInfo = params => dispatch => (
