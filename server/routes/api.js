@@ -612,7 +612,7 @@ function updateFeedbackAndDeletePlay (playId) {
 
 			Feedback.update(
 				{studentName: player.studentName, teacherId: play.teacherId},
-				{$push: {wrongQuestions: {$each: wrongQuestions}}},
+				{$push: {wrongQuestions: {$each: wrongQuestions}}, $set: { lastPlayId: playId, lastWrongQuestions: wrongQuestions }},
 				{upsert: true},
 				function(err, numAffected) {
 					if (i >= play.studentPlayerList.length - 1) {
@@ -1093,6 +1093,48 @@ router.post('/student/sendStudentInfo', function(req, res){
 	}
 
 	res.send(data);
+});
+
+router.post('/student/getLastFeedBackList', function(req, res){
+	const studentName = req.body.studentName;
+	const playId = req.body.playId;
+
+	var data = {
+		feedBackList: [],
+		questionList: []
+	};
+
+	if (playId && studentName) {
+		Feedback.findOne({lastPlayId: playId, studentName: studentName}, function(err, feedBackList) {
+			if (err) {
+				return res.send(data);
+			}
+
+			if (feedBackList) {
+				data.feedBackList = feedBackList;
+
+				for (var i = 0; i < feedBackList.lastWrongQuestions.length; i++) {
+					Question.findById(feedBackList.lastWrongQuestions[i], function(err, question) {
+						if (err) {
+							console.error(err);
+						}
+
+						if (question) {
+							data.questionList.push(question);
+						}
+
+						if (i >= feedBackList.lastWrongQuestions.length - 1) {
+							res.send(data);
+						}
+					});
+				}
+			} else {
+				res.send(data);
+			}
+		});
+	} else {
+		res.send(data);
+	}
 });
 
 function calculateScore (playTimeOut, presentationTime, answerTime) {

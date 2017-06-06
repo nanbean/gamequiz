@@ -424,38 +424,101 @@ export const callCheckPlayId = params => (dispatch) => {
 	);
 };
 
+export const callGetLastFeedBackList = params => dispatch => (
+	fetchCall('/api/student/getLastFeedBackList', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		result => (
+			dispatch({
+				type: 'SET_GET_LAST_FEEDBACK_LIST',
+				payload: result
+			})
+		)
+	)
+);
+
 export const callGetServerEvent = params => (dispatch, getState) => {
-	const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 	const playId = params.playId;
 
-	source.addEventListener('message', (e) => {
-		const data = JSON.parse(e.data);
+	if (typeof EventSource === 'undefined') {
+		const EventSource = require('eventsource-polyfill');
+		const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 
-		if (data.playId === playId) {
-			if (data.result && data.result.survivors) {
+		source.addEventListener('message', (e) => {
+			const data = JSON.parse(e.data);
+
+			if (data.playId === playId) {
 				const state = getState();
-				let survived = false;
 
-				for (let i = 0; i < data.result.survivors.length; i += 1) {
-					if (data.result.survivors[i].studentId === state.studentId) {
-						survived = true;
+				if (data.result && data.result.survivors) {
+					let survived = false;
+
+					for (let i = 0; i < data.result.survivors.length; i += 1) {
+						if (data.result.survivors[i].studentId === state.studentId) {
+							survived = true;
+						}
 					}
+					data.survived = survived;
 				}
-				data.survived = survived;
+
+				if (data.serverStatus === 'END') {
+					dispatch(callGetLastFeedBackList());
+				}
+
+				dispatch({
+					type: 'SET_SERVER_STATUS',
+					payload: data
+				});
 			}
+		}, false);
 
-			dispatch({
-				type: 'SET_SERVER_STATUS',
-				payload: data
-			});
-		}
-	}, false);
+		source.addEventListener('open', () => {
+		}, false);
 
-	source.addEventListener('open', () => {
-	}, false);
+		source.addEventListener('error', () => {
+		}, false);
+	} else {
+		const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 
-	source.addEventListener('error', () => {
-	}, false);
+		source.addEventListener('message', (e) => {
+			const data = JSON.parse(e.data);
+
+			if (data.playId === playId) {
+				const state = getState();
+
+				if (data.result && data.result.survivors) {
+					let survived = false;
+
+					for (let i = 0; i < data.result.survivors.length; i += 1) {
+						if (data.result.survivors[i].studentId === state.studentId) {
+							survived = true;
+						}
+					}
+					data.survived = survived;
+				}
+
+				if (data.serverStatus === 'END') {
+					dispatch(callGetLastFeedBackList({
+						playId: state.playId,
+						studentName: state.studentName
+					}));
+				}
+
+				dispatch({
+					type: 'SET_SERVER_STATUS',
+					payload: data
+				});
+			}
+		}, false);
+
+		source.addEventListener('open', () => {
+		}, false);
+
+		source.addEventListener('error', () => {
+		}, false);
+	}
 };
 
 export const callSendStudentInfo = params => dispatch => (

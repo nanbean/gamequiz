@@ -1,7 +1,16 @@
 .teacher {
-	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 	text-align: center;
-	margin: 20px;
+	padding: 20px;
+}
+
+.teacher-normal {
+	text-align: center;
+	padding: 20px;
 }
 
 .teacher-outer {
@@ -118,6 +127,15 @@ div.teacher-tag-suggestions li mark {
 div.teacher-tag-suggestions ul li.teacher-tag-active-suggestion {
 	background: #b7cfe0;
 	cursor: pointer;
+}
+
+.teacher-wait-student-list {
+	display: inline-block;
+}
+
+.teacher-wait-student {
+	display: inline-block;
+	margin: 20px;
 }
 
 .teacher-play-title {

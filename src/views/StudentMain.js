@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Input, Loader, Grid, Button, Header, Icon, Dimmer, Popup } from 'semantic-ui-react';
+import { Input, Loader, Grid, Button, Header, Icon, Dimmer, Popup, List } from 'semantic-ui-react';
 
 import { callCheckPlayId, setPlayId, callSendStudentInfo, callGetServerEvent, callSendStudentAnswer, resetToHome } from '../actions';
 
@@ -152,8 +152,29 @@ class StudentMain extends Component {
 		this.props.resetToHome();
 	}
 
+	renderWrongQuestion (question) {
+		this.category = question.category;
+		this.title = question.title;
+
+		return (
+			<List.Item key={question._id}>
+				<List.Content floated='right'>
+					<Header as='h3'>
+						{this.category.map(item => item.text).toString()}
+					</Header>
+				</List.Content>
+				<List.Content floated='left'>
+					<Header as='h3'>
+						{this.title}
+					</Header>
+				</List.Content>
+			</List.Item>
+		);
+	}
+
 	render () {
-		const { playIdCheck, studentPage, serverStatus, studentAnswered, survivor } = this.props;
+		const { playIdCheck, studentPage, serverStatus, studentAnswered } = this.props;
+		const { survivor, wrongQuestions } = this.props;
 		const { showNameHelp, showNickHelp } = this.state;
 
 		return (
@@ -276,6 +297,19 @@ class StudentMain extends Component {
 									{survivor === true ? strings.gameOver : strings.survivalFail}
 								</Header.Content>
 							</Header>
+							{
+								wrongQuestions.length >= 1 &&
+								<div>
+									<Header as='h3'>
+										{strings.wrongQuestions}
+									</Header>
+									<List divided verticalAlign='middle'>
+										{
+											wrongQuestions.map(this.renderWrongQuestion, this)
+										}
+									</List>
+								</div>
+							}
 							<div>
 								<Button
 									className='student-home-button'
@@ -348,6 +382,7 @@ StudentMain.propTypes = {
 	serverStatus: PropTypes.string.isRequired,
 	studentAnswered: PropTypes.bool.isRequired,
 	survivor: PropTypes.bool.isRequired,
+	wrongQuestions: PropTypes.object.isRequired,
 	callCheckPlayId: PropTypes.func.isRequired,
 	setPlayId: PropTypes.func.isRequired,
 	resetToHome: PropTypes.func.isRequired,
@@ -362,7 +397,8 @@ const mapStateToProps = state => ({
 	serverStatus: state.serverStatus,
 	studentId: state.studentId,
 	studentAnswered: state.studentAnswered,
-	survivor: state.survivor
+	survivor: state.survivor,
+	wrongQuestions: state.wrongQuestions
 });
 
 const mapDispatchToProps = dispatch => ({

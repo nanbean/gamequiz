@@ -13,6 +13,7 @@ import question from './question';
 import tagSuggestions from './tagSuggestions';
 import gameMode from './gameMode';
 import studentNick from './studentNick';
+import studentName from './studentName';
 import studentId from './studentId';
 import studentPlayerList from './studentPlayerList';
 import studentPage from './studentPage';
@@ -29,6 +30,7 @@ import teacherImage from './teacherImage';
 import playIdCheck from './playIdCheck';
 import survivor from './survivor';
 import playSurvivors from './playSurvivors';
+import wrongQuestions from './wrongQuestions';
 
 const gamequiz = combineReducers({
 	playId,
@@ -45,6 +47,7 @@ const gamequiz = combineReducers({
 	feedBackList,
 	getQuestionList,
 	studentId,
+	studentName,
 	studentNick,
 	studentPlayerList,
 	studentPage,
@@ -60,7 +63,8 @@ const gamequiz = combineReducers({
 	teacherImage,
 	playIdCheck,
 	survivor,
-	playSurvivors
+	playSurvivors,
+	wrongQuestions
 });
 
 export default gamequiz;
