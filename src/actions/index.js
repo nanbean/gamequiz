@@ -424,19 +424,35 @@ export const callCheckPlayId = params => (dispatch) => {
 	);
 };
 
+export const callGetLastFeedBackList = params => dispatch => (
+	fetchCall('/api/student/getLastFeedBackList', params).then(
+		response => (
+			response.json()
+		)
+	).then(
+		result => (
+			dispatch({
+				type: 'SET_GET_LAST_FEEDBACK_LIST',
+				payload: result
+			})
+		)
+	)
+);
+
 export const callGetServerEvent = params => (dispatch, getState) => {
 	const playId = params.playId;
 
 	if (typeof EventSource === 'undefined') {
-		const EventSource = require( 'eventsource-polyfill');
+		const EventSource = require('eventsource-polyfill');
 		const source = new EventSource(`/api/getServerEvent?playId=${params.playId}&studentId=${params.studentId}`);
 
 		source.addEventListener('message', (e) => {
 			const data = JSON.parse(e.data);
 
 			if (data.playId === playId) {
+				const state = getState();
+
 				if (data.result && data.result.survivors) {
-					const state = getState();
 					let survived = false;
 
 					for (let i = 0; i < data.result.survivors.length; i += 1) {
@@ -445,6 +461,10 @@ export const callGetServerEvent = params => (dispatch, getState) => {
 						}
 					}
 					data.survived = survived;
+				}
+
+				if (data.serverStatus === 'END') {
+					dispatch(callGetLastFeedBackList());
 				}
 
 				dispatch({
@@ -466,8 +486,9 @@ export const callGetServerEvent = params => (dispatch, getState) => {
 			const data = JSON.parse(e.data);
 
 			if (data.playId === playId) {
+				const state = getState();
+
 				if (data.result && data.result.survivors) {
-					const state = getState();
 					let survived = false;
 
 					for (let i = 0; i < data.result.survivors.length; i += 1) {
@@ -476,6 +497,13 @@ export const callGetServerEvent = params => (dispatch, getState) => {
 						}
 					}
 					data.survived = survived;
+				}
+
+				if (data.serverStatus === 'END') {
+					dispatch(callGetLastFeedBackList({
+						playId: state.playId,
+						studentName: state.studentName
+					}));
 				}
 
 				dispatch({

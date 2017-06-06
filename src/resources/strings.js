@@ -95,7 +95,8 @@ const strings = new LocalizedStrings({
 		deleteAccountConfirmHeader: 'Delete Your Account',
 		deleteAccountConfirmContent: 'Are you sure you want to delete your account',
 		yes: 'Yes',
-		no: 'No'
+		no: 'No',
+		wrongQuestions: 'Wrong Questions'
 	},
 	ko: {
 		typeGameId: '게임 번호를 입력하세요',
@@ -191,7 +192,8 @@ const strings = new LocalizedStrings({
 		deleteAccountConfirmHeader: '회원 정보를 삭제합니다',
 		deleteAccountConfirmContent: '정말 회원 정보를 삭제하나요? 퀴즈와 문제는 모두 복구할 수 없습니다.',
 		yes: '네',
-		no: '아니오'
+		no: '아니오',
+		wrongQuestions: '틀린 문제'
 	}
 });
 
