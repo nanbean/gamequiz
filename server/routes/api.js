@@ -769,6 +769,17 @@ function sendResult (playId) {
 
 	play.status = 'RESULT';
 
+	for (var k = 0; k < play.studentPlayerList.length; k++) {
+		if (play.studentPlayerList[k].answerList.length < play.currentQuestionIndex + 1) {
+			play.studentPlayerList[k].answerList.push({
+				questionId: 0,
+				answer: -1,
+				correct: false,
+				score: 0
+			});
+		}
+	}
+
 	if (play && quizId) {
 		Quiz.findById(quizId, function(err, quiz){
 			if (err) {
@@ -794,14 +805,11 @@ function sendResult (playId) {
 					var answerList = play.studentPlayerList[i].answerList;
 					if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 1) {
 						data.result.example1++;
-					}
-					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
+					} else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
 						data.result.example2++;
-					}
-					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
+					} else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
 						data.result.example3++;
-					}
-					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
+					} else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
 						data.result.example4++;
 					}
 				}
@@ -1088,6 +1096,8 @@ router.post('/student/sendStudentInfo', function(req, res){
 		data.studentId = Math.floor((Math.random() * 10000) + 1);
 		data.studentNick = studentNick;
 		data.studentName = studentName;
+		data.answerList = [];
+
 		addStudentPalyer(playId, data);
 		data.return = true;
 	}
@@ -1110,24 +1120,21 @@ router.post('/student/getLastFeedBackList', function(req, res){
 				return res.send(data);
 			}
 
-			if (feedBackList) {
+			if (feedBackList && feedBackList.lastWrongQuestions) {
 				data.feedBackList = feedBackList;
 
-				for (var i = 0; i < feedBackList.lastWrongQuestions.length; i++) {
-					Question.findById(feedBackList.lastWrongQuestions[i], function(err, question) {
-						if (err) {
-							console.error(err);
-						}
+				Question.find({_id: {$in: feedBackList.lastWrongQuestions.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, questions) {
+					if (err) {
+						console.error(err);
+					}
 
-						if (question) {
-							data.questionList.push(question);
-						}
-
-						if (i >= feedBackList.lastWrongQuestions.length - 1) {
-							res.send(data);
-						}
-					});
-				}
+					if (questions) {
+						data.questionList = questions;
+						res.send(data);
+					} else {
+						res.send(data);
+					}
+				});
 			} else {
 				res.send(data);
 			}
