@@ -14,6 +14,7 @@ module.exports = {
         "FormData": true
     },
     "rules": {
+        "no-console": "off",
         "linebreak-style": "off",
         "no-tabs": "off",
         "no-underscore-dangle": "off",
