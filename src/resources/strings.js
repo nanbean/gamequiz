@@ -96,7 +96,8 @@ const strings = new LocalizedStrings({
 		deleteAccountConfirmContent: 'Are you sure you want to delete your account',
 		yes: 'Yes',
 		no: 'No',
-		wrongQuestions: 'Wrong Questions'
+		wrongQuestions: 'Wrong Questions',
+		ieWarning: 'We don\'t support Internet Explorer or Edge'
 	},
 	ko: {
 		typeGameId: '게임 번호를 입력하세요',
@@ -193,7 +194,8 @@ const strings = new LocalizedStrings({
 		deleteAccountConfirmContent: '정말 회원 정보를 삭제하나요? 퀴즈와 문제는 모두 복구할 수 없습니다.',
 		yes: '네',
 		no: '아니오',
-		wrongQuestions: '틀린 문제'
+		wrongQuestions: '틀린 문제',
+		ieWarning: '인터넷 익스플로러와 엣지는 지원하지 않습니다.'
 	}
 });
 

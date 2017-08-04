@@ -1,76 +1,38 @@
 const express = require('express');
-const router = express.Router();
 const fs = require('fs');
-const multer  = require('multer');
-const getServerEventTeacher = require("./sse");
-const getServerEvent = require("./sse");
+const multer = require('multer');
+const getServerEventTeacher = require('./sse');
+const getServerEvent = require('./sse');
 const mongoose = require('mongoose');
+
+const router = express.Router();
 
 const db = mongoose.connection;
 db.on('error', console.error);
-db.once('open', function(){
-		// CONNECTED TO MONGODB SERVER
-		console.log("Connected to mongod server");
+db.once('open', () => {
+	// CONNECTED TO MONGODB SERVER
+	console.log('Connected to mongod server');
 });
 
 mongoose.connect('mongodb://localhost/gamequiz');
 
+const Teacher = require('./models/teacher');
+const Quiz = require('./models/quiz');
+const Question = require('./models/question');
+const Suggestion = require('./models/suggestion');
+const Feedback = require('./models/feedback');
 
-var Teacher = require('./models/teacher');
-var Quiz = require('./models/quiz');
-var Question = require('./models/question');
-var Suggestion = require('./models/suggestion');
-var Feedback = require('./models/feedback');
+router.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+	next();
+});
 
-router.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*")
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-	next()
-})
+router.get('/', (req, res) => {
+	res.json({});
+});
 
-router.get('/', function(req, res, next) {
-	res.json({})
-})
-
-var feedback = [
-	{
-		studentId: 0,
-		studentName: 'James',
-		wrongQuestionList: [
-			3,
-			4,
-		]
-	},
-	{
-		studentId: 1,
-		studentName: 'Tom',
-		wrongQuestionList: [
-			1,
-			2
-		]
-	},
-	{
-		studentId: 2,
-		studentName: 'Aron',
-		wrongQuestionList: [
-			1,
-			2,
-			3,
-			4,
-			5,
-			6
-		]
-	},
-	{
-		studentId: 3,
-		studentName: 'John',
-		wrongQuestionList: [
-			6
-		]
-	}
-];
-
-var plays = [
+const plays = [
 	// {
 	// 	playId: 1234,
 	// 	teacherId: '',
@@ -100,63 +62,20 @@ var plays = [
 	// }
 ];
 
-router.post('/teacher/checkTeacher', function(req, res){
-	var teacherId = req.body.teacherId;
-	var data = {
+const waitTime = 5000;
+
+router.post('/teacher/checkTeacher', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const data = {
 		valid: false
 	};
 
-	Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
-		if (err) {
-			return res.send(data);
-		}
-
-		if (teacher) {
-			data.valid = true;
-			return res.send(data);
-		}
-
-		res.send(data);
-	});
-});
-
-router.post('/teacher/registerTeacher', function(req, res){
-	var teacherId = req.body.teacherId;
-	var data = {
-		error: '',
-		return : false
-	};
-
 	if (teacherId) {
-		var teacher = new Teacher();
-		teacher.teacherId = teacherId;
-		teacher.quizList = [];
-
-		teacher.save(function(err){
-			if(err) {
-				data.error = 'DB_ERROR'
-				return res.send(data);
-			}
-
-			data.return = true;
-			res.send(data);
-		});
-	} else {
-		data.error = 'NO_TEACHER_ID'
-		res.send(data);
-	}
-});
-
-router.post('/teacher/unRegisterTeacher', function(req, res){
-	var teacherId = req.body.teacherId;
-	var data = {
-		error: '',
-		return : false
-	};
-
-	if (teacherId) {
-		Teacher.remove({teacherId: teacherId}, function(err, teacher) {
+		Teacher.findOne({
+			teacherId
+		}, (err, teacher) => {
 			if (err) {
+				console.error(err);
 				return res.send(data);
 			}
 
@@ -165,105 +84,168 @@ router.post('/teacher/unRegisterTeacher', function(req, res){
 				return res.send(data);
 			}
 
-			res.send(data);
+			return res.send(data);
 		});
 	} else {
-		data.error = 'NO_TEACHER_ID'
+		res.send(data);
+	}
+});
+
+router.post('/teacher/registerTeacher', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const data = {
+		error: '',
+		return: false
+	};
+
+	if (teacherId) {
+		const teacher = new Teacher();
+		teacher.teacherId = teacherId;
+		teacher.quizList = [];
+
+		teacher.save((err) => {
+			if (err) {
+				console.error(err);
+				data.error = 'DB_ERROR';
+				return res.send(data);
+			}
+
+			data.return = true;
+			return res.send(data);
+		});
+	} else {
+		data.error = 'NO_TEACHER_ID';
+		res.send(data);
+	}
+});
+
+router.post('/teacher/unRegisterTeacher', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const data = {
+		error: '',
+		return: false
+	};
+
+	if (teacherId) {
+		Teacher.remove({
+			teacherId
+		}, (err, teacher) => {
+			if (err) {
+				console.error(err);
+				return res.send(data);
+			}
+
+			if (teacher) {
+				data.valid = true;
+				return res.send(data);
+			}
+
+			return res.send(data);
+		});
+	} else {
+		data.error = 'NO_TEACHER_ID';
 		res.send(data);
 	}
 });
 
 
-router.post('/teacher/getQuizList', function(req, res){
-	var teacherId = req.body.teacherId;
-	var data = {
+router.post('/teacher/getQuizList', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const data = {
 		return: false,
 		quizList: []
 	};
 
 	if (teacherId) {
-		Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
+		Teacher.findOne({
+			teacherId
+		}, (err, teacher) => {
 			if (err) {
+				console.error(err);
 				return res.send(data);
 			}
 
 			if (teacher) {
-				Quiz.find({_id: {$in: teacher.quizList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, quizList) {
-					if (err) {
+				return Quiz.find({
+					_id: {
+						$in: teacher.quizList.map(o => (mongoose.Types.ObjectId(o)))
+					}
+				}, (err2, quizList) => {
+					if (err2) {
+						console.error(err2);
 						return res.send(data);
 					}
 
 					data.return = true;
 					data.quizList = quizList;
-					res.send(data);
+					return res.send(data);
 				});
-			} else {
-				res.send(data);
 			}
+
+			return res.send(data);
 		});
 	} else {
 		res.send(data);
 	}
 });
 
-router.post('/teacher/getFeedBackList', function(req, res){
-	var teacherId = req.body.teacherId;
-	var data = {
+router.post('/teacher/getFeedBackList', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const data = {
 		feedBackList: []
 	};
 
-	Feedback.find({teacherId: teacherId}, function(err, feedBackList) {
+	Feedback.find({
+		teacherId
+	}, (err, feedBackList) => {
 		if (err) {
 			return res.send(data);
 		}
 
 		data.feedBackList = feedBackList;
-		res.send(data);
+		return res.send(data);
 	});
 });
 
-function addQuiztoTeacher (teacherId, quizId) {
-	for (var i = 0; i < teacher.length; i++) {
-		if (teacher[i].teacherId == teacherId) {
-			teacher[i].quizList.push(quizId);
-		}
-	}
-}
-
-router.post('/teacher/addQuiz', function(req, res){
-	var teacherId = req.body.teacherId;
-	var newQuiz = req.body.quiz;
-	var data = {
+router.post('/teacher/addQuiz', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const newQuiz = req.body.quiz;
+	const data = {
 		return: false
 	};
 
 	if (teacherId && newQuiz) {
-		var quiz = new Quiz();
-
+		const quiz = new Quiz();
 		quiz.quizTitle = newQuiz.quizTitle;
 		quiz.questionList = newQuiz.questionList;
 
-		quiz.save(function(err){
-			if(err) {
+		quiz.save((err) => {
+			if (err) {
 				return res.send(data);
 			}
 
-			Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
-				if (err) {
+			return Teacher.findOne({
+				teacherId
+			}, (err2, teacher) => {
+				if (err2) {
 					return res.send(data);
 				}
 
-				teacher.quizList.push(quiz._id);
+				if (teacher) {
+					teacher.quizList.push(quiz._id);
 
-				teacher.save(function(err){
-					if (err) {
+					return teacher.save((err3) => {
+						if (err3) {
+							return res.send(data);
+						}
+
+						data.quizId = quiz._id;
+						data.return = true;
 						return res.send(data);
-					}
+					});
+				}
 
-					data.quizId = quiz._id
-					data.return = true;
-					res.send(data);
-				});
+				return res.send(data);
 			});
 		});
 	} else {
@@ -271,139 +253,164 @@ router.post('/teacher/addQuiz', function(req, res){
 	}
 });
 
-router.post('/teacher/editQuiz', function(req, res){
-	var quizModified = req.body.quiz;
-	var data = {
+router.post('/teacher/editQuiz', (req, res) => {
+	const quizModified = req.body.quiz;
+	const data = {
 		return: false
 	};
 
-	Quiz.findById(quizModified._id, function(err, quiz){
+	Quiz.findById(quizModified._id, (err, quiz) => {
 		if (err) {
 			return res.send(data);
 		}
 
-		quiz.quizTitle = quizModified.quizTitle;
-		quiz.questionList = quizModified.questionList;
+		const editQuit = quiz;
 
-		quiz.save(function(err){
-			if (err) {
+		editQuit.quizTitle = quizModified.quizTitle;
+		editQuit.questionList = quizModified.questionList;
+
+		return editQuit.save((err2) => {
+			if (err2) {
 				return res.send(data);
 			}
 
 			data.return = true;
-			res.send(data);
+			return res.send(data);
 		});
 	});
 });
 
-router.post('/teacher/deleteQuiz', function(req, res){
-	var teacherId = req.body.teacherId;
-	var quizId = req.body.quizId;
-	var data = {
+router.post('/teacher/deleteQuiz', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const quizId = req.body.quizId;
+	const data = {
 		return: false
 	};
 
-	Teacher.findOne({teacherId: teacherId}, function(err, teacher) {
+	Teacher.findOne({
+		teacherId
+	}, (err, teacher) => {
 		if (err) {
 			return res.send(data);
 		}
 
-		for (var i = 0; i < teacher.quizList.length; i++) {
-			if (teacher.quizList[i] == quizId) {
+		for (let i = 0; i < teacher.quizList.length; i += 1) {
+			if (teacher.quizList[i] === quizId) {
 				teacher.quizList.splice(i, 1);
 			}
 		}
 
-		teacher.save(function(err){
-			if (err) {
+		return teacher.save((err2) => {
+			if (err2) {
 				return res.send(data);
 			}
 
-			Quiz.remove({_id: quizId}, function(err, quiz){
-				if (err) {
+			return Quiz.remove({
+				_id: quizId
+			}, (err3) => {
+				if (err3) {
 					return res.send(data);
 				}
 
 				data.return = true;
-				res.send(data);
+				return res.send(data);
 			});
-
 		});
 	});
 });
 
-router.post('/teacher/getQuestionList', function(req, res){
-	var quizId = req.body.quizId;
-	var data = {
+router.post('/teacher/getQuestionList', (req, res) => {
+	const quizId = req.body.quizId;
+	const data = {
 		return: false,
 		questionList: []
 	};
 
 	if (quizId) {
-		Quiz.findById(quizId, function(err, quiz) {
+		Quiz.findById(quizId, (err, quiz) => {
 			if (err) {
 				return res.send(data);
 			}
 
 			if (quiz && quiz.questionList) {
-				Question.find({_id: {$in: quiz.questionList.map(function(o){ return mongoose.Types.ObjectId(o); })}}, function(err, questionList) {
-					if (err) {
+				return Question.find({
+					_id: {
+						$in: quiz.questionList.map(o => (mongoose.Types.ObjectId(o)))
+					}
+				}, (err2, questionList) => {
+					if (err2) {
 						return res.send(data);
 					}
 
 					data.return = true;
 					data.questionList = questionList;
-					res.send(data);
+					return res.send(data);
 				});
-			} else {
-				res.send(data);
 			}
+
+			return res.send(data);
 		});
 	} else {
 		res.send(data);
 	}
 });
 
-function addQuestiontoQuiz (quizId, questionId) {
-	for (var i = 0; i < quizzes.length; i++) {
-		if (quizzes[i].quizId == quizId) {
-			quizzes[i].questionList.push(questionId);
-			break;
-		}
+function updateSuggestions (categories) {
+	for (let i = 0; i < categories.length; i += 1) {
+		const suggestion = {
+			category: categories[i].text
+		};
+
+		Suggestion.update(
+			{
+				category: suggestion.category
+			},
+			{
+				$setOnInsert: suggestion
+			},
+			{
+				upsert: true
+			},
+			(err, numAffected) => {
+				console.log(numAffected);
+			}
+		);
 	}
 }
 
-router.post('/teacher/editQuestion', function(req, res){
-	var modifiedQuestion = req.body.question;
-	var data = {
+router.post('/teacher/editQuestion', (req, res) => {
+	const modifiedQuestion = req.body.question;
+	const data = {
 		return: false
 	};
 
 	if (modifiedQuestion) {
-		Question.findById(modifiedQuestion._id, function(err, question) {
+		Question.findById(modifiedQuestion._id, (err, question) => {
 			if (err) {
 				return res.send(data);
 			}
 
-			question.category = modifiedQuestion.category;
-			question.title = modifiedQuestion.title;
-			question.pictureUrl = modifiedQuestion.pictureUrl;
-			question.example1 = modifiedQuestion.example1;
-			question.example2 = modifiedQuestion.example2;
-			question.example3 = modifiedQuestion.example3;
-			question.example4 = modifiedQuestion.example4;
-			question.answer = modifiedQuestion.answer;
-			question.timer = modifiedQuestion.timer;
+			const editQuestion = question;
 
-			question.save(function(err){
-				if (err) {
+			editQuestion.category = modifiedQuestion.category;
+			editQuestion.title = modifiedQuestion.title;
+			editQuestion.pictureUrl = modifiedQuestion.pictureUrl;
+			editQuestion.example1 = modifiedQuestion.example1;
+			editQuestion.example2 = modifiedQuestion.example2;
+			editQuestion.example3 = modifiedQuestion.example3;
+			editQuestion.example4 = modifiedQuestion.example4;
+			editQuestion.answer = modifiedQuestion.answer;
+			editQuestion.timer = modifiedQuestion.timer;
+
+			return editQuestion.save((err2) => {
+				if (err2) {
 					return res.send(data);
 				}
 
-				data.return = true;
-				res.send(data);
-
 				updateSuggestions(modifiedQuestion.category);
+
+				data.return = true;
+				return res.send(data);
 			});
 		});
 	} else {
@@ -411,16 +418,15 @@ router.post('/teacher/editQuestion', function(req, res){
 	}
 });
 
-router.post('/teacher/addQuestion', function(req, res){
-	var newQuestion = req.body.question;
-	var quizId = req.body.quizId;
-
-	var data = {
+router.post('/teacher/addQuestion', (req, res) => {
+	const newQuestion = req.body.question;
+	const quizId = req.body.quizId;
+	const data = {
 		return: false
 	};
 
 	if (newQuestion) {
-		var question = new Question();
+		const question = new Question();
 		question.category = newQuestion.category;
 		question.title = newQuestion.title;
 		question.pictureUrl = newQuestion.pictureUrl;
@@ -431,28 +437,32 @@ router.post('/teacher/addQuestion', function(req, res){
 		question.answer = newQuestion.answer;
 		question.timer = newQuestion.timer;
 
-		question.save(function(err){
+		question.save((err) => {
 			if (err) {
 				return res.send(data);
 			}
 
-			Quiz.findById(quizId, function(err, quiz) {
-				if (err) {
+			return Quiz.findById(quizId, (err2, quiz) => {
+				if (err2) {
 					return res.send(data);
 				}
 
-				quiz.questionList.push(question._id);
+				if (quiz) {
+					quiz.questionList.push(question._id);
 
-				quiz.save(function(err){
-					if (err) {
+					return quiz.save((err3) => {
+						if (err3) {
+							return res.send(data);
+						}
+
+						updateSuggestions(newQuestion.category);
+
+						data.return = true;
 						return res.send(data);
-					}
+					});
+				}
 
-					data.return = true;
-					res.send(data);
-
-					updateSuggestions(newQuestion.category);
-				});
+				return res.send(data);
 			});
 		});
 	} else {
@@ -460,48 +470,49 @@ router.post('/teacher/addQuestion', function(req, res){
 	}
 });
 
-router.post('/teacher/deleteQuestion', function(req, res){
-	var teacherId = req.body.teacherId;
-	var quizId = req.body.quizId;
-	var questionId = req.body.questionId;
-	var data = {
+router.post('/teacher/deleteQuestion', (req, res) => {
+	const quizId = req.body.quizId;
+	const questionId = req.body.questionId;
+	const data = {
 		return: false
 	};
 
-	Quiz.findById(quizId, function(err, quiz) {
+	Quiz.findById(quizId, (err, quiz) => {
 		if (err) {
 			return res.send(data);
 		}
 
 		if (quiz && quiz.questionList) {
-			for (var i = 0; i < quiz.questionList.length; i++) {
-				if (quiz.questionList[i] == questionId) {
+			for (let i = 0; i < quiz.questionList.length; i += 1) {
+				if (quiz.questionList[i] === questionId) {
 					quiz.questionList.splice(i, 1);
 					break;
 				}
 			}
 
-			quiz.save(function(err){
-				if (err) {
+			return quiz.save((err2) => {
+				if (err2) {
 					return res.send(data);
 				}
 
 				data.return = true;
-				res.send(data);
+				return res.send(data);
 			});
 		}
+
+		return res.send(data);
 	});
 });
 
-let upload = multer({
+const upload = multer({
 	storage: multer.diskStorage({
 		destination: (req, file, callback) => {
-			let teacherId = req.params.teacherId;
-			let path = `./uploads/${teacherId}`;
-			if(!fs.existsSync('./uploads')) {
+			const teacherId = req.params.teacherId;
+			const path = `./uploads/${teacherId}`;
+			if (!fs.existsSync('./uploads')) {
 				fs.mkdirSync('./uploads');
 			}
-			if(!fs.existsSync(path)) {
+			if (!fs.existsSync(path)) {
 				fs.mkdirSync(path);
 			}
 			callback(null, path);
@@ -512,49 +523,31 @@ let upload = multer({
 	})
 });
 
-router.post('/teacher/uploadImage/:teacherId', upload.any(), function (req, res, next) {
+router.post('/teacher/uploadImage/:teacherId', upload.any(), (req, res) => {
 	res.status(200).send({
 		path: req.files[0].path
 	});
 });
 
-function updateSuggestions (categories) {
-	for (var i = 0 ; i <  categories.length; i++) {
-		var suggestion = {
-			category: categories[i].text
-		}
-		Suggestion.update(
-			{category: suggestion.category},
-			{$setOnInsert: suggestion},
-			{upsert: true},
-			function(err, numAffected) {
-				console.log(numAffected);
-			}
-		);
-	}
-}
-
-router.post('/teacher/getTagSuggestions', function(req, res){
-	var data = {
+router.post('/teacher/getTagSuggestions', (req, res) => {
+	const data = {
 		suggestions: []
 	};
 
-	Suggestion.find({}, function(err, suggestions) {
-		data.suggestions = [...new Set(suggestions.map(function(o){ return o.category; }))];
+	Suggestion.find({}, (err, suggestions) => {
+		data.suggestions = [...new Set(suggestions.map(o => (o.category)))];
 		res.send(data);
 	});
 });
 
 function startGameMode (teacherId, quizId, gameMode) {
-	var playId;
-
-	playId = Math.floor((Math.random() * 10000) + 1).toString();;
+	const playId = Math.floor((Math.random() * 10000) + 1).toString();
 
 	plays.push({
-		playId: playId,
-		teacherId: teacherId,
-		quizId: quizId,
-		gameMode: gameMode,
+		playId,
+		teacherId,
+		quizId,
+		gameMode,
 		status: 'INIT_WAIT',
 		studentPlayerList: [],
 		survivors: [],
@@ -562,26 +555,23 @@ function startGameMode (teacherId, quizId, gameMode) {
 	});
 
 	return {
-		playId: playId,
-		gameMode: gameMode
+		playId,
+		gameMode
 	};
 }
 
-router.post('/teacher/startGameMode', function(req, res){
-	var teacherId = req.body.teacherId;
-	var quizId = req.body.quizId;
-	var gameMode = req.body.gameMode;
-
-	var data = {};
-
-	data = startGameMode(teacherId, quizId, gameMode);
+router.post('/teacher/startGameMode', (req, res) => {
+	const teacherId = req.body.teacherId;
+	const quizId = req.body.quizId;
+	const gameMode = req.body.gameMode;
+	const data = startGameMode(teacherId, quizId, gameMode);
 
 	res.send(data);
 });
 
 function getPlayWithPlayId (playId) {
-	for (var i = 0; i < plays.length; i++) {
-		if (plays[i].playId == playId) {
+	for (let i = 0; i < plays.length; i += 1) {
+		if (plays[i].playId === playId) {
 			return plays[i];
 		}
 	}
@@ -590,31 +580,46 @@ function getPlayWithPlayId (playId) {
 }
 
 function deletePlayWithPlayId (playId) {
-	for (var i = 0; i < plays.length; i++) {
-		if (plays[i].playId == playId) {
+	for (let i = 0; i < plays.length; i += 1) {
+		if (plays[i].playId === playId) {
 			plays.splice(i, 1);
 		}
 	}
 }
 
 function updateFeedbackAndDeletePlay (playId) {
-	var play = getPlayWithPlayId(playId);
-	for (var i = 0; i < play.studentPlayerList.length; i++) {
+	const play = getPlayWithPlayId(playId);
+	for (let i = 0; i < play.studentPlayerList.length; i += 1) {
 		const player = play.studentPlayerList[i];
-		var wrongQuestions = [];
+		const wrongQuestions = [];
 
 		if (player && player.answerList) {
-			for (var j = 0; j < player.answerList.length; j++) {
+			for (let j = 0; j < player.answerList.length; j += 1) {
 				if (player.answerList[j].correct === false) {
 					wrongQuestions.push(player.answerList[j].questionId);
 				}
 			}
 
 			Feedback.update(
-				{studentName: player.studentName, teacherId: play.teacherId},
-				{$push: {wrongQuestions: {$each: wrongQuestions}}, $set: { lastPlayId: playId, lastWrongQuestions: wrongQuestions }},
-				{upsert: true},
-				function(err, numAffected) {
+				{
+					studentName: player.studentName,
+					teacherId: play.teacherId
+				},
+				{
+					$push: {
+						wrongQuestions: {
+							$each: wrongQuestions
+						}
+					},
+					$set: {
+						lastPlayId: playId,
+						lastWrongQuestions: wrongQuestions
+					}
+				},
+				{
+					upsert: true
+				},
+				() => {
 					if (i >= play.studentPlayerList.length - 1) {
 						deletePlayWithPlayId(playId);
 					}
@@ -622,40 +627,18 @@ function updateFeedbackAndDeletePlay (playId) {
 			);
 		}
 	}
-	// 	studentPlayerList: [
-	// 		{
-	// 			studentId: '',
-	// 			studentName: '',
-	// 			studentNick: '',
-	// 			answerList: [
-	// 				{
-	// 					questionId: '',
-	// 					answer: 1,
-	// 					correct: true,
-	// 					score: 100
-	// 				}
-	// 			]
-	// 		}
-	// 	],
-}
-
-function getQuestionWithQuestionId (questionId) {
-	for (var i = 0; i < questions.length; i++) {
-		if (questions[i].questionId == questionId) {
-			return questions[i];
-		}
-	}
-
-	return null;
 }
 
 function sendLeaderBoard (playId) {
-	var data = {};
-	var play = getPlayWithPlayId(playId);
-	var quizId = play && play.quizId;
+	const data = {};
+	const play = getPlayWithPlayId(playId);
+	const quizId = play && play.quizId;
 
 	if (play && quizId) {
-		Quiz.findById(quizId, function(err, quiz){
+		let i;
+		let j;
+
+		Quiz.findById(quizId, (err, quiz) => {
 			if (err) {
 				console.error(err);
 			}
@@ -664,7 +647,10 @@ function sendLeaderBoard (playId) {
 			data.leaderBoard = [];
 
 			if (play.gameMode === 'SURVIVAL') {
-				data.survivors = play.survivors.map(function(student){ return {studentId: student.studentId, studentNick: student.studentNick}; });
+				data.survivors = play.survivors.map(student => ({
+					studentId: student.studentId,
+					studentNick: student.studentNick
+				}));
 			}
 
 			if (play.currentQuestionIndex >= quiz.questionList.length - 1 || (play.gameMode === 'SURVIVAL' && data.survivors.length < 1)) {
@@ -672,19 +658,22 @@ function sendLeaderBoard (playId) {
 
 				play.status = 'END';
 
-				for (var i = 0; i < play.studentPlayerList.length; i++) {
-					var student = {};
-					var answerList = play.studentPlayerList[i].answerList;
+				for (i = 0; i < play.studentPlayerList.length; i += 1) {
+					const student = {};
+					const answerList = play.studentPlayerList[i].answerList;
 					student.studentId = play.studentPlayerList[i].studentId;
 					student.studentNick = play.studentPlayerList[i].studentNick;
 					student.score = 0;
 
-					console.log('student.studentNick: ' + student.studentNick);
+					console.log(`student.studentNick: ${student.studentNick}`);
 
 					if (answerList) {
-						for (var j = 0; j < answerList.length; j++) {
-							console.log('score ' + j + ' : ' + play.studentPlayerList[i].answerList[j].score);
-							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
+						for (j = 0; j < answerList.length; j += 1) {
+							console.log(`score ${j} : ${play.studentPlayerList[i].answerList[j].score}`);
+							student.score = parseInt(
+								student.score + play.studentPlayerList[i].answerList[j].score,
+								10
+							);
 						}
 					}
 
@@ -701,20 +690,23 @@ function sendLeaderBoard (playId) {
 
 				play.status = 'LEADER_BOARD';
 
-				for (var i = 0; i < play.studentPlayerList.length; i++) {
-					var student = {};
-					var answerList = play.studentPlayerList[i].answerList;
+				for (i = 0; i < play.studentPlayerList.length; i += 1) {
+					const student = {};
+					const answerList = play.studentPlayerList[i].answerList;
 
 					student.studentId = play.studentPlayerList[i].studentId;
 					student.studentNick = play.studentPlayerList[i].studentNick;
 					student.score = 0;
 
-					console.log('student.studentNick: ' + student.studentNick);
+					console.log(`student.studentNick: ${student.studentNick}`);
 
 					if (answerList) {
-						for (var j = 0; j < answerList.length; j++) {
-							console.log('score ' + j + ' : ' + play.studentPlayerList[i].answerList[j].score);
-							student.score = parseInt(student.score + play.studentPlayerList[i].answerList[j].score);
+						for (j = 0; j < answerList.length; j += 1) {
+							console.log(`score ${j} : ${play.studentPlayerList[i].answerList[j].score}`);
+							student.score = parseInt(
+								student.score + play.studentPlayerList[i].answerList[j].score,
+								10
+							);
 						}
 					}
 
@@ -722,27 +714,30 @@ function sendLeaderBoard (playId) {
 				}
 			}
 
-			data.leaderBoard = data.leaderBoard.sort(function(a, b){return b.score-a.score});
+			data.leaderBoard = data.leaderBoard.sort((a, b) => (b.score - a.score));
 
 			if (play.previousRank) {
-				var maxRank = 3;
+				let maxRank = 3;
+				let k;
+				let q;
+
 				if (play.studentPlayerList.length < maxRank) {
 					maxRank = play.studentPlayerList.length;
 				}
 
-				for (var k = 0; k < maxRank; k++) {
-					var newRanker = true;
-					var rocket = true;
-					for (var q = 0; q < maxRank; q++) {
+				for (k = 0; k < maxRank; k += 1) {
+					let newRanker = true;
+					let rocket = true;
+					for (q = 0; q < maxRank; q += 1) {
 						if (data.leaderBoard[k].studentId === play.previousRank[q].studentId) {
 							newRanker = false;
 						}
 					}
 
 					if (!newRanker) {
-						for (var q = 0; q <= k; q++) {
+						for (q = 0; q <= k; q += 1) {
 							if (data.leaderBoard[k].studentId === play.previousRank[q].studentId) {
-								rocket = false
+								rocket = false;
 							}
 						}
 					}
@@ -760,9 +755,9 @@ function sendLeaderBoard (playId) {
 }
 
 function sendResult (playId) {
-	var data = {};
-	var play = getPlayWithPlayId(playId);
-	var quizId = play && play.quizId;
+	const data = {};
+	const play = getPlayWithPlayId(playId);
+	const quizId = play && play.quizId;
 
 	data.playId = playId;
 	data.serverStatus = 'RESULT';
@@ -770,16 +765,27 @@ function sendResult (playId) {
 	play.status = 'RESULT';
 
 	if (play && quizId) {
-		Quiz.findById(quizId, function(err, quiz){
+		Quiz.findById(quizId, (err, quiz) => {
 			if (err) {
 				console.error(err);
 			}
 
-			var questionId = quiz.questionList[play.currentQuestionIndex];
+			const questionId = quiz.questionList[play.currentQuestionIndex];
 
-			Question.findById(questionId, function(err, question){
-				if (err) {
-					console.error(err);
+			for (let k = 0; k < play.studentPlayerList.length; k += 1) {
+				if (play.studentPlayerList[k].answerList.length < play.currentQuestionIndex + 1) {
+					play.studentPlayerList[k].answerList.push({
+						questionId,
+						answer: -1,
+						correct: false,
+						score: 0
+					});
+				}
+			}
+
+			Question.findById(questionId, (err2, question) => {
+				if (err2) {
+					console.error(err2);
 				}
 
 				data.result = {
@@ -790,73 +796,45 @@ function sendResult (playId) {
 					example4: 0
 				};
 
-				for (var i = 0; i < play.studentPlayerList.length; i++) {
-					var answerList = play.studentPlayerList[i].answerList;
-					if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 1) {
-						data.result.example1++;
-					}
-					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
-						data.result.example2++;
-					}
-					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
-						data.result.example3++;
-					}
-					else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
-						data.result.example4++;
+				for (let i = 0; i < play.studentPlayerList.length; i += 1) {
+					const answerList = play.studentPlayerList[i].answerList;
+					if (answerList && answerList[play.currentQuestionIndex] &&
+						answerList[play.currentQuestionIndex].answer === 1) {
+						data.result.example1 += 1;
+					} else if (answerList && answerList[play.currentQuestionIndex] &&
+						answerList[play.currentQuestionIndex].answer === 2) {
+						data.result.example2 += 1;
+					} else if (answerList && answerList[play.currentQuestionIndex] &&
+						answerList[play.currentQuestionIndex].answer === 3) {
+						data.result.example3 += 1;
+					} else if (answerList && answerList[play.currentQuestionIndex] &&
+						answerList[play.currentQuestionIndex].answer === 4) {
+						data.result.example4 += 1;
 					}
 				}
 
 				if (play.gameMode === 'SURVIVAL') {
-					data.result.survivors = play.survivors.map(function(student){ return {studentId: student.studentId, studentNick: student.studentNick}; });
+					data.result.survivors = play.survivors.map(student => ({
+						studentId: student.studentId,
+						studentNick: student.studentNick
+					}));
 				}
 
 				getServerEvent.publish(JSON.stringify(data));
 				getServerEventTeacher.publish(JSON.stringify(data));
 
-				play.nextStepTimer = setTimeout(function() {
+				play.nextStepTimer = setTimeout(() => {
 					sendLeaderBoard(playId);
-				}, 5000);
+					play.nextStepTimer = null;
+				}, waitTime);
 			});
 		});
 	}
-
-	// if (play && quiz && question) {
-	// 	data.result = {
-	// 		answer: question.answer,
-	// 		example1: 0,
-	// 		example2: 0,
-	// 		example3: 0,
-	// 		example4: 0
-	// 	};
-
-	// 	for (var i = 0; i < play.studentPlayerList.length; i++) {
-	// 		var answerList = play.studentPlayerList[i].answerList;
-	// 		if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 1) {
-	// 			data.result.example1++;
-	// 		}
-	// 		else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 2) {
-	// 			data.result.example2++;
-	// 		}
-	// 		else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 3) {
-	// 			data.result.example3++;
-	// 		}
-	// 		else if (answerList && answerList[play.currentQuestionIndex] && answerList[play.currentQuestionIndex].answer == 4) {
-	// 			data.result.example4++;
-	// 		}
-	// 	}
-
-	// 	getServerEvent.publish(JSON.stringify(data));
-	// 	getServerEventTeacher.publish(JSON.stringify(data));
-
-	// 	play.nextStepTimer = setTimeout(function() {
-	// 		sendLeaderBoard(playId);
-	// 	}, 5000);
-	// }
 }
 
 function sendWait (playId) {
-	var play = getPlayWithPlayId(playId);
-	var data = {};
+	const play = getPlayWithPlayId(playId);
+	const data = {};
 
 	data.playId = playId;
 	data.serverStatus = 'WAIT';
@@ -868,12 +846,12 @@ function sendWait (playId) {
 }
 
 function sendQuetion (playId) {
-	var data = {};
-	var timeOut;
-	var play = getPlayWithPlayId(playId);
+	const data = {};
+	let timeOut;
+	const play = getPlayWithPlayId(playId);
 
 	if (play) {
-		Quiz.findById(play.quizId, function(err, quiz){
+		Quiz.findById(play.quizId, (err, quiz) => {
 			if (err) {
 				console.error(err);
 			}
@@ -883,10 +861,16 @@ function sendQuetion (playId) {
 
 				play.status = 'PLAY';
 
-				Question.findById(quiz.questionList[play.currentQuestionIndex], function(err, question){
-					if (err) {
-						console.error(err);
+				Question.findById(quiz.questionList[play.currentQuestionIndex], (err2, question) => {
+					if (err2) {
+						console.error(err2);
 					}
+
+					if (!question) {
+						console.log(`play.currentQuestionIndex: ${play.currentQuestionIndex}`);
+						console.log(`quiz.questionList[play.currentQuestionIndex]: ${quiz.questionList[play.currentQuestionIndex]}`);
+					}
+
 					data.question = question;
 					timeOut = question.timer;
 					data.timeOut = question.timer;
@@ -897,16 +881,16 @@ function sendQuetion (playId) {
 					getServerEvent.publish(JSON.stringify(data));
 					getServerEventTeacher.publish(JSON.stringify(data));
 
-					play.nextStepTimer = setInterval(function() {
-						timeOut--;
+					play.nextStepTimer = setInterval(() => {
+						timeOut -= 1;
 						data.timeOut = timeOut;
-						if ( timeOut >= 0) {
+						if (timeOut >= 0) {
 							getServerEvent.publish(JSON.stringify(data));
 							getServerEventTeacher.publish(JSON.stringify(data));
 						} else {
 							if (play && play.nextStepTimer) {
-								play && clearInterval(play.nextStepTimer);
-								play.nextStepTimer =  null;
+								clearInterval(play.nextStepTimer);
+								play.nextStepTimer = null;
 							}
 							sendResult(playId);
 						}
@@ -918,37 +902,39 @@ function sendQuetion (playId) {
 }
 
 function startPlay (playId) {
-	var play = getPlayWithPlayId(playId);
+	const play = getPlayWithPlayId(playId);
 
 	sendWait(playId);
 
-	play.nextStepTimer = setTimeout(function() {
+	play.nextStepTimer = setTimeout(() => {
 		sendQuetion(playId);
-	}, 2000);
+		play.nextStepTimer = null;
+	}, waitTime);
 }
 
-router.post('/teacher/nextPlayQuestion', function(req, res){
-	var playId = req.body.playId;
-	var play = getPlayWithPlayId(playId);
-
-	var data = {
+router.post('/teacher/nextPlayQuestion', (req, res) => {
+	const playId = req.body.playId;
+	const play = getPlayWithPlayId(playId);
+	const data = {
 		return: true
 	};
 
-	play.currentQuestionIndex++;
-	sendWait(playId);
+	if (!play.nextStepTimer) {
+		play.currentQuestionIndex += 1;
+		sendWait(playId);
 
-	play.nextStepTimer = setTimeout(function() {
-		sendQuetion(playId);
-	}, 2000);
+		play.nextStepTimer = setTimeout(() => {
+			sendQuetion(playId);
+			play.nextStepTimer = null;
+		}, waitTime);
+	}
 
 	res.send(data);
 });
 
-router.post('/teacher/startPlay', function(req, res){
-	var playId = req.body.playId;
-
-	var data = {
+router.post('/teacher/startPlay', (req, res) => {
+	const playId = req.body.playId;
+	const data = {
 		return: true
 	};
 
@@ -961,8 +947,8 @@ router.post('/teacher/startPlay', function(req, res){
 });
 
 function terminatePlay (playId) {
-	var data = {};
-	var play = getPlayWithPlayId(playId);
+	const data = {};
+	const play = getPlayWithPlayId(playId);
 
 	data.playId = playId;
 	data.leaderBoard = [];
@@ -972,85 +958,85 @@ function terminatePlay (playId) {
 
 	if (play && play.nextStepTimer) {
 		clearInterval(play.nextStepTimer);
-		play.nextStepTimer =  null;
+		play.nextStepTimer = null;
 	}
 
 	deletePlayWithPlayId(playId);
 }
 
-function initialiseGetServerEventTeacherSSE(req, res) {
-	const playId = req.query.playId;
-
-	var subscriber = getServerEventTeacher.subscribe(function(channel, message){
-			var messageEvent = new ServerEvent();
-			messageEvent.addData(message);
-			outputGetServerEventTeacherSSE(req, res, messageEvent.payload());
-	});
-
-	res.set({
-			"Content-Type": "text/event-stream",
-			"Cache-Control": "no-cache",
-			"Connection": "keep-alive",
-			"Access-Control-Allow-Origin": "*"
-	});
-
-	res.write("retry: 10000\n\n");
-
-	var keepAlive = setInterval(function() {
-		outputGetServerEventTeacherSSE(req, res, ':keep-alive\n\n');
-	}, 20000);
-
-	res.on('close', function close() {
-		keepAlive && clearInterval(keepAlive);
-		terminatePlay(playId);
-
-		// TO DO: need to send play end event to Students
-
-		getServerEventTeacher.unsubscribe(subscriber);
-	});
-}
-
-function outputGetServerEventTeacherSSE(req, res, data) {
+function outputGetServerEventTeacherSSE (req, res, data) {
 	res.write(data);
-			if (res.flush && data.match(/\n\n$/)) {
+	if (res.flush && data.match(/\n\n$/)) {
 		res.flush();
 	}
 }
 
-function ServerEvent() {
-	this.data = "";
+function ServerEvent () {
+	this.data = '';
+}
+
+function initialiseGetServerEventTeacherSSE (req, res) {
+	const playId = req.query.playId;
+
+	const subscriber = getServerEventTeacher.subscribe((channel, message) => {
+		const messageEvent = new ServerEvent();
+		messageEvent.addData(message);
+		outputGetServerEventTeacherSSE(req, res, messageEvent.payload());
+	});
+
+	res.set({
+		'Content-Type': 'text/event-stream',
+		'Cache-Control': 'no-cache',
+		'Connection': 'keep-alive',
+		'Access-Control-Allow-Origin': '*'
+	});
+
+	res.write('retry: 10000\n\n');
+
+	const keepAlive = setInterval(() => {
+		outputGetServerEventTeacherSSE(req, res, ':keep-alive\n\n');
+	}, 20000);
+
+	res.on('close', () => {
+		if (keepAlive) {
+			clearInterval(keepAlive);
+		}
+		terminatePlay(playId);
+		getServerEventTeacher.unsubscribe(subscriber);
+	});
+}
+
+ServerEvent.prototype.addData = function addData (data) {
+	const lines = data.split(/\n/);
+
+	for (let i = 0; i < lines.length; i += 1) {
+		const element = lines[i];
+		this.data += `data:${element}\n`;
+	}
 };
 
-ServerEvent.prototype.addData = function(data) {
-	var lines = data.split(/\n/);
+ServerEvent.prototype.payload = function payload () {
+	let payloads = '';
 
-	for (var i = 0; i < lines.length; i++) {
-			var element = lines[i];
-			this.data += "data:" + element + "\n";
-	}
-}
+	payloads += this.data;
+	return `${payloads}\n`;
+};
 
-ServerEvent.prototype.payload = function() {
-	var payload = "";
-
-	payload += this.data;
-	return payload + "\n";
-}
-
-router.get("/teacher/getServerEventTeacher", function(req, res) {
-	const playId = req.body.playId;
+router.get('/teacher/getServerEventTeacher', (req, res) => {
 	initialiseGetServerEventTeacherSSE(req, res);
 
-	getServerEventTeacher.publish(JSON.stringify({serverStatus: 'WAIT'}));
+	getServerEventTeacher.publish(JSON.stringify({
+		serverStatus: 'WAIT'
+	}));
 });
 
-router.post('/student/checkPlayId', function(req, res){
-	var playId = req.body.playId;
-	var play = playId && getPlayWithPlayId(playId);
-	var data = {};
+router.post('/student/checkPlayId', (req, res) => {
+	const playId = req.body.playId;
+	const play = playId && getPlayWithPlayId(playId);
+	const data = {};
 
 	if (getPlayWithPlayId(playId)) {
-		if (play.status == 'INIT_WAIT') {
+		if (play.status === 'INIT_WAIT') {
 			data.valid = true;
 		}
 	} else {
@@ -1061,25 +1047,24 @@ router.post('/student/checkPlayId', function(req, res){
 });
 
 function addStudentPalyer (playId, student) {
-	var play = getPlayWithPlayId(playId);
+	const play = getPlayWithPlayId(playId);
 
 	if (play) {
 		play.studentPlayerList.push(student);
 		play.survivors.push(student);
 
-		if (play.status == 'INIT_WAIT') {
+		if (play.status === 'INIT_WAIT') {
 			getServerEventTeacher.publish(JSON.stringify(play));
 		}
 	}
 }
 
-router.post('/student/sendStudentInfo', function(req, res){
+router.post('/student/sendStudentInfo', (req, res) => {
 	const studentNick = req.body.studentNick;
 	const studentName = req.body.studentName;
 	const playId = req.body.playId;
 	const play = playId && getPlayWithPlayId(playId);
-
-	var data = {
+	const data = {
 		return: false
 	};
 
@@ -1088,6 +1073,8 @@ router.post('/student/sendStudentInfo', function(req, res){
 		data.studentId = Math.floor((Math.random() * 10000) + 1);
 		data.studentNick = studentNick;
 		data.studentName = studentName;
+		data.answerList = [];
+
 		addStudentPalyer(playId, data);
 		data.return = true;
 	}
@@ -1095,42 +1082,45 @@ router.post('/student/sendStudentInfo', function(req, res){
 	res.send(data);
 });
 
-router.post('/student/getLastFeedBackList', function(req, res){
+router.post('/student/getLastFeedBackList', (req, res) => {
 	const studentName = req.body.studentName;
 	const playId = req.body.playId;
-
-	var data = {
+	const data = {
 		feedBackList: [],
 		questionList: []
 	};
 
 	if (playId && studentName) {
-		Feedback.findOne({lastPlayId: playId, studentName: studentName}, function(err, feedBackList) {
+		Feedback.findOne({
+			lastPlayId: playId,
+			studentName
+		}, (err, feedBackList) => {
 			if (err) {
 				return res.send(data);
 			}
 
-			if (feedBackList) {
+			if (feedBackList && feedBackList.lastWrongQuestions) {
 				data.feedBackList = feedBackList;
 
-				for (var i = 0; i < feedBackList.lastWrongQuestions.length; i++) {
-					Question.findById(feedBackList.lastWrongQuestions[i], function(err, question) {
-						if (err) {
-							console.error(err);
-						}
+				return Question.find({
+					_id: {
+						$in: feedBackList.lastWrongQuestions.map(o => (mongoose.Types.ObjectId(o)))
+					}
+				}, (err2, questions) => {
+					if (err2) {
+						console.error(err2);
+					}
 
-						if (question) {
-							data.questionList.push(question);
-						}
-
-						if (i >= feedBackList.lastWrongQuestions.length - 1) {
-							res.send(data);
-						}
-					});
-				}
-			} else {
-				res.send(data);
+					if (questions) {
+						data.questionList = questions;
+						res.send(data);
+					} else {
+						res.send(data);
+					}
+				});
 			}
+
+			return res.send(data);
 		});
 	} else {
 		res.send(data);
@@ -1138,8 +1128,8 @@ router.post('/student/getLastFeedBackList', function(req, res){
 });
 
 function calculateScore (playTimeOut, presentationTime, answerTime) {
-	var elapsedTime = answerTime - presentationTime;
-	var score = playTimeOut*25 - elapsedTime/1000*25;
+	const elapsedTime = answerTime - presentationTime;
+	let score = (playTimeOut * 25) - ((elapsedTime / 1000) * 25);
 	// 25 is temporary number
 
 	if (score < 0) {
@@ -1150,45 +1140,48 @@ function calculateScore (playTimeOut, presentationTime, answerTime) {
 }
 
 function updateAnswerToPlay (playId, studentId, answer) {
-	var play = getPlayWithPlayId(playId);
-	var quizId = play && play.quizId;
+	const play = getPlayWithPlayId(playId);
+	const quizId = play && play.quizId;
 
 	if (play && quizId) {
-		Quiz.findById(quizId, function(err, quiz){
+		Quiz.findById(quizId, (err, quiz) => {
 			if (err) {
 				console.error(err);
 			}
 
-			var questionId = quiz && quiz.questionList[play.currentQuestionIndex];
+			const questionId = quiz && quiz.questionList[play.currentQuestionIndex];
 
 			if (questionId) {
-				Question.findById(quiz.questionList[play.currentQuestionIndex], function(err, question){
+				Question.findById(quiz.questionList[play.currentQuestionIndex], (err2, question) => {
 					if (err) {
-						console.error(err);
+						console.error(err2);
 					}
 
 					if (question) {
+						let i;
+
 						if (play.gameMode === 'SURVIVAL') {
 							if (question.answer !== answer) {
-								for (var i = 0; i < play.survivors.length; i++) {
-									if ( play.survivors[i].studentId == studentId) {
+								for (i = 0; i < play.survivors.length; i += 1) {
+									if (play.survivors[i].studentId === studentId) {
 										play.survivors.splice(i, 1);
 									}
 								}
 							}
 						}
 
-						for (var i = 0; i < play.studentPlayerList.length; i++) {
-							if ( play.studentPlayerList[i].studentId == studentId) {
+						for (i = 0; i < play.studentPlayerList.length; i += 1) {
+							if (play.studentPlayerList[i].studentId === studentId) {
 								if (!play.studentPlayerList[i].answerList) {
 									play.studentPlayerList[i].answerList = [];
 								}
 
 								play.studentPlayerList[i].answerList.push({
 									questionId: question._id,
-									answer: answer,
-									correct: question.answer == answer,
-									score: question.answer == answer ? calculateScore(play.timeOut, play.presentationTime, new Date()):0
+									answer,
+									correct: question.answer === answer,
+									score: question.answer === answer ?
+													calculateScore(play.timeOut, play.presentationTime, new Date()) : 0
 								});
 							}
 						}
@@ -1199,12 +1192,12 @@ function updateAnswerToPlay (playId, studentId, answer) {
 	}
 }
 
-router.post('/student/sendStudentAnswer', function(req, res){
+router.post('/student/sendStudentAnswer', (req, res) => {
 	const playId = req.body.playId;
 	const studentId = req.body.studentId;
 	const answer = req.body.answer;
 
-	var data = {
+	const data = {
 		return: true
 	};
 
@@ -1214,18 +1207,18 @@ router.post('/student/sendStudentAnswer', function(req, res){
 });
 
 function removeStudentFromPlay (playId, studentId) {
-	var play = getPlayWithPlayId(playId);
+	const play = getPlayWithPlayId(playId);
 
 	if (play) {
-		for (let i = 0; i < play.studentPlayerList.length; i++) {
-			if (play.studentPlayerList[i].studentId == studentId) {
+		for (let i = 0; i < play.studentPlayerList.length; i += 1) {
+			if (play.studentPlayerList[i].studentId === studentId) {
 				play.studentPlayerList.splice(i, 1);
 				// if (play && play.nextStepTimer) {
 				// 	clearInterval(play.nextStepTimer);
 				// 	play.nextStepTimer =  null;
 				// }
 
-				if (play.status == 'INIT_WAIT') {
+				if (play.status === 'INIT_WAIT') {
 					getServerEventTeacher.publish(JSON.stringify(play));
 				}
 				return;
@@ -1234,45 +1227,47 @@ function removeStudentFromPlay (playId, studentId) {
 	}
 }
 
-function initialiseGetServerEventSSE(req, res) {
-	const playId = req.query.playId;
-	const studentId = req.query.studentId;
-
-	var subscriber = getServerEvent.subscribe(function(channel, message){
-			var messageEvent = new ServerEvent();
-			messageEvent.addData(message);
-			outputGetServerEventSSE(req, res, messageEvent.payload());
-	});
-
-	res.set({
-			"Content-Type": "text/event-stream",
-			"Cache-Control": "no-cache",
-			"Connection": "keep-alive",
-			"Access-Control-Allow-Origin": "*"
-	});
-
-	res.write("retry: 10000\n\n");
-
-	var keepAlive = setInterval(function() {
-		outputGetServerEventSSE(req, res, ':keep-alive\n\n');
-	}, 20000);
-
-	res.on('close', function close() {
-		keepAlive && clearInterval(keepAlive);
-		getServerEvent.unsubscribe(subscriber);
-		removeStudentFromPlay(playId, studentId);
-	});
-}
-
-function outputGetServerEventSSE(req, res, data) {
+function outputGetServerEventSSE (req, res, data) {
 	res.write(data);
 	if (res.flush && data.match(/\n\n$/)) {
 		res.flush();
 	}
 }
 
-router.get("/getServerEvent", function(req, res) {
-	var data = {};
+function initialiseGetServerEventSSE (req, res) {
+	const playId = req.query.playId;
+	const studentId = req.query.studentId;
+
+	const subscriber = getServerEvent.subscribe((channel, message) => {
+		const messageEvent = new ServerEvent();
+		messageEvent.addData(message);
+		outputGetServerEventSSE(req, res, messageEvent.payload());
+	});
+
+	res.set({
+		'Content-Type': 'text/event-stream',
+		'Cache-Control': 'no-cache',
+		'Connection': 'keep-alive',
+		'Access-Control-Allow-Origin': '*'
+	});
+
+	res.write('retry: 10000\n\n');
+
+	const keepAlive = setInterval(() => {
+		outputGetServerEventSSE(req, res, ':keep-alive\n\n');
+	}, 20000);
+
+	res.on('close', () => {
+		if (keepAlive) {
+			clearInterval(keepAlive);
+		}
+		getServerEvent.unsubscribe(subscriber);
+		removeStudentFromPlay(playId, studentId);
+	});
+}
+
+router.get('/getServerEvent', (req, res) => {
+	const data = {};
 	const playId = req.query.playId;
 	initialiseGetServerEventSSE(req, res);
 
@@ -1282,4 +1277,4 @@ router.get("/getServerEvent", function(req, res) {
 	getServerEvent.publish(JSON.stringify(data));
 });
 
-module.exports = router
+module.exports = router;
