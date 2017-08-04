@@ -62,6 +62,8 @@ const plays = [
 	// }
 ];
 
+const waitTime = 5000;
+
 router.post('/teacher/checkTeacher', (req, res) => {
 	const teacherId = req.body.teacherId;
 	const data = {
@@ -824,7 +826,7 @@ function sendResult (playId) {
 				play.nextStepTimer = setTimeout(() => {
 					sendLeaderBoard(playId);
 					play.nextStepTimer = null;
-				}, 5000);
+				}, waitTime);
 			});
 		});
 	}
@@ -907,7 +909,7 @@ function startPlay (playId) {
 	play.nextStepTimer = setTimeout(() => {
 		sendQuetion(playId);
 		play.nextStepTimer = null;
-	}, 2000);
+	}, waitTime);
 }
 
 router.post('/teacher/nextPlayQuestion', (req, res) => {
@@ -924,7 +926,7 @@ router.post('/teacher/nextPlayQuestion', (req, res) => {
 		play.nextStepTimer = setTimeout(() => {
 			sendQuetion(playId);
 			play.nextStepTimer = null;
-		}, 2000);
+		}, waitTime);
 	}
 
 	res.send(data);
