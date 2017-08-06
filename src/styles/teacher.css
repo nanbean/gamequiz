@@ -43,11 +43,11 @@
 }
 
 .teacher-logo {
-	margin-bottom: 50px;
-	height: 150px;
-	background: url(../question.png);
+	margin-bottom: 30px;
+	height: 200px;
+	background: url(../assets/logo.svg);
 	background-position: center;
-	background-size: 150px 150px;
+	background-size: 200px 200px;
 	background-repeat: no-repeat;
 }
 
