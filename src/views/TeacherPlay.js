@@ -229,6 +229,7 @@ class TeacherPlay extends Component {
 											<Grid.Column>
 												<Header
 													as='h1'
+													block
 													image={triangle}
 													content={playQuestion.example1}
 												/>
@@ -236,6 +237,7 @@ class TeacherPlay extends Component {
 											<Grid.Column>
 												<Header
 													as='h1'
+													block
 													image={diamond}
 													content={playQuestion.example2}
 												/>
@@ -245,6 +247,7 @@ class TeacherPlay extends Component {
 											<Grid.Column>
 												<Header
 													as='h1'
+													block
 													image={circle}
 													content={playQuestion.example3}
 												/>
@@ -252,6 +255,7 @@ class TeacherPlay extends Component {
 											<Grid.Column>
 												<Header
 													as='h1'
+													block
 													image={square}
 													content={playQuestion.example4}
 												/>
