@@ -21,12 +21,16 @@ class TeacherMode extends Component {
 	}
 
 	onQuizMarathonButton () {
-		this.props.callStartGameMode({
-			teacherId: this.props.teacherId,
-			quizId: this.props.quizId,
-			gameMode: 'MARATHON'
-		});
-		this.props.history.push('/wait/');
+		const { teacherId, quizId } = this.props;
+
+		if (teacherId && quizId) {
+			this.props.callStartGameMode({
+				teacherId,
+				quizId,
+				gameMode: 'MARATHON'
+			});
+			this.props.history.push('/wait/');
+		}
 	}
 
 	onQuizSurvivalButton () {
