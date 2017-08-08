@@ -82,13 +82,15 @@ class TeacherMy extends Component {
 		const { getQuizList } = this.props;
 		const { id } = ev.target;
 
-		this.props.setQuizId(id);
-		for (let i = 0; i < getQuizList.quizList.length; i += 1) {
-			if (getQuizList.quizList[i]._id === id) {
-				this.props.setQuizName(getQuizList.quizList[i].quizTitle);
+		if (id) {
+			this.props.setQuizId(id);
+			for (let i = 0; i < getQuizList.quizList.length; i += 1) {
+				if (getQuizList.quizList[i]._id === id) {
+					this.props.setQuizName(getQuizList.quizList[i].quizTitle);
+				}
 			}
+			this.props.history.push('/mode/');
 		}
-		this.props.history.push('/mode/');
 	}
 
 	renderQuiz (quiz, index) {
